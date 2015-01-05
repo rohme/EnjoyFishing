@@ -385,6 +385,33 @@ namespace EnjoyFishing
             }
         }
         /// <summary>
+        /// 竿名称 残数付き
+        /// </summary>
+        public string RodNameWithRemain
+        {
+            get
+            {
+                if (!isRod(this.RodName)) return string.Empty;
+                //鞄にアイテムが存在するかチェック
+                int rodId = FFACE.ParseResources.GetItemId(this.RodName);
+                uint remain = fface.Item.GetItemCount(rodId, InventoryType.Inventory);
+                if (settings.UseItemizer)
+                {
+                    if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(rodId, InventoryType.Satchel);
+                    if (settings.Fishing.NoBaitNoRodSack) remain += fface.Item.GetItemCount(rodId, InventoryType.Sack);
+                    if (settings.Fishing.NoBaitNoRodCase) remain += fface.Item.GetItemCount(rodId, InventoryType.Case);
+                }
+                if (remain <= 1)
+                {
+                    return RodName;
+                }
+                else 
+                {
+                    return string.Format("{0}[{1}]", RodName, remain);
+                }
+            }
+        }
+        /// <summary>
         /// エサ名称
         /// </summary>
         public string BaitName
@@ -400,6 +427,33 @@ namespace EnjoyFishing
                 else
                 {
                     return string.Empty;
+                }
+            }
+        }
+        /// <summary>
+        /// エサ名称 残数付き
+        /// </summary>
+        public string BaitNameWithRemain
+        {
+            get
+            {
+                if (!isBait(this.BaitName)) return string.Empty;
+                //鞄にアイテムが存在するかチェック
+                int baitId = FFACE.ParseResources.GetItemId(this.BaitName);
+                uint remain = fface.Item.GetItemCount(baitId, InventoryType.Inventory);
+                if (settings.UseItemizer)
+                {
+                    if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(baitId, InventoryType.Satchel);
+                    if (settings.Fishing.NoBaitNoRodSack) remain += fface.Item.GetItemCount(baitId, InventoryType.Sack);
+                    if (settings.Fishing.NoBaitNoRodCase) remain += fface.Item.GetItemCount(baitId, InventoryType.Case);
+                }
+                if (remain <= 1)
+                {
+                    return BaitName;
+                }
+                else
+                {
+                    return string.Format("{0}[{1}]", BaitName, remain);
                 }
             }
         }
@@ -849,7 +903,7 @@ namespace EnjoyFishing
             oSneakWarning = false;
 
             setFishingStatus(FishingStatusKind.Normal);
-            setMessage(string.Format("キャスト中：{0}x{1}", oFish.RodName, oFish.BaitName));
+            setMessage(string.Format("キャスト中：{0}x{1}", this.RodNameWithRemain, this.BaitNameWithRemain));
 
             //キャスト
             while (this.RunningStatus == RunningStatusKind.Running && fface.Player.Status != FFACETools.Status.Fishing)

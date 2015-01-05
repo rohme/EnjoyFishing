@@ -1091,8 +1091,8 @@ namespace EnjoyFishing
             else
             {
                 lblFishingInfoZoneName.Text = fishing.ZoneName;
-                lblFishingInfoRodName.Text = fishing.RodName;
-                lblFishingInfoBaitName.Text = fishing.BaitName;
+                lblFishingInfoRodName.Text = fishing.RodNameWithRemain;
+                lblFishingInfoBaitName.Text = fishing.BaitNameWithRemain;
                 lblFishingInfoNoCatchCount.Text = fishing.NoCatchCount.ToString();
                 lblFishingInfoSkill.Text = fishing.FishingSkill.ToString();
                 lblFishingInfoInventory.Text = string.Format("{0:00}/{1:00}", fishing.InventoryCount, fishing.InventoryMax);
