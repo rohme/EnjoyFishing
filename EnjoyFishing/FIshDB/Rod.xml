@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Rods>
+    <Rod name="ヤナギの釣竿" />
+    <Rod name="イチイの釣竿" />
+    <Rod name="バンブーロッド" />
+    <Rod name="渓流竿" />
+    <Rod name="タルタル式釣竿" />
+    <Rod name="グラスロッド" />
+    <Rod name="カーボンロッド" />
+    <Rod name="ヒューム式釣竿" />
+    <Rod name="ハルシオンロッド" />
+    <Rod name="太公望の釣竿" />
+    <Rod name="恵比寿釣竿" />
+    <Rod name="物干し竿" />
+    <Rod name="一本釣りの竿" />
+    <Rod name="ミスラ式釣竿" />
+    <Rod name="複合素材の竿" />
+    <Rod name="モブリン式釣竿" />
+</Rods>
