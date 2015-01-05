@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MiscTools
@@ -207,13 +208,27 @@ namespace MiscTools
         /// <param name="iLine">ログ</param>
         private void writeLog(string iFilename, string iLine)
         {
-            FileStream fs = new FileStream(iFilename, FileMode.Append);
-            StreamWriter sw = new StreamWriter(fs);
-            sw.WriteLine(iLine);
-            sw.Dispose();
-            sw = null;
-            fs.Dispose();
-            fs = null;
+            for (int i = 0; i < 100; i++)
+            {
+                try
+                {
+                    using (FileStream fs = new FileStream(iFilename, FileMode.Append, FileAccess.Write, FileShare.None))//ファイルロック
+                    {
+                        using (StreamWriter sw = new StreamWriter(fs))
+                        {
+                            sw.WriteLine(iLine);
+                            sw.Dispose();
+                        }
+                        fs.Dispose();
+                    }
+                    break;
+                }
+                catch (IOException)
+                {
+                    Thread.Sleep(100);
+                    continue;
+                }
+            }
         }
 
         /// <summary>
