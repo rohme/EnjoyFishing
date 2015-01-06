@@ -119,6 +119,7 @@ namespace EnjoyFishing
             historydb.EarthDate = DateTime.Parse(iFish.EarthTime.ToString("yyyy/MM/dd"));
             historydb.Fishes.Add(iFish);
             //合計数を算出
+            historydb.CatchCount = 0;
             for (int i = 0; i < historydb.Fishes.Count; i++)
             {
                 if (historydb.Fishes[i].Result == FishResultStatusKind.Catch) historydb.CatchCount++;
