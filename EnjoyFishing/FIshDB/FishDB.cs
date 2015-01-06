@@ -50,7 +50,7 @@ namespace EnjoyFishing
         }
 
         #region メンバ
-        public List<string> Rods{ get {return _Rods; }}
+        public List<string> Rods { get { return _Rods; } }
         public List<string> Baits { get { return _Baits; } }
         public List<string> Gears { get { return _Gears; } }
         #endregion

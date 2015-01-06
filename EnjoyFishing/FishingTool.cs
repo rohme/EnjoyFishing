@@ -1709,8 +1709,7 @@ namespace EnjoyFishing
         private bool isRod(string iRodName)
         {
             if (iRodName.Length == 0) return false;
-            if (fishDB.SelectRod(iRodName).Count == 0) return false; ;
-            return true;
+            return fishDB.Rods.Contains(iRodName);
         }
         /// <summary>
         /// 指定されたアイテム名がエサかどうか判定
@@ -1720,8 +1719,7 @@ namespace EnjoyFishing
         private bool isBait(string iBaitName)
         {
             if (iBaitName.Length == 0) return false;
-            if (fishDB.SelectBait(iBaitName).Count == 0) return false; ;
-            return true;
+            return fishDB.Baits.Contains(iBaitName);
         }
         /// <summary>
         /// アイテムを鞄へ移動する

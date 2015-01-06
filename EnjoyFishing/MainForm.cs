@@ -211,7 +211,6 @@ namespace EnjoyFishing
             fface = iPol.FFACE;
             //LoggerTool初期設定
             logger = new LoggerTool(MiscTool.GetAppAssemblyName(), pol.FFACE.Player.Name);
-            logger.DefaultLogLevel = LogLevelKind.INFO;
             logger.Enable = args.LoggerEnable;
             logger.OutputLogLevel = args.LoggerLogLevel;
             logger.EnableVarDump = args.LoggerVarDumpEnable;
@@ -729,6 +728,7 @@ namespace EnjoyFishing
             //SelectedIndexをチェック
             if (lstFish.SelectedIndex == -1) return;
 
+            //選択された行がチェックされたか判定
             bool checkedFlg = false;
             string viewFishName = (string)lstFish.Items[lstFish.SelectedIndex];
             SettingsPlayerFishListWantedModel target = fishListKey[viewFishName];
@@ -736,6 +736,7 @@ namespace EnjoyFishing
             {
                 if (fishName == viewFishName) checkedFlg = true;
             }
+            //Wanted更新
             if (checkedFlg)
             {
                 if (settings.FishList.Mode == Settings.FishListModeKind.ID)

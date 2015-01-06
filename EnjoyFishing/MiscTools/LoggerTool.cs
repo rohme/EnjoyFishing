@@ -56,6 +56,11 @@ namespace MiscTools
         {
             this.LogFilename = iLogFilename;
             this.LogFilenameSub = iLogFilenameSub;
+            this.Enable = true;
+            this.EnableVarDump = false;
+            this.OutputConsole = true;
+            this.DefaultLogLevel = LogLevelKind.INFO;
+            this.OutputLogLevel = LogLevelKind.INFO;
         }
         #endregion
 
