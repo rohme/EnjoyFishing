@@ -293,9 +293,13 @@ namespace EnjoyFishing
             foreach (SettingsPlayerFishListWantedModel w in this.Wanted)
             {
                 if (iID1 == 0 && iID2 == 0 && iID3 == 0 && iID4 == 0)
+                {
                     if (w.Compare(iFishName)) return true;
+                }
                 else
+                {
                     if (w.Compare(iFishName, iID1, iID2, iID3, iID4)) return true;
+                }
             }
             return false;
         }
@@ -320,10 +324,13 @@ namespace EnjoyFishing
             for (int i = 0; i < this.Wanted.Count; i++)
             {
                 if (iID1 == 0 && iID2 == 0 && iID3 == 0 && iID4 == 0)
+                {
                     foundFlg = this.Wanted[i].Compare(iFishName);
+                }
                 else
+                {
                     foundFlg = this.Wanted[i].Compare(iFishName, iID1, iID2, iID3, iID4);
-                
+                }
                 if (foundFlg)
                 {
                     this.Wanted.RemoveAt(i);
