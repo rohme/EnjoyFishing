@@ -1033,6 +1033,8 @@ namespace EnjoyFishing
                             fface.Fish.FightFish();
                             Thread.Sleep(settings.Global.WaitBase);
                         }
+                        //HP0になった瞬間に釣り上げるとFFの画面上ではHPが残ったままになるのでウェイト
+                        Thread.Sleep(500);
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
                         while (this.PlayerStatus == FFACETools.Status.FishBite)
