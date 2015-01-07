@@ -898,6 +898,7 @@ namespace EnjoyFishing
             oFish.Z = this.Position.Z;
             oFish.H = this.Position.H;
 
+            bool fishedFlg = false;
             oChatReceive = false;
             oEnemyAttack = false;
             oSneakWarning = false;
@@ -1030,19 +1031,33 @@ namespace EnjoyFishing
                                     Thread.Sleep(settings.Global.WaitBase);
                                 }
                             }
+                            //格闘
                             fface.Fish.FightFish();
+                            //チャット処理
+                            if (chat.GetNextChatLine(out cl))
+                            {
+                                ChatKbnKind temp = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
+                                if (chatKbn == ChatKbnKind.BaitCritical)//クリティカル
+                                {
+                                    oFish.Critical = true;
+                                }
+                            }
                             Thread.Sleep(settings.Global.WaitBase);
                         }
+                        //HP0になった瞬間に釣り上げるとFFの画面上ではHPが残ったままになるのでウェイト
+                        Thread.Sleep(500);
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
                         while (this.PlayerStatus == FFACETools.Status.FishBite)
                         {
+                            fishedFlg = true;
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
                             Thread.Sleep(settings.Global.WaitBase);
                         } 
                     }
                     else if (chatKbn == ChatKbnKind.CatchSingle)//釣れた
                     {
+                        if (!fishedFlg) continue;//釣り上げていない場合は登録しない
                         oFish.FishName = chatKbnArgs[0];
                         oFish.FishCount = 1;
                         oFish.Result = FishResultStatusKind.Catch;
@@ -1059,6 +1074,7 @@ namespace EnjoyFishing
                     }
                     else if (chatKbn == ChatKbnKind.CatchMultiple)//複数釣れた
                     {
+                        if (!fishedFlg) continue;//釣り上げていない場合は登録しない
                         oFish.FishName = chatKbnArgs[0];
                         oFish.FishCount = int.Parse(chatKbnArgs[1]);
                         oFish.Result = FishResultStatusKind.Catch;
