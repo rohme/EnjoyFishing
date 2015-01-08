@@ -1033,19 +1033,20 @@ namespace EnjoyFishing
                             }
                             //格闘
                             fface.Fish.FightFish();
-                            //チャット処理
-                            if (chat.GetNextChatLine(out cl))
-                            {
-                                ChatKbnKind temp = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
-                                if (chatKbn == ChatKbnKind.BaitCritical)//クリティカル
-                                {
-                                    oFish.Critical = true;
-                                }
-                            }
                             Thread.Sleep(settings.Global.WaitBase);
                         }
                         //HP0になった瞬間に釣り上げるとFFの画面上ではHPが残ったままになるのでウェイト
                         Thread.Sleep(500);
+                        //チャット処理
+                        while(chat.GetNextChatLine(out cl))
+                        {
+                            ChatKbnKind fightingChatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
+                            logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, fightingChatKbn));
+                            if (fightingChatKbn == ChatKbnKind.BaitCritical)//クリティカル
+                            {
+                                oFish.Critical = true;
+                            }
+                        }
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
                         while (this.PlayerStatus == FFACETools.Status.FishBite)
