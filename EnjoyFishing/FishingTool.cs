@@ -1116,7 +1116,7 @@ namespace EnjoyFishing
                     else if (chatKbn == ChatKbnKind.CatchSingle)//釣れた
                     {
                         if (!fishedFlg) continue;//釣り上げていない場合は登録しない
-                        oFish.FishName = chatKbnArgs[0];
+                        oFish.FishName = renameFish(chatKbnArgs[0]);
                         oFish.FishCount = 1;
                         oFish.Result = FishResultStatusKind.Catch;
                         //データベースへの登録
@@ -1133,7 +1133,7 @@ namespace EnjoyFishing
                     else if (chatKbn == ChatKbnKind.CatchMultiple)//複数釣れた
                     {
                         if (!fishedFlg) continue;//釣り上げていない場合は登録しない
-                        oFish.FishName = chatKbnArgs[0];
+                        oFish.FishName = renameFish(chatKbnArgs[0]);
                         oFish.FishCount = int.Parse(chatKbnArgs[1]);
                         oFish.Result = FishResultStatusKind.Catch;
                         //データベースへの登録
@@ -1165,7 +1165,7 @@ namespace EnjoyFishing
                     }
                     else if (chatKbn == ChatKbnKind.InventoryFull)//鞄いっぱい
                     {
-                        oFish.FishName = chatKbnArgs[0];
+                        oFish.FishName = renameFish(chatKbnArgs[0]);
                         oFish.FishCount = 1;
                         oFish.Result = FishResultStatusKind.Release;
                         //データベースへの登録
@@ -1334,6 +1334,22 @@ namespace EnjoyFishing
                 return false;
             }
             return true;
+        }
+        /// <summary>
+        /// 名寄せ情報に基づき、魚名を変更する
+        /// </summary>
+        /// <param name="iFishName">魚名</param>
+        /// <returns>名寄せした魚名</returns>
+        private string renameFish(string iFishName)
+        {
+            if (fishDB.RenameFish.ContainsKey(iFishName))
+            {
+                return fishDB.RenameFish[iFishName];
+            }
+            else
+            {
+                return iFishName;
+            }
         }
         /// <summary>
         /// 強制HP0して良いか判定

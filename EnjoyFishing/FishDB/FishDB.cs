@@ -22,11 +22,13 @@ namespace EnjoyFishing
         private const string FILENAME_RODDB = "Rod.xml";
         private const string FILENAME_BAITDB = "Bait.xml";
         private const string FILENAME_GEARDB = "Gear.xml";
+        private const string FILENAME_RENAMEFISH = "RenameFish.xml";
 
         private LoggerTool logger;
         private List<string> _Rods = new List<string>();
         private List<string> _Baits = new List<string>();
         private List<string> _Gears = new List<string>();
+        private Dictionary<string, string> _RenameFish = new Dictionary<string, string>();
 
         /// <summary>
         /// コンストラクタ
@@ -37,15 +39,22 @@ namespace EnjoyFishing
             logger = iLogger;
             foreach(RodDBRodModel rod in SelectRod())
             {
-                _Rods.Add(rod.RodName);
+                this._Rods.Add(rod.RodName);
             }
             foreach(BaitDBBaitModel bait in SelectBait())
             {
-                _Baits.Add(bait.BaitName);
+                this._Baits.Add(bait.BaitName);
             }
-            foreach(GearDBGearModel gear in SelectGear())
+            foreach (GearDBGearModel gear in SelectGear())
             {
-                _Gears.Add(gear.GearName);
+                this._Gears.Add(gear.GearName);
+            }
+            foreach (RenameFishDBFishModel fish in SelectRenameFish())
+            {
+                if (!this._RenameFish.ContainsKey(fish.FishName))
+                {
+                    this._RenameFish.Add(fish.FishName, fish.FishRename);
+                }
             }
         }
 
@@ -53,6 +62,7 @@ namespace EnjoyFishing
         public List<string> Rods { get { return _Rods; } }
         public List<string> Baits { get { return _Baits; } }
         public List<string> Gears { get { return _Gears; } }
+        public Dictionary<string,string> RenameFish { get { return _RenameFish; } }
         #endregion
         
         #region FishDB
@@ -629,6 +639,61 @@ namespace EnjoyFishing
                 fs.Close();
             }
             return gearDB;
+        }
+        #endregion
+
+        #region RenameFishDB
+        /// <summary>
+        /// 名寄せ情報を取得する（引数無し）
+        /// </summary>
+        /// <returns>名寄せ情報の一覧</returns>
+        public List<RenameFishDBFishModel> SelectRenameFish()
+        {
+            return SelectRenameFish(string.Empty);
+        }
+        /// <summary>
+        /// 名寄せ情報を取得する
+        /// </summary>
+        /// <param name="iSearchString">魚名称（正規表現）</param>
+        /// <returns>名寄せ情報の一覧</returns>
+        public List<RenameFishDBFishModel> SelectRenameFish(string iSearchString)
+        {
+            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
+            List<RenameFishDBFishModel> ret = new List<RenameFishDBFishModel>();
+            RenameFishDBModel renameFishDB = getRenameFishDB();
+            if (iSearchString == string.Empty)
+            {
+                ret = renameFishDB.Fishes;
+            }
+            else
+            {
+                foreach (RenameFishDBFishModel fish in renameFishDB.Fishes)
+                {
+                    if (MiscTool.IsRegexString(fish.FishName, iSearchString))
+                    {
+                        ret.Add(fish);
+                    }
+                }
+            }
+            logger.VarDump(ret);
+            return ret;
+        }
+        /// <summary>
+        /// RenameFish.xmlの内容を全て取得する
+        /// </summary>
+        /// <returns>GearDBModel</returns>
+        private RenameFishDBModel getRenameFishDB()
+        {
+            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_RENAMEFISH;
+            RenameFishDBModel renameFishDB = new RenameFishDBModel();
+            if (File.Exists(xmlFilename))
+            {
+                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
+                XmlSerializer serializer = new XmlSerializer(typeof(RenameFishDBModel));
+                renameFishDB = (RenameFishDBModel)serializer.Deserialize(fs);
+                fs.Close();
+            }
+            return renameFishDB;
         }
         #endregion
 

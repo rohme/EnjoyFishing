@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RenameFish>
+	<!-- アトルガン魚 -->
+    <Fish name="アフポット" rename="ネビムナイト" />
+    <Fish name="アラバルウ" rename="ヒカリマス" />
+    <Fish name="イスタコズ" rename="ゴールドロブスター" />
+    <Fish name="イスティルディエ" rename="シャル貝" />
+    <Fish name="カダーバフロッグ " rename="エルシモフロッグ " />
+    <Fish name="カプルンバァ" rename="レッドテラピン" />
+    <Fish name="カヤバルウ" rename="タブナジアゴビー" />
+    <Fish name="カラマール" rename="コーンカラマリ" />
+    <Fish name="ザザンバルウ" rename="ゴールドカープ" />
+    <Fish name="ディル" rename="ブラックソール" />
+    <Fish name="デニズアナス" rename="コバルトジェリー" />
+    <Fish name="ハムシー" rename="バストアサーディン" />
+    <Fish name="メルジャンバルウ" rename="バストアブリーム" />
+    <Fish name="モリナバルウ" rename="煌魚" />
+    <Fish name="ユランバルウ" rename="ブラックイール" />
+    <Fish name="ラケルダ" rename="ググリュートゥーナ" />
+	<!-- アドゥリン魚 -->
+    <Fish name="センローサーディン" rename="バストアサーディン" />
+</RenameFish>
