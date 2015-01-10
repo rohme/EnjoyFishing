@@ -1116,7 +1116,7 @@ namespace EnjoyFishing
                     else if (chatKbn == ChatKbnKind.CatchSingle)//釣れた
                     {
                         if (!fishedFlg) continue;//釣り上げていない場合は登録しない
-                        oFish.FishName = renameFish(chatKbnArgs[0]);
+                        oFish.FishName = chatKbnArgs[0];
                         oFish.FishCount = 1;
                         oFish.Result = FishResultStatusKind.Catch;
                         //データベースへの登録
@@ -1133,7 +1133,7 @@ namespace EnjoyFishing
                     else if (chatKbn == ChatKbnKind.CatchMultiple)//複数釣れた
                     {
                         if (!fishedFlg) continue;//釣り上げていない場合は登録しない
-                        oFish.FishName = renameFish(chatKbnArgs[0]);
+                        oFish.FishName = chatKbnArgs[0];
                         oFish.FishCount = int.Parse(chatKbnArgs[1]);
                         oFish.Result = FishResultStatusKind.Catch;
                         //データベースへの登録
@@ -1165,7 +1165,7 @@ namespace EnjoyFishing
                     }
                     else if (chatKbn == ChatKbnKind.InventoryFull)//鞄いっぱい
                     {
-                        oFish.FishName = renameFish(chatKbnArgs[0]);
+                        oFish.FishName = chatKbnArgs[0];
                         oFish.FishCount = 1;
                         oFish.Result = FishResultStatusKind.Release;
                         //データベースへの登録
@@ -1291,17 +1291,18 @@ namespace EnjoyFishing
             //FishDBに登録
             if (iFish.ID1 != 0 && iFish.ID2 != 0 && iFish.ID3 != 0 && iFish.ID4 != 0)
             {
+                //魚名の名寄せ
+                string renameFishname = renameFish(iFish.FishName);
                 //FishDBから魚情報取得（不明魚以外で）
-                FishDBFishModel fish = fishDB.SelectFishFromIDName(iFish.RodName, iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, iFish.FishName, false);
+                FishDBFishModel fish = fishDB.SelectFishFromIDName(iFish.RodName, iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, renameFishname, false);
                 FishDBIdModel id = fish.GetId(iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4);
-                //FishCount Critical Wanted
                 if (fish.FishName != string.Empty)
                 {
                     iFish.FishCount = id.Count;
                     iFish.Critical = id.Critical;
                 }
                 //FishTypeの設定
-                if(!isTmpFishFromName(iFish.FishName))
+                if (!isTmpFishFromName(renameFishname))
                 {
                     if (iFish.FishType == FishDBFishTypeKind.UnknownSmallFish) iFish.FishType = FishDBFishTypeKind.SmallFish;
                     if (iFish.FishType == FishDBFishTypeKind.UnknownLargeFish) iFish.FishType = FishDBFishTypeKind.LargeFish;
@@ -1309,7 +1310,7 @@ namespace EnjoyFishing
                 }
                 //登録情報の設定 
                 FishDBFishModel fishDBFish = new FishDBFishModel();
-                fishDBFish.FishName = iFish.FishName;
+                fishDBFish.FishName = renameFishname;
                 FishDBIdModel fishDBId = new FishDBIdModel();
                 fishDBId.ID1 = iFish.ID1;
                 fishDBId.ID2 = iFish.ID2;
