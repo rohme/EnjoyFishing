@@ -150,9 +150,12 @@
             this.cmbHistoryFishName = new System.Windows.Forms.ComboBox();
             this.cmbHistoryResult = new System.Windows.Forms.ComboBox();
             this.tabMainHarakiri = new System.Windows.Forms.TabPage();
+            this.txtHarakiriFishname = new System.Windows.Forms.TextBox();
+            this.rdoHarakiriInput = new System.Windows.Forms.RadioButton();
+            this.rdoHarakiriSelect = new System.Windows.Forms.RadioButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.comboBox4 = new System.Windows.Forms.ComboBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.cmbHarakiriFishname = new System.Windows.Forms.ComboBox();
+            this.btnExecHarakiri = new System.Windows.Forms.Button();
             this.tabMainSetting = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnAddonUpdate = new System.Windows.Forms.Button();
@@ -1772,9 +1775,12 @@
             // 
             // tabMainHarakiri
             // 
+            this.tabMainHarakiri.Controls.Add(this.txtHarakiriFishname);
+            this.tabMainHarakiri.Controls.Add(this.rdoHarakiriInput);
+            this.tabMainHarakiri.Controls.Add(this.rdoHarakiriSelect);
             this.tabMainHarakiri.Controls.Add(this.dataGridView1);
-            this.tabMainHarakiri.Controls.Add(this.comboBox4);
-            this.tabMainHarakiri.Controls.Add(this.button2);
+            this.tabMainHarakiri.Controls.Add(this.cmbHarakiriFishname);
+            this.tabMainHarakiri.Controls.Add(this.btnExecHarakiri);
             this.tabMainHarakiri.Location = new System.Drawing.Point(4, 23);
             this.tabMainHarakiri.Name = "tabMainHarakiri";
             this.tabMainHarakiri.Size = new System.Drawing.Size(552, 304);
@@ -1782,31 +1788,64 @@
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
             // 
+            // txtHarakiriFishname
+            // 
+            this.txtHarakiriFishname.Location = new System.Drawing.Point(256, 7);
+            this.txtHarakiriFishname.Name = "txtHarakiriFishname";
+            this.txtHarakiriFishname.Size = new System.Drawing.Size(121, 21);
+            this.txtHarakiriFishname.TabIndex = 5;
+            // 
+            // rdoHarakiriInput
+            // 
+            this.rdoHarakiriInput.AutoSize = true;
+            this.rdoHarakiriInput.Location = new System.Drawing.Point(239, 11);
+            this.rdoHarakiriInput.Name = "rdoHarakiriInput";
+            this.rdoHarakiriInput.Size = new System.Drawing.Size(14, 13);
+            this.rdoHarakiriInput.TabIndex = 4;
+            this.rdoHarakiriInput.TabStop = true;
+            this.rdoHarakiriInput.UseVisualStyleBackColor = true;
+            this.rdoHarakiriInput.CheckedChanged += new System.EventHandler(this.rdoHarakiriInput_CheckedChanged);
+            // 
+            // rdoHarakiriSelect
+            // 
+            this.rdoHarakiriSelect.AutoSize = true;
+            this.rdoHarakiriSelect.Location = new System.Drawing.Point(92, 11);
+            this.rdoHarakiriSelect.Name = "rdoHarakiriSelect";
+            this.rdoHarakiriSelect.Size = new System.Drawing.Size(14, 13);
+            this.rdoHarakiriSelect.TabIndex = 4;
+            this.rdoHarakiriSelect.TabStop = true;
+            this.rdoHarakiriSelect.UseVisualStyleBackColor = true;
+            this.rdoHarakiriSelect.CheckedChanged += new System.EventHandler(this.rdoHarakiriSelect_CheckedChanged);
+            // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(8, 44);
+            this.dataGridView1.Location = new System.Drawing.Point(3, 35);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 21;
-            this.dataGridView1.Size = new System.Drawing.Size(240, 150);
+            this.dataGridView1.Size = new System.Drawing.Size(377, 150);
             this.dataGridView1.TabIndex = 2;
+            this.dataGridView1.Visible = false;
             // 
-            // comboBox4
+            // cmbHarakiriFishname
             // 
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Location = new System.Drawing.Point(3, 15);
-            this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(121, 22);
-            this.comboBox4.TabIndex = 1;
+            this.cmbHarakiriFishname.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbHarakiriFishname.FormattingEnabled = true;
+            this.cmbHarakiriFishname.Location = new System.Drawing.Point(109, 7);
+            this.cmbHarakiriFishname.Name = "cmbHarakiriFishname";
+            this.cmbHarakiriFishname.Size = new System.Drawing.Size(121, 22);
+            this.cmbHarakiriFishname.TabIndex = 1;
             // 
-            // button2
+            // btnExecHarakiri
             // 
-            this.button2.Location = new System.Drawing.Point(130, 15);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 0;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnExecHarakiri.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnExecHarakiri.Location = new System.Drawing.Point(3, 6);
+            this.btnExecHarakiri.Name = "btnExecHarakiri";
+            this.btnExecHarakiri.Size = new System.Drawing.Size(75, 23);
+            this.btnExecHarakiri.TabIndex = 0;
+            this.btnExecHarakiri.Text = "開　始";
+            this.btnExecHarakiri.UseVisualStyleBackColor = true;
+            this.btnExecHarakiri.Click += new System.EventHandler(this.btnExecHarakiri_Click);
             // 
             // tabMainSetting
             // 
@@ -2238,6 +2277,7 @@
             this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridHistorySummary)).EndInit();
             this.tabMainHarakiri.ResumeLayout(false);
+            this.tabMainHarakiri.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tabMainSetting.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -2408,7 +2448,10 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.NumericUpDown txtSneakFishingRemain;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.ComboBox comboBox4;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ComboBox cmbHarakiriFishname;
+        private System.Windows.Forms.Button btnExecHarakiri;
+        private System.Windows.Forms.TextBox txtHarakiriFishname;
+        private System.Windows.Forms.RadioButton rdoHarakiriInput;
+        private System.Windows.Forms.RadioButton rdoHarakiriSelect;
     }
 }

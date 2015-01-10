@@ -11,6 +11,20 @@ using MiscTools;
 
 namespace EnjoyFishing
 {
+    /// <summary>
+    /// 釣り結果ステータス
+    /// </summary>
+    public enum FishResultStatusKind
+    {
+        Catch,
+        NoBite,
+        NoCatch,
+        Release,
+        LineBreak,
+        RodBreak,
+        Unknown,
+    }
+
     [XmlRoot("History")]
     public class FishHistoryDBModel
     {

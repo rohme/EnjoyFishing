@@ -102,7 +102,6 @@ namespace EnjoyFishing
         private string lastBaitName = string.Empty;
         private int noCatchCount = 0;
 
-
         #region メンバ
         /// <summary>
         /// 実行ステータス

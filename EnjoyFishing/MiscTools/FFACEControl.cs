@@ -502,21 +502,21 @@ namespace MiscTools
         /// </summary>
         /// <param name="iId">NpcID</param>
         /// <returns>True:ターゲット完了 False:ターゲット出来なかった</returns>
-        public bool SetTargetFromId(FFACE iFFACE, int iId, bool iWithEnter, int iBaseWait, int iChatWait)
+        public bool SetTargetFromId(int iId, bool iWithEnter = false)
         {
-            logger.Output(LogLevelKind.INFO,  "SetTargetFromId", string.Format("Id={0} WithEnter={1} BaseWait={2} ChatWait={3}", iId, iWithEnter, iBaseWait, iChatWait));
+            logger.Output(LogLevelKind.INFO,  "SetTargetFromId", string.Format("Id={0} WithEnter={1}", iId, iWithEnter));
             for (int i = 0; i < this.MaxLoopCount; i++)
             {
-                iFFACE.Target.SetNPCTarget(iId);
-                System.Threading.Thread.Sleep(iBaseWait);
-                iFFACE.Windower.SendString("/ta <t>");
-                System.Threading.Thread.Sleep(iBaseWait);
+                fface.Target.SetNPCTarget(iId);
+                System.Threading.Thread.Sleep(this.BaseWait);
+                fface.Windower.SendString("/ta <t>");
+                System.Threading.Thread.Sleep(this.BaseWait);
                 if (iWithEnter)
                 {
-                    iFFACE.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
-                    System.Threading.Thread.Sleep(iChatWait);//Wait
+                    fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
+                    System.Threading.Thread.Sleep(this.ChatWait);//Wait
                 }
-                if (iFFACE.Target.ID == iId) return true;
+                if (fface.Target.ID == iId) return true;
             }
             logger.Output(LogLevelKind.WARN, "SetTargetFromId", "タイムアウトしました");
             return false;

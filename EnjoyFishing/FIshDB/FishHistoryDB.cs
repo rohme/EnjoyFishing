@@ -10,20 +10,6 @@ using System.Threading;
 
 namespace EnjoyFishing
 {
-    /// <summary>
-    /// 釣り結果ステータス
-    /// </summary>
-    public enum FishResultStatusKind
-    {
-        Catch,
-        NoBite,
-        NoCatch,
-        Release,
-        LineBreak,
-        RodBreak,
-        Unknown,
-    }
-
     public class FishHistoryDB
     {
         private const string DIRECTORY_FISHHISTORYDB = "History";
@@ -125,7 +111,7 @@ namespace EnjoyFishing
                 if (historydb.Fishes[i].Result == FishResultStatusKind.Catch) historydb.CatchCount++;
             }
 
-            return putFishDB(iPlayername, historydb);
+            return putHistoryDB(iPlayername, historydb);
         }
         /// <summary>
         /// xmlの内容を全て取得する
@@ -168,7 +154,7 @@ namespace EnjoyFishing
         /// <param name="iPlayerName">プレイヤー名</param>
         /// <param name="iHistoryDB">FishHistoryDBModel</param>
         /// <returns>True:成功</returns>
-        private bool putFishDB(string iPlayerName, FishHistoryDBModel iHistoryDB)
+        private bool putHistoryDB(string iPlayerName, FishHistoryDBModel iHistoryDB)
         {
             string xmlFilename = getXmlName(iPlayerName, iHistoryDB.EarthDate);
             if (!Directory.Exists(DIRECTORY_FISHHISTORYDB))

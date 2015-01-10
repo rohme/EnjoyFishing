@@ -19,6 +19,7 @@ namespace EnjoyFishing
         public bool UseItemizer { get; set; }
         public bool UseCancel { get; set; }
         public SettingsArgsModel Args { get; set; }
+        public string HarakiriFishname { get; set; }
         //xmlファイルに保存するメンバ
         public SettingsGlobalModel Global { get; set; }
         public SettingsPlayerFormModel Form { get; set; }

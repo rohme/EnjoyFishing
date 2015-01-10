@@ -104,11 +104,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="FIshDB\FishDB.cs" />
-    <Compile Include="FIshDB\FishDBModel.cs" />
-    <Compile Include="FIshDB\FishHistoryDB.cs" />
-    <Compile Include="FIshDB\FishHistoryDBModel.cs" />
+    <Compile Include="FishDB\FishDB.cs" />
+    <Compile Include="FishDB\FishDBModel.cs" />
+    <Compile Include="FishDB\FishHistoryDB.cs" />
+    <Compile Include="FishDB\FishHistoryDBModel.cs" />
+    <Compile Include="FishDB\HarakiriDB.cs" />
+    <Compile Include="FishDB\HarakiriDBModel.cs" />
     <Compile Include="FishingTool.cs" />
+    <Compile Include="HarakiriTool.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,7 +147,7 @@
     <EmbeddedResource Include="MiscTools\PolToolForm.resx">
       <DependentUpon>PolToolForm.cs</DependentUpon>
     </EmbeddedResource>
-    <Content Include="FIshDB\Bait.xml">
+    <Content Include="FishDB\Bait.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
@@ -156,10 +159,10 @@
     <Content Include="FFACE.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FIshDB\Gear.xml">
+    <Content Include="FishDB\Gear.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FIshDB\Rod.xml">
+    <Content Include="FishDB\Rod.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="EnjoyFishing.ico" />

@@ -117,15 +117,18 @@ namespace EnjoyFishing
         private Settings settings;
         private ChatTool chat;
         private FishingTool fishing;
+        private HarakiriTool harakiri;
         private FFACEControl control;
         private FishDB fishDB;
         private FishHistoryDB fishHistoryDB;
 
         private Thread thFishing;
+        private Thread thHarakiri;
         private Thread thMonitor;
         private bool loginFlg = true;//キャラクターログイン中のフラグ
         private bool startupFlg = false;//初期化中のフラグ
         private bool fishingFlg = false;//釣り中のフラグ
+        private bool harakiriFlg = false;//ハラキリ中のフラグ
         private SettingsArgsModel args = new SettingsArgsModel();
         private Dictionary<string, SettingsPlayerFishListWantedModel> fishListKey = new Dictionary<string, SettingsPlayerFishListWantedModel>();
 
@@ -134,6 +137,8 @@ namespace EnjoyFishing
         delegate void InitFormDelegate();
         delegate void StartFishingDelegate();
         delegate void StopFishingDelegate(bool iShowStopMessage);
+        delegate void StartHarakiriDelegate();
+        delegate void StopHarakiriDelegate(bool iShowStopMessage);
         delegate void SetStatusStripBackColorDelegate();
         delegate void UpdateFishListDelegate();
         delegate void UpdateHistoryDelegate();
@@ -141,8 +146,11 @@ namespace EnjoyFishing
         delegate void UpdateFishingInfoRealTimeDelegate();
         delegate void FishingTool_ChangeStatusDelegate(object sender, FishingTool.ChangeStatusEventArgs e);
         delegate void FishingTool_ChangeMessageDelegate(object sender, FishingTool.ChangeMessageEventArgs e);
+        delegate void HarakiriTool_ChangeStatusDelegate(object sender, HarakiriTool.ChangeStatusEventArgs e);
+        delegate void HarakiriTool_ChangeMessageDelegate(object sender, HarakiriTool.ChangeMessageEventArgs e);
         delegate void saveSettingsDelegate();
         delegate void lockControlDelegate(bool iLock);
+        delegate void threadHarakiriDelegate();
         #endregion
 
         #region Models
@@ -222,12 +230,18 @@ namespace EnjoyFishing
             //ChatTool初期設定
             chat = new ChatTool(iPol.FFACE);
             logger.Output(LogLevelKind.DEBUG, "ChatTool起動");
-            //Fishing初期設定
+            //FishingTool初期設定
             fishing = new FishingTool(iPol, chat, settings, logger);
             fishing.Fished += new FishingTool.FishedEventHandler(this.FishingTool_Fished);
             fishing.ChangeMessage += new FishingTool.ChangeMessageEventHandler(this.FishingTool_ChangeMessage);
             fishing.ChangeStatus += new FishingTool.ChangeStatusEventHandler(this.FishingTool_ChangeStatus);
             logger.Output(LogLevelKind.DEBUG, "FishingTool起動");
+            //HarakiriTool初期設定
+            harakiri = new HarakiriTool(iPol, chat, settings, logger);
+            harakiri.HarakiriOnce += new HarakiriTool.HarakiriOnceEventHandler(this.HarakiriTool_HarakiriOnce);
+            harakiri.ChangeMessage += new HarakiriTool.ChangeMessageEventHandler(this.HarakiriTool_ChangeMessage);
+            harakiri.ChangeStatus += new HarakiriTool.ChangeStatusEventHandler(this.HarakiriTool_ChangeStatus);
+            logger.Output(LogLevelKind.DEBUG, "HarakiriTool起動");
             //FFACEControl初期設定
             control = new FFACEControl(pol, chat, logger);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
@@ -253,7 +267,6 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            tabMain.TabPages.Remove(tabMainHarakiri);
             tabFishingMain.TabPages.Remove(tabFishingMainEquip);
 
             //アドオン・プラグインの更新
@@ -378,6 +391,10 @@ namespace EnjoyFishing
                 dateHistory.Value = DateTime.Now;
                 updateHistory();
                 updateFishingInfo(gridHistorySummary, dateHistory.Value, (FishResultStatusKind)cmbHistoryResult.SelectedValue, (string)cmbHistoryFishName.SelectedValue);
+                //ハラキリ
+                rdoHarakiriSelect.Checked = true;
+                cmbHarakiriFishname.SelectedIndex = -1;
+                txtHarakiriFishname.Text = "";
                 //ステータスバー
                 statusStrip.BackColor = SystemColors.Control;
                 lblMoonPhase.Text = string.Empty;
@@ -583,6 +600,9 @@ namespace EnjoyFishing
             
             System.Environment.Exit(0);//プログラム終了
         }
+        /// <summary>
+        /// アンロード処理
+        /// </summary>
         private void unload()
         {
             //設定保存
@@ -598,6 +618,10 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "監視スレッド停止");
             //FFACEControl停止
             control = null;
+            //HarakiriTool停止
+            if (harakiri != null) harakiri.SystemAbort();
+            harakiri = null;
+            logger.Output(LogLevelKind.DEBUG, "HarakiriTool停止");
             //FishingTool停止
             if (fishing != null) fishing.SystemAbort();
             fishing = null;
@@ -829,6 +853,89 @@ namespace EnjoyFishing
             btnAddonUpdate.Enabled = false;
             updateAddonPlugin();
             btnAddonUpdate.Enabled = true;
+        }
+        /// <summary>
+        /// ハラキリ実行 Clickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnExecHarakiri_Click(object sender, EventArgs e)
+        {
+            if (!harakiriFlg)
+            {
+                //釣り開始
+                startHarakiri();
+            }
+            else
+            {
+                //釣り停止
+                stopHarakiri(true);
+            }
+        }
+        /// <summary>
+        /// ハラキリ開始
+        /// </summary>
+        private void startHarakiri()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new StartHarakiriDelegate(startHarakiri), null);
+            }
+            else
+            {
+                logger.Output(LogLevelKind.INFO, "ハラキリ開始");
+                harakiriFlg = true;
+                btnExecHarakiri.Text = "停　止";
+
+                if (rdoHarakiriSelect.Checked)
+                {
+                    settings.HarakiriFishname = cmbHarakiriFishname.Text;
+                }
+                else if (rdoHarakiriInput.Checked)
+                {
+                    settings.HarakiriFishname = txtHarakiriFishname.Text;
+                }
+
+                thHarakiri = new Thread(threadHarakiri);
+                thHarakiri.Start();
+            }
+        }
+        /// <summary>
+        /// ハラキリ停止
+        /// </summary>
+        private void stopHarakiri(bool iShowStopMessage)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new StopHarakiriDelegate(stopHarakiri), iShowStopMessage);
+            }
+            else
+            {
+                logger.Output(LogLevelKind.INFO, "ハラキリ停止");
+                harakiriFlg = false;
+                btnExecHarakiri.Text = "開　始";
+                bool ret = harakiri.HarakiriAbort();
+                if(iShowStopMessage) lblMessage.Text = "停止しました";
+            }
+        }
+        /// <summary>
+        /// 釣りメインスレッド
+        /// </summary>
+        private void threadHarakiri()
+        {
+
+            HarakiriTool.HarakiriStatusKind ret = harakiri.HarakiriStart(settings.HarakiriFishname);
+            stopHarakiri(false);
+            if (ret != HarakiriTool.HarakiriStatusKind.Error)
+            {
+                //正常終了
+                SystemSounds.Asterisk.Play();
+            }
+            else
+            {
+                //エラー
+                SystemSounds.Hand.Play();
+            }
         }
         #endregion
 
@@ -1581,6 +1688,18 @@ namespace EnjoyFishing
         }
         #endregion
         #endregion
+        #region ハラキリ
+        private void rdoHarakiriSelect_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbHarakiriFishname.Enabled = true;
+            txtHarakiriFishname.Enabled = false;
+        }
+        private void rdoHarakiriInput_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbHarakiriFishname.Enabled = false;
+            txtHarakiriFishname.Enabled = true;
+        }
+        #endregion
         #region 設定
         #region 設定・ステータスバー表示
         private void chkVisibleMoonPhase_CheckedChanged(object sender, EventArgs e)
@@ -1822,7 +1941,83 @@ namespace EnjoyFishing
                 }
             }
         }
+        /// <summary>
+        /// HarakiriTool HarakiriOnceイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HarakiriTool_HarakiriOnce(object sender, HarakiriTool.HarakiriOnceEventArgs e)
+        {
+        }
+        /// <summary>
+        /// FishingTool ChangeMessageイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HarakiriTool_ChangeMessage(object sender, HarakiriTool.ChangeMessageEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+
+                Invoke(new HarakiriTool_ChangeMessageDelegate(HarakiriTool_ChangeMessage), sender, e);
+            }
+            else
+            {
+                //メッセージの更新
+                lblMessage.Text = e.Message;
+            }
+        }
+        /// <summary>
+        /// FishingTool ChangeStatusイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HarakiriTool_ChangeStatus(object sender, HarakiriTool.ChangeStatusEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new HarakiriTool_ChangeStatusDelegate(HarakiriTool_ChangeStatus), sender, e);
+            }
+            else
+            {
+                //ステータスバーの背景色を設定
+                switch (e.FishingStatus)
+                {
+                    case HarakiriTool.HarakiriStatusKind.Normal:
+                        if (e.RunningStatus == HarakiriTool.RunningStatusKind.Running)
+                        {
+                            statusStrip.BackColor = Color.FromArgb(0x80, 0xFF, 0xFF);
+                        }
+                        else
+                        {
+                            statusStrip.BackColor = SystemColors.Control;
+                        }
+                        break;
+                    case HarakiriTool.HarakiriStatusKind.Wait:
+                        statusStrip.BackColor = Color.FromArgb(0xFF, 0xFF, 0x80);
+                        break;
+                    case HarakiriTool.HarakiriStatusKind.Error:
+                        statusStrip.BackColor = Color.FromArgb(0xFF, 0x80, 0x80);
+                        break;
+                    default:
+                        statusStrip.BackColor = SystemColors.Control;
+                        break;
+                }
+                switch (e.RunningStatus)
+                {
+                    case HarakiriTool.RunningStatusKind.UnderStop:
+                        this.Cursor = Cursors.WaitCursor;
+                        break;
+                    case HarakiriTool.RunningStatusKind.Stop:
+                        this.Cursor = Cursors.Default;
+                        break;
+                }
+            }
+        }
+        
         #endregion
+
+
 
     }
 }
