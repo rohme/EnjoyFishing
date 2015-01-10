@@ -410,6 +410,7 @@ namespace EnjoyFishing
         public bool ChatShout { get; set; }
         public bool ChatRestart { get; set; }
         public int ChatRestartMinute { get; set; }
+        public bool EntryPort { get; set; }
         public bool InventoryFullSack { get; set; }
         public bool InventoryFullSatchel { get; set; }
         public bool InventoryFullCase { get; set; }
@@ -457,6 +458,7 @@ namespace EnjoyFishing
             this.ChatShout = true;
             this.ChatRestart = false;
             this.ChatRestartMinute = 10;
+            this.EntryPort = true;
             this.InventoryFullSack = true;
             this.InventoryFullSatchel = true;
             this.InventoryFullCase = true;

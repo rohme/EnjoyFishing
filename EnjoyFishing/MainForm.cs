@@ -343,6 +343,7 @@ namespace EnjoyFishing
                 chkChatShout.Checked = settings.Fishing.ChatShout;
                 chkChatRestart.Checked = settings.Fishing.ChatRestart;
                 txtChatRestartMinute.Value = settings.Fishing.ChatRestartMinute;
+                chkEntryPort.Checked = settings.Fishing.EntryPort;
                 chkInventoryFullSack.Checked = settings.Fishing.InventoryFullSack;
                 chkInventoryFullSatchel.Checked = settings.Fishing.InventoryFullSatchel;
                 chkInventoryFullCase.Checked = settings.Fishing.InventoryFullCase;
@@ -1327,6 +1328,7 @@ namespace EnjoyFishing
                 settings.Fishing.ChatShout = chkChatShout.Checked;
                 settings.Fishing.ChatRestart = chkChatRestart.Checked;
                 settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
+                settings.Fishing.EntryPort = chkEntryPort.Checked;
                 //設定・ステータスバー表示
                 settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
                 settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
@@ -1686,6 +1688,10 @@ namespace EnjoyFishing
         {
             settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
         }
+        private void chkEntryPort_CheckedChanged(object sender, EventArgs e)
+        {
+            settings.Fishing.EntryPort = chkEntryPort.Checked;
+        }
         #endregion
         #endregion
         #region ハラキリ
@@ -2016,8 +2022,5 @@ namespace EnjoyFishing
         }
         
         #endregion
-
-
-
     }
 }

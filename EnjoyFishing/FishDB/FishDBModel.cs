@@ -226,7 +226,7 @@ namespace EnjoyFishing
     }
     #endregion
 
-    #region EquipGearModel
+    #region GearModel
     [XmlRoot("Gears")]
     public class GearDBModel
     {
@@ -241,6 +241,26 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string GearName { get; set; }
+    }
+    #endregion
+
+    #region RenameFishModel
+    [XmlRoot("RenameFish")]
+    public class RenameFishDBModel
+    {
+        [XmlElement("Fish")]
+        public List<RenameFishDBFishModel> Fishes { get; set; }
+        public RenameFishDBModel()
+        {
+            Fishes =new List<RenameFishDBFishModel>();
+        }
+    }
+    public class RenameFishDBFishModel
+    {
+        [XmlAttribute("name")]
+        public string FishName { get; set; }
+        [XmlAttribute("rename")]
+        public string FishRename { get; set; }
     }
     #endregion
 }
