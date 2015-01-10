@@ -184,6 +184,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
+            this.chkEntryPort = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxCatchCount)).BeginInit();
@@ -244,7 +245,7 @@
             this.lstFish.FormattingEnabled = true;
             this.lstFish.Location = new System.Drawing.Point(0, 70);
             this.lstFish.Name = "lstFish";
-            this.lstFish.Size = new System.Drawing.Size(127, 228);
+            this.lstFish.Size = new System.Drawing.Size(127, 244);
             this.lstFish.TabIndex = 8;
             this.lstFish.SelectedIndexChanged += new System.EventHandler(this.lstFish_SelectedIndexChanged);
             // 
@@ -277,7 +278,7 @@
             this.lblHP,
             this.barRemainTime,
             this.lblRemainTime});
-            this.statusStrip.Location = new System.Drawing.Point(0, 331);
+            this.statusStrip.Location = new System.Drawing.Point(0, 351);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.ShowItemToolTips = true;
             this.statusStrip.Size = new System.Drawing.Size(560, 22);
@@ -387,6 +388,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkEntryPort);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtMaxCatchCount);
             this.groupBox1.Controls.Add(this.txtMaxNoCatchCount);
@@ -404,7 +406,7 @@
             this.groupBox1.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.groupBox1.Location = new System.Drawing.Point(0, 120);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(401, 73);
+            this.groupBox1.Size = new System.Drawing.Size(401, 99);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
@@ -1019,7 +1021,7 @@
             this.tabFishingMain.Name = "tabFishingMain";
             this.tabFishingMain.Padding = new System.Drawing.Point(0, 0);
             this.tabFishingMain.SelectedIndex = 0;
-            this.tabFishingMain.Size = new System.Drawing.Size(412, 298);
+            this.tabFishingMain.Size = new System.Drawing.Size(412, 318);
             this.tabFishingMain.TabIndex = 9;
             // 
             // tabFishingMainSetting
@@ -1031,7 +1033,7 @@
             this.tabFishingMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainSetting.Name = "tabFishingMainSetting";
             this.tabFishingMainSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainSetting.Size = new System.Drawing.Size(404, 271);
+            this.tabFishingMainSetting.Size = new System.Drawing.Size(404, 291);
             this.tabFishingMainSetting.TabIndex = 0;
             this.tabFishingMainSetting.Text = "釣り設定";
             this.tabFishingMainSetting.UseVisualStyleBackColor = true;
@@ -1040,7 +1042,7 @@
             // 
             this.groupNoBiteNoRod.Controls.Add(this.flowLayoutPanel4);
             this.groupNoBiteNoRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupNoBiteNoRod.Location = new System.Drawing.Point(203, 193);
+            this.groupNoBiteNoRod.Location = new System.Drawing.Point(203, 219);
             this.groupNoBiteNoRod.Name = "groupNoBiteNoRod";
             this.groupNoBiteNoRod.Size = new System.Drawing.Size(198, 71);
             this.groupNoBiteNoRod.TabIndex = 3;
@@ -1121,7 +1123,7 @@
             // 
             this.groupInventoryFull.Controls.Add(this.flowLayoutPanel3);
             this.groupInventoryFull.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupInventoryFull.Location = new System.Drawing.Point(0, 193);
+            this.groupInventoryFull.Location = new System.Drawing.Point(0, 219);
             this.groupInventoryFull.Name = "groupInventoryFull";
             this.groupInventoryFull.Size = new System.Drawing.Size(200, 71);
             this.groupInventoryFull.TabIndex = 2;
@@ -1578,7 +1580,7 @@
             // splitMain.Panel2
             // 
             this.splitMain.Panel2.Controls.Add(this.tabFishingMain);
-            this.splitMain.Size = new System.Drawing.Size(546, 298);
+            this.splitMain.Size = new System.Drawing.Size(546, 318);
             this.splitMain.SplitterDistance = 130;
             this.splitMain.TabIndex = 8;
             // 
@@ -1675,7 +1677,7 @@
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(560, 331);
+            this.tabMain.Size = new System.Drawing.Size(560, 351);
             this.tabMain.TabIndex = 0;
             // 
             // tabMainFishing
@@ -1684,7 +1686,7 @@
             this.tabMainFishing.Location = new System.Drawing.Point(4, 23);
             this.tabMainFishing.Name = "tabMainFishing";
             this.tabMainFishing.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainFishing.Size = new System.Drawing.Size(552, 304);
+            this.tabMainFishing.Size = new System.Drawing.Size(552, 324);
             this.tabMainFishing.TabIndex = 0;
             this.tabMainFishing.Text = "釣り";
             this.tabMainFishing.UseVisualStyleBackColor = true;
@@ -2176,12 +2178,24 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
+            // chkEntryPort
+            // 
+            this.chkEntryPort.AutoSize = true;
+            this.chkEntryPort.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkEntryPort.Location = new System.Drawing.Point(6, 70);
+            this.chkEntryPort.Name = "chkEntryPort";
+            this.chkEntryPort.Size = new System.Drawing.Size(89, 18);
+            this.chkEntryPort.TabIndex = 14;
+            this.chkEntryPort.Text = "入港メッセージ";
+            this.chkEntryPort.UseVisualStyleBackColor = true;
+            this.chkEntryPort.CheckedChanged += new System.EventHandler(this.chkEntryPort_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(560, 353);
+            this.ClientSize = new System.Drawing.Size(560, 373);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -2410,5 +2424,6 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ComboBox comboBox4;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox chkEntryPort;
     }
 }
