@@ -39,6 +39,15 @@ namespace EnjoyFishing
             {ChatKbnKind.EnemyAttack2, "→{0}に、([0-9]*)ダメージ。"},
             {ChatKbnKind.SneakWarning1, "スニークの効果がきれそうだ。"},
             {ChatKbnKind.SneakWarning2, "{0}は、スニークの効果がきれた。"},
+            {ChatKbnKind.ShipWarning1, "まもなく(.*)へ到着します。"},//汽船航路・外洋航路・銀海航路
+            {ChatKbnKind.ShipWarning2, "(.*)に入港いたします。"},//汽船航路・外洋航路・銀海航路
+            {ChatKbnKind.ShipWarning3, "もうすぐ夕照桟橋に着いちまうぜ。"},//マナクリッパー マリヤカレヤリーフ遊覧
+            {ChatKbnKind.ShipWarning4, "Khots Chalahko : そろそろ到着だ。"},//マナクリッパー 夕照桟橋→プルゴノルゴ島
+            {ChatKbnKind.ShipWarning5, "ブブリム半島が見えてきたぜ！！"},//マナクリッパー プルゴノルゴ島→夕照桟橋
+            {ChatKbnKind.ShipWarning6, "Ineuteniace : そろそろ北桟橋ですな。"},//バージ 主水路(南桟橋→北桟橋)
+            {ChatKbnKind.ShipWarning7, "Eunirange : そろそろ中桟橋かな？"},//バージ 主水路(北桟橋→中桟橋)
+            {ChatKbnKind.ShipWarning8, "Ineuteniace : そろそろ南桟橋じゃな。"},//バージ 井守ヶ淵(中桟橋→南桟橋)
+            {ChatKbnKind.ShipWarning9, "Eunirange : そろそろ中桟橋かな。"},//バージ エメフィ支水路(南桟橋→中桟橋)
         };
         #endregion
 
@@ -72,6 +81,15 @@ namespace EnjoyFishing
             EnemyAttack2,
             SneakWarning1,
             SneakWarning2,
+            ShipWarning1,
+            ShipWarning2,
+            ShipWarning3,
+            ShipWarning4,
+            ShipWarning5,
+            ShipWarning6,
+            ShipWarning7,
+            ShipWarning8,
+            ShipWarning9,
         }
         public enum RunningStatusKind
         {
@@ -100,6 +118,7 @@ namespace EnjoyFishing
         private int remainTimeMAX = 0;
         private string lastRodName = string.Empty;
         private string lastBaitName = string.Empty;
+        private string lastZoneName = string.Empty;
         private int noCatchCount = 0;
 
 
@@ -651,9 +670,11 @@ namespace EnjoyFishing
             bool chatReceive = false;
             bool enemyAttack = false;
             bool sneakWaening = false;
+            bool shipWaening = false;
             noCatchCount = 0;
             lastRodName = string.Empty;
             lastBaitName = string.Empty;
+            lastZoneName = string.Empty;
             chat.CurrentIndex = chat.MaxIndex;
             setFishingStatus(FishingStatusKind.Normal);
             FishHistoryDBFishModel fish = new FishHistoryDBFishModel();
@@ -691,6 +712,27 @@ namespace EnjoyFishing
                         setMessage("チャットを感知したので停止");
                         break;
                     }
+                }
+                //入港警告感知
+                if (this.RunningStatus != RunningStatusKind.Running) break;
+                if (settings.Fishing.EntryPort)
+                {
+                    if (shipWaening)
+                    {
+                        setRunningStatus(RunningStatusKind.Stop);
+                        setFishingStatus(FishingStatusKind.Normal);
+                        setMessage("入港するので停止");
+                        break;
+                    }
+                }
+                //エリア切り替わり感知
+                if (this.RunningStatus != RunningStatusKind.Running) break;
+                if (this.lastZoneName.Length > 0 && this.lastZoneName != this.ZoneName)
+                {
+                    setRunningStatus(RunningStatusKind.Stop);
+                    setFishingStatus(FishingStatusKind.Error);
+                    setMessage("エリアが切り替わったので停止");
+                    break;
                 }
                 //釣果数
                 if (this.RunningStatus != RunningStatusKind.Running) break;
@@ -854,7 +896,7 @@ namespace EnjoyFishing
 
                 //魚を釣る
                 if (this.RunningStatus != RunningStatusKind.Running) break;
-                if (!FishingOnce(out fish, out chatReceive, out enemyAttack, out sneakWaening))
+                if (!FishingOnce(out fish, out chatReceive, out enemyAttack, out sneakWaening, out shipWaening))
                 {
                     //エラー発生時処理
                     setRunningStatus(RunningStatusKind.Stop);
@@ -873,7 +915,7 @@ namespace EnjoyFishing
         /// <param name="oFish"></param>
         /// <param name="oMessage"></param>
         /// <returns></returns>
-        private bool FishingOnce(out FishHistoryDBFishModel oFish, out bool oChatReceive, out bool oEnemyAttack, out bool oSneakWarning)
+        private bool FishingOnce(out FishHistoryDBFishModel oFish, out bool oChatReceive, out bool oEnemyAttack, out bool oSneakWarning, out bool oShipWarning)
         {
             //戻り値初期化
             oFish = new FishHistoryDBFishModel();
@@ -902,6 +944,7 @@ namespace EnjoyFishing
             oChatReceive = false;
             oEnemyAttack = false;
             oSneakWarning = false;
+            oShipWarning = false;
 
             setFishingStatus(FishingStatusKind.Normal);
             setMessage(string.Format("キャスト中：{0}x{1}", this.RodNameWithRemain, this.BaitNameWithRemain));
@@ -917,7 +960,7 @@ namespace EnjoyFishing
                 {
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
-                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
+                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
                     logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                     //エラーチェック
                     if (chatKbn == ChatKbnKind.CanNotFishing)
@@ -938,6 +981,12 @@ namespace EnjoyFishing
                         setMessage("エサを装備していないので停止");
                         return false;
                     }
+                    else if (lastZoneName.Length > 0 && lastZoneName != this.ZoneName)//エリア切り替わり感知
+                    {
+                        setFishingStatus(FishingStatusKind.Error);
+                        setMessage("エリアが切り替わったので停止");
+                        return false;
+                    }
                     else if (oChatReceive) //チャット感知
                     {
                         return true;
@@ -950,14 +999,22 @@ namespace EnjoyFishing
             }
             this.lastRodName = this.RodName;
             this.lastBaitName = this.BaitName;
+            this.lastZoneName = this.ZoneName;
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
-                while(chat.GetNextChatLine(out cl))
+                //エリア切り替わり感知
+                if (lastZoneName.Length > 0 && lastZoneName != this.ZoneName)
+                {
+                    setFishingStatus(FishingStatusKind.Error);
+                    setMessage("エリアが切り替わったので停止");
+                    return false;
+                } 
+                while (chat.GetNextChatLine(out cl))
                 {
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
-                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
+                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
                     logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                     
                     if (chatKbn == ChatKbnKind.BaitSmallFish || chatKbn == ChatKbnKind.BaitLargeFish ||
@@ -1040,7 +1097,7 @@ namespace EnjoyFishing
                         //チャット処理
                         while(chat.GetNextChatLine(out cl))
                         {
-                            ChatKbnKind fightingChatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
+                            ChatKbnKind fightingChatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
                             logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, fightingChatKbn));
                             if (fightingChatKbn == ChatKbnKind.BaitCritical)//クリティカル
                             {
@@ -1349,7 +1406,7 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iCl">チャットライン</param>
         /// <returns>チャット区分</returns>
-        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs, ref bool rChatRecieve, ref bool rEnemyAttack, ref bool rSneakWarning)
+        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs, ref bool rChatRecieve, ref bool rEnemyAttack, ref bool rSneakWarning, ref bool rShipWarning)
         {
             oArgs = new List<string>();
             switch (iCl.Type)
@@ -1396,6 +1453,11 @@ namespace EnjoyFishing
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
                     if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2) rEnemyAttack = true;
                     if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/) rSneakWarning = true;
+                    if (v.Key == ChatKbnKind.ShipWarning1 || v.Key == ChatKbnKind.ShipWarning2 ||
+                        v.Key == ChatKbnKind.ShipWarning3 || v.Key == ChatKbnKind.ShipWarning4 ||
+                        v.Key == ChatKbnKind.ShipWarning5 || v.Key == ChatKbnKind.ShipWarning6 ||
+                        v.Key == ChatKbnKind.ShipWarning7 || v.Key == ChatKbnKind.ShipWarning8 || 
+                        v.Key == ChatKbnKind.ShipWarning9) rShipWarning = true;
                     return v.Key;
                 }
             }
