@@ -23,6 +23,8 @@ namespace EnjoyFishing
     [XmlRoot("Rod")]
     public class FishDBModel
     {
+        [XmlAttribute("version")]
+        public string Version { get; set; }
         [XmlAttribute("name")]
         public string RodName { get; set; }
         [XmlElement("Fish")]
@@ -32,8 +34,9 @@ namespace EnjoyFishing
         }
         public FishDBModel(string iRodName)
         {
-            RodName = iRodName;
-            Fishes = new List<FishDBFishModel>();
+            this.Version = "1.0.0";
+            this.RodName = iRodName;
+            this.Fishes = new List<FishDBFishModel>();
         }
     }
     public class FishDBFishModel
@@ -53,11 +56,11 @@ namespace EnjoyFishing
         public List<string> BaitNames { get; set; }
         public FishDBFishModel()
         {
-            FishName = string.Empty;
-            FishType = FishDBFishTypeKind.Unknown;
-            IDs = new List<FishDBIdModel>();
-            ZoneNames = new List<string>();
-            BaitNames = new List<string>();
+            this.FishName = string.Empty;
+            this.FishType = FishDBFishTypeKind.Unknown;
+            this.IDs = new List<FishDBIdModel>();
+            this.ZoneNames = new List<string>();
+            this.BaitNames = new List<string>();
         }
        public FishDBIdModel GetId(int iID1, int iID2, int iID3, int iID4)
         {
@@ -198,7 +201,7 @@ namespace EnjoyFishing
         public List<RodDBRodModel> Rod { get; set; }
         public RodDBModel()
         {
-            Rod = new List<RodDBRodModel>();
+            this.Rod = new List<RodDBRodModel>();
         }
     }
     public class RodDBRodModel
@@ -216,7 +219,7 @@ namespace EnjoyFishing
         public List<BaitDBBaitModel> Bait { get; set; }
         public BaitDBModel()
         {
-            Bait = new List<BaitDBBaitModel>();
+            this.Bait = new List<BaitDBBaitModel>();
         }
     }
     public class BaitDBBaitModel
@@ -234,7 +237,7 @@ namespace EnjoyFishing
         public List<GearDBGearModel> Gear { get; set; }
         public GearDBModel()
         {
-            Gear = new List<GearDBGearModel>();
+            this.Gear = new List<GearDBGearModel>();
         }
     }
     public class GearDBGearModel
@@ -252,7 +255,7 @@ namespace EnjoyFishing
         public List<RenameFishDBFishModel> Fishes { get; set; }
         public RenameFishDBModel()
         {
-            Fishes =new List<RenameFishDBFishModel>();
+            this.Fishes = new List<RenameFishDBFishModel>();
         }
     }
     public class RenameFishDBFishModel

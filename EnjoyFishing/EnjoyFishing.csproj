@@ -108,7 +108,10 @@
     <Compile Include="FishDB\FishDBModel.cs" />
     <Compile Include="FishDB\FishHistoryDB.cs" />
     <Compile Include="FishDB\FishHistoryDBModel.cs" />
+    <Compile Include="FishDB\HarakiriDB.cs" />
+    <Compile Include="FishDB\HarakiriDBModel.cs" />
     <Compile Include="FishingTool.cs" />
+    <Compile Include="HarakiriTool.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

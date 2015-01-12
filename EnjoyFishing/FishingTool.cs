@@ -121,7 +121,6 @@ namespace EnjoyFishing
         private string lastZoneName = string.Empty;
         private int noCatchCount = 0;
 
-
         #region メンバ
         /// <summary>
         /// 実行ステータス
@@ -175,7 +174,7 @@ namespace EnjoyFishing
         /// <summary>
         /// ヴァナ時間
         /// </summary>
-        public String VanaDateTimeYmdhm
+        public String VanaDateTimeYmdhms
         {
             get
             {
@@ -184,7 +183,8 @@ namespace EnjoyFishing
                                                                              int.Parse(vt.Month.ToString()),
                                                                              int.Parse(vt.Day.ToString()),
                                                                              int.Parse(vt.Hour.ToString()),
-                                                                             int.Parse(vt.Minute.ToString()));
+                                                                             int.Parse(vt.Minute.ToString()),
+                                                                             int.Parse(vt.Second.ToString()));
             }
         }
         /// <summary>
@@ -932,7 +932,7 @@ namespace EnjoyFishing
             oFish.FishType = FishDBFishTypeKind.Unknown;
             oFish.Result = FishResultStatusKind.NoBite;
             oFish.EarthTime = this.EarthDateTime;
-            oFish.VanaTime = this.VanaDateTimeYmdhm;
+            oFish.VanaTime = this.VanaDateTimeYmdhms;
             oFish.VanaWeekDay = this.DayType;
             oFish.MoonPhase = this.MoonPhase;
             oFish.X = this.Position.X;
@@ -1051,7 +1051,7 @@ namespace EnjoyFishing
                         logger.Output(LogLevelKind.INFO, string.Format("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType));
                         //日時の設定
                         oFish.EarthTime = this.EarthDateTime;
-                        oFish.VanaTime = this.VanaDateTimeYmdhm;
+                        oFish.VanaTime = this.VanaDateTimeYmdhms;
                         oFish.VanaWeekDay = this.DayType;
                         oFish.MoonPhase = this.MoonPhase;
                         //HP0の設定
