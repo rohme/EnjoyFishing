@@ -25,16 +25,62 @@ namespace EnjoyFishing
         }
 
         /// <summary>
+        /// サマリーを取得する
+        /// </summary>
+        public HarakiriDBModel GetSummary()
+        {
+            HarakiriDBModel ret = getHarakiriDB();
+            return ret;
+        }
+
+        /// <summary>
         /// 履歴に追加
         /// </summary>
         /// <param name="iPlayername">プレイヤー名</param>
         /// <param name="iHistory">FishHistoryDBFishModel</param>
         /// <returns>True:成功</returns>
-        public bool Add(HarakiriDBHistoryModel iHistory)
+        public bool Add(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
         {
-            HarakiriDBModel harakiridb = getHarakiriDB();
-            harakiridb.History.Add(iHistory);
-            return putHarakiriDB(harakiridb);
+            HarakiriDBModel harakiriDB = getHarakiriDB();
+            if (harakiriDB.Fishes.Contains(new HarakiriDBFishModel(iFishName)))
+            {
+                HarakiriDBFishModel fish = harakiriDB.Fishes[harakiriDB.Fishes.IndexOf(new HarakiriDBFishModel(iFishName))];
+                fish.Count++;
+                if (iItemName != string.Empty)
+                {
+                    if (fish.Items.Contains(new HarakiriDBItemModel(iItemName)))
+                    {
+                        //Items更新
+                        HarakiriDBItemModel item = fish.Items[fish.Items.IndexOf(new HarakiriDBItemModel(iItemName))];
+                        item.Count++;
+                    }
+                    else
+                    {
+                        //Items追加
+                        HarakiriDBItemModel item = new HarakiriDBItemModel();
+                        item.ItemName = iItemName;
+                        item.Count = 1;
+                        fish.Items.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                //Fishes追加
+                HarakiriDBFishModel fish = new HarakiriDBFishModel();
+                fish.FishName = iFishName;
+                fish.Count = 1;
+                if (iItemName != string.Empty)
+                {
+                    HarakiriDBItemModel item = new HarakiriDBItemModel();
+                    item.ItemName = iItemName;
+                    item.Count = 1;
+                    fish.Items.Add(item);
+                }
+                harakiriDB.Fishes.Add(fish);
+            }
+            harakiriDB.Histories.Add(new HarakiriDBHistoryModel(iEarthDate, iVanaDate, iFishName, iItemName));
+            return putHarakiriDB(harakiriDB);
         }
 
         /// <summary>

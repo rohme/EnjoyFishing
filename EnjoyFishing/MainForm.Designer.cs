@@ -47,6 +47,7 @@
             this.chkIgnoreSmallFish = new System.Windows.Forms.CheckBox();
             this.chkIgnoreLargeFish = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkEntryPort = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtMaxCatchCount = new System.Windows.Forms.NumericUpDown();
             this.txtMaxNoCatchCount = new System.Windows.Forms.NumericUpDown();
@@ -150,10 +151,11 @@
             this.cmbHistoryFishName = new System.Windows.Forms.ComboBox();
             this.cmbHistoryResult = new System.Windows.Forms.ComboBox();
             this.tabMainHarakiri = new System.Windows.Forms.TabPage();
+            this.btnHarakiriUpdate = new System.Windows.Forms.Button();
             this.txtHarakiriFishname = new System.Windows.Forms.TextBox();
-            this.rdoHarakiriInput = new System.Windows.Forms.RadioButton();
-            this.rdoHarakiriSelect = new System.Windows.Forms.RadioButton();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.rdoHarakiriInputTypeInput = new System.Windows.Forms.RadioButton();
+            this.rdoHarakiriInputTypeSelect = new System.Windows.Forms.RadioButton();
+            this.gridHarakiri = new System.Windows.Forms.DataGridView();
             this.cmbHarakiriFishname = new System.Windows.Forms.ComboBox();
             this.btnExecHarakiri = new System.Windows.Forms.Button();
             this.tabMainSetting = new System.Windows.Forms.TabPage();
@@ -187,7 +189,6 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.chkEntryPort = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxCatchCount)).BeginInit();
@@ -228,7 +229,7 @@
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridHistorySummary)).BeginInit();
             this.tabMainHarakiri.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridHarakiri)).BeginInit();
             this.tabMainSetting.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -413,6 +414,17 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
+            // 
+            // chkEntryPort
+            // 
+            this.chkEntryPort.AutoSize = true;
+            this.chkEntryPort.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkEntryPort.Location = new System.Drawing.Point(6, 70);
+            this.chkEntryPort.Name = "chkEntryPort";
+            this.chkEntryPort.Size = new System.Drawing.Size(89, 18);
+            this.chkEntryPort.TabIndex = 14;
+            this.chkEntryPort.Text = "入港メッセージ";
+            this.chkEntryPort.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -1210,7 +1222,7 @@
             this.tabFishingMainEquip.Controls.Add(this.comboBox1);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
-            this.tabFishingMainEquip.Size = new System.Drawing.Size(404, 271);
+            this.tabFishingMainEquip.Size = new System.Drawing.Size(404, 291);
             this.tabFishingMainEquip.TabIndex = 2;
             this.tabFishingMainEquip.Text = "装備";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
@@ -1267,7 +1279,7 @@
             this.tabFishingMainInfo.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainInfo.Name = "tabFishingMainInfo";
             this.tabFishingMainInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainInfo.Size = new System.Drawing.Size(404, 271);
+            this.tabFishingMainInfo.Size = new System.Drawing.Size(404, 291);
             this.tabFishingMainInfo.TabIndex = 1;
             this.tabFishingMainInfo.Text = "情報";
             this.tabFishingMainInfo.UseVisualStyleBackColor = true;
@@ -1346,7 +1358,7 @@
             this.gridFishingInfo.Location = new System.Drawing.Point(-1, 46);
             this.gridFishingInfo.Name = "gridFishingInfo";
             this.gridFishingInfo.RowTemplate.Height = 21;
-            this.gridFishingInfo.Size = new System.Drawing.Size(404, 225);
+            this.gridFishingInfo.Size = new System.Drawing.Size(404, 245);
             this.gridFishingInfo.TabIndex = 8;
             this.gridFishingInfo.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -1548,7 +1560,7 @@
             this.gridHistory.Location = new System.Drawing.Point(3, 3);
             this.gridHistory.Name = "gridHistory";
             this.gridHistory.RowTemplate.Height = 21;
-            this.gridHistory.Size = new System.Drawing.Size(538, 246);
+            this.gridHistory.Size = new System.Drawing.Size(538, 266);
             this.gridHistory.TabIndex = 0;
             // 
             // dateHistory
@@ -1704,7 +1716,7 @@
             this.tabMainHistory.Location = new System.Drawing.Point(4, 23);
             this.tabMainHistory.Name = "tabMainHistory";
             this.tabMainHistory.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainHistory.Size = new System.Drawing.Size(552, 304);
+            this.tabMainHistory.Size = new System.Drawing.Size(552, 324);
             this.tabMainHistory.TabIndex = 1;
             this.tabMainHistory.Text = "履歴";
             this.tabMainHistory.UseVisualStyleBackColor = true;
@@ -1719,7 +1731,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 25);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(552, 279);
+            this.tabControl1.Size = new System.Drawing.Size(552, 299);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -1728,7 +1740,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 23);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(544, 252);
+            this.tabPage1.Size = new System.Drawing.Size(544, 272);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "詳細";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -1739,7 +1751,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 23);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(544, 252);
+            this.tabPage2.Size = new System.Drawing.Size(544, 272);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "合計";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1751,7 +1763,7 @@
             this.gridHistorySummary.Location = new System.Drawing.Point(3, 3);
             this.gridHistorySummary.Name = "gridHistorySummary";
             this.gridHistorySummary.RowTemplate.Height = 21;
-            this.gridHistorySummary.Size = new System.Drawing.Size(538, 246);
+            this.gridHistorySummary.Size = new System.Drawing.Size(538, 266);
             this.gridHistorySummary.TabIndex = 0;
             this.gridHistorySummary.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -1777,74 +1789,90 @@
             // 
             // tabMainHarakiri
             // 
+            this.tabMainHarakiri.Controls.Add(this.btnHarakiriUpdate);
             this.tabMainHarakiri.Controls.Add(this.txtHarakiriFishname);
-            this.tabMainHarakiri.Controls.Add(this.rdoHarakiriInput);
-            this.tabMainHarakiri.Controls.Add(this.rdoHarakiriSelect);
-            this.tabMainHarakiri.Controls.Add(this.dataGridView1);
+            this.tabMainHarakiri.Controls.Add(this.rdoHarakiriInputTypeInput);
+            this.tabMainHarakiri.Controls.Add(this.rdoHarakiriInputTypeSelect);
+            this.tabMainHarakiri.Controls.Add(this.gridHarakiri);
             this.tabMainHarakiri.Controls.Add(this.cmbHarakiriFishname);
             this.tabMainHarakiri.Controls.Add(this.btnExecHarakiri);
             this.tabMainHarakiri.Location = new System.Drawing.Point(4, 23);
             this.tabMainHarakiri.Name = "tabMainHarakiri";
-            this.tabMainHarakiri.Size = new System.Drawing.Size(552, 304);
+            this.tabMainHarakiri.Size = new System.Drawing.Size(552, 324);
             this.tabMainHarakiri.TabIndex = 3;
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
             // 
+            // btnHarakiriUpdate
+            // 
+            this.btnHarakiriUpdate.Location = new System.Drawing.Point(228, 7);
+            this.btnHarakiriUpdate.Name = "btnHarakiriUpdate";
+            this.btnHarakiriUpdate.Size = new System.Drawing.Size(42, 23);
+            this.btnHarakiriUpdate.TabIndex = 2;
+            this.btnHarakiriUpdate.Text = "更新";
+            this.btnHarakiriUpdate.UseVisualStyleBackColor = true;
+            this.btnHarakiriUpdate.Click += new System.EventHandler(this.btnHarakiriUpdate_Click);
+            // 
             // txtHarakiriFishname
             // 
-            this.txtHarakiriFishname.Location = new System.Drawing.Point(256, 7);
+            this.txtHarakiriFishname.Location = new System.Drawing.Point(303, 7);
             this.txtHarakiriFishname.Name = "txtHarakiriFishname";
             this.txtHarakiriFishname.Size = new System.Drawing.Size(121, 21);
-            this.txtHarakiriFishname.TabIndex = 5;
+            this.txtHarakiriFishname.TabIndex = 4;
+            this.txtHarakiriFishname.TextChanged += new System.EventHandler(this.txtHarakiriFishname_TextChanged);
             // 
-            // rdoHarakiriInput
+            // rdoHarakiriInputTypeInput
             // 
-            this.rdoHarakiriInput.AutoSize = true;
-            this.rdoHarakiriInput.Location = new System.Drawing.Point(239, 11);
-            this.rdoHarakiriInput.Name = "rdoHarakiriInput";
-            this.rdoHarakiriInput.Size = new System.Drawing.Size(14, 13);
-            this.rdoHarakiriInput.TabIndex = 4;
-            this.rdoHarakiriInput.TabStop = true;
-            this.rdoHarakiriInput.UseVisualStyleBackColor = true;
-            this.rdoHarakiriInput.CheckedChanged += new System.EventHandler(this.rdoHarakiriInput_CheckedChanged);
+            this.rdoHarakiriInputTypeInput.AutoSize = true;
+            this.rdoHarakiriInputTypeInput.Location = new System.Drawing.Point(286, 11);
+            this.rdoHarakiriInputTypeInput.Name = "rdoHarakiriInputTypeInput";
+            this.rdoHarakiriInputTypeInput.Size = new System.Drawing.Size(14, 13);
+            this.rdoHarakiriInputTypeInput.TabIndex = 3;
+            this.rdoHarakiriInputTypeInput.UseVisualStyleBackColor = true;
+            this.rdoHarakiriInputTypeInput.CheckedChanged += new System.EventHandler(this.rdoHarakiriInputTypeInput_CheckedChanged);
             // 
-            // rdoHarakiriSelect
+            // rdoHarakiriInputTypeSelect
             // 
-            this.rdoHarakiriSelect.AutoSize = true;
-            this.rdoHarakiriSelect.Location = new System.Drawing.Point(92, 11);
-            this.rdoHarakiriSelect.Name = "rdoHarakiriSelect";
-            this.rdoHarakiriSelect.Size = new System.Drawing.Size(14, 13);
-            this.rdoHarakiriSelect.TabIndex = 4;
-            this.rdoHarakiriSelect.TabStop = true;
-            this.rdoHarakiriSelect.UseVisualStyleBackColor = true;
-            this.rdoHarakiriSelect.CheckedChanged += new System.EventHandler(this.rdoHarakiriSelect_CheckedChanged);
+            this.rdoHarakiriInputTypeSelect.AutoSize = true;
+            this.rdoHarakiriInputTypeSelect.Checked = true;
+            this.rdoHarakiriInputTypeSelect.Location = new System.Drawing.Point(90, 11);
+            this.rdoHarakiriInputTypeSelect.Name = "rdoHarakiriInputTypeSelect";
+            this.rdoHarakiriInputTypeSelect.Size = new System.Drawing.Size(14, 13);
+            this.rdoHarakiriInputTypeSelect.TabIndex = 0;
+            this.rdoHarakiriInputTypeSelect.TabStop = true;
+            this.rdoHarakiriInputTypeSelect.UseVisualStyleBackColor = true;
+            this.rdoHarakiriInputTypeSelect.CheckedChanged += new System.EventHandler(this.rdoHarakiriInputTypeSelect_CheckedChanged);
             // 
-            // dataGridView1
+            // gridHarakiri
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 35);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowTemplate.Height = 21;
-            this.dataGridView1.Size = new System.Drawing.Size(377, 150);
-            this.dataGridView1.TabIndex = 2;
-            this.dataGridView1.Visible = false;
+            this.gridHarakiri.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridHarakiri.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridHarakiri.Location = new System.Drawing.Point(3, 35);
+            this.gridHarakiri.Name = "gridHarakiri";
+            this.gridHarakiri.RowTemplate.Height = 21;
+            this.gridHarakiri.Size = new System.Drawing.Size(546, 289);
+            this.gridHarakiri.TabIndex = 6;
+            this.gridHarakiri.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridHarakiri_CellFormatting);
             // 
             // cmbHarakiriFishname
             // 
             this.cmbHarakiriFishname.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbHarakiriFishname.FormattingEnabled = true;
-            this.cmbHarakiriFishname.Location = new System.Drawing.Point(109, 7);
+            this.cmbHarakiriFishname.Location = new System.Drawing.Point(107, 7);
             this.cmbHarakiriFishname.Name = "cmbHarakiriFishname";
             this.cmbHarakiriFishname.Size = new System.Drawing.Size(121, 22);
             this.cmbHarakiriFishname.TabIndex = 1;
+            this.cmbHarakiriFishname.SelectedIndexChanged += new System.EventHandler(this.cmbHarakiriFishname_SelectedIndexChanged);
             // 
             // btnExecHarakiri
             // 
             this.btnExecHarakiri.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnExecHarakiri.Location = new System.Drawing.Point(3, 6);
+            this.btnExecHarakiri.Location = new System.Drawing.Point(3, 7);
             this.btnExecHarakiri.Name = "btnExecHarakiri";
             this.btnExecHarakiri.Size = new System.Drawing.Size(75, 23);
-            this.btnExecHarakiri.TabIndex = 0;
+            this.btnExecHarakiri.TabIndex = 5;
             this.btnExecHarakiri.Text = "開　始";
             this.btnExecHarakiri.UseVisualStyleBackColor = true;
             this.btnExecHarakiri.Click += new System.EventHandler(this.btnExecHarakiri_Click);
@@ -1856,7 +1884,7 @@
             this.tabMainSetting.Controls.Add(this.groupBox7);
             this.tabMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabMainSetting.Name = "tabMainSetting";
-            this.tabMainSetting.Size = new System.Drawing.Size(552, 304);
+            this.tabMainSetting.Size = new System.Drawing.Size(552, 324);
             this.tabMainSetting.TabIndex = 2;
             this.tabMainSetting.Text = "設定";
             this.tabMainSetting.UseVisualStyleBackColor = true;
@@ -2217,18 +2245,6 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // chkEntryPort
-            // 
-            this.chkEntryPort.AutoSize = true;
-            this.chkEntryPort.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkEntryPort.Location = new System.Drawing.Point(6, 70);
-            this.chkEntryPort.Name = "chkEntryPort";
-            this.chkEntryPort.Size = new System.Drawing.Size(89, 18);
-            this.chkEntryPort.TabIndex = 14;
-            this.chkEntryPort.Text = "入港メッセージ";
-            this.chkEntryPort.UseVisualStyleBackColor = true;
-            this.chkEntryPort.CheckedChanged += new System.EventHandler(this.chkEntryPort_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -2292,7 +2308,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridHistorySummary)).EndInit();
             this.tabMainHarakiri.ResumeLayout(false);
             this.tabMainHarakiri.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridHarakiri)).EndInit();
             this.tabMainSetting.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -2461,11 +2477,13 @@
         private System.Windows.Forms.Label lblAddonCancel;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.NumericUpDown txtSneakFishingRemain;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView gridHarakiri;
         private System.Windows.Forms.ComboBox cmbHarakiriFishname;
         private System.Windows.Forms.Button btnExecHarakiri;
         private System.Windows.Forms.TextBox txtHarakiriFishname;
-        private System.Windows.Forms.RadioButton rdoHarakiriInput;
-        private System.Windows.Forms.RadioButton rdoHarakiriSelect;
+        private System.Windows.Forms.RadioButton rdoHarakiriInputTypeInput;
+        private System.Windows.Forms.RadioButton rdoHarakiriInputTypeSelect;
+        private System.Windows.Forms.CheckBox chkEntryPort;
+        private System.Windows.Forms.Button btnHarakiriUpdate;
     }
 }

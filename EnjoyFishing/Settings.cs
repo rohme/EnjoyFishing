@@ -19,7 +19,6 @@ namespace EnjoyFishing
         public bool UseItemizer { get; set; }
         public bool UseCancel { get; set; }
         public SettingsArgsModel Args { get; set; }
-        public string HarakiriFishname { get; set; }
         //xmlファイルに保存するメンバ
         public SettingsGlobalModel Global { get; set; }
         public SettingsPlayerFormModel Form { get; set; }
@@ -27,6 +26,7 @@ namespace EnjoyFishing
         public SettingsPlayerFishingModel Fishing { get; set; }
         public SettingsPlayerEtcModel Etc { get; set; }
         public SettingsPlayerHistoryModel History { get; set; }
+        public SettingsPlayerHarakiriModel Harakiri { get; set; }
 
         public enum FishListModeKind
         {
@@ -37,6 +37,11 @@ namespace EnjoyFishing
         {
             Shared,
             ByPlayer,
+        }
+        public enum HarakiriInputTypeKind
+        {
+            Select,
+            Input,
         }
 
         private const string XML_FILENAME_SETTINGS = "EnjoyFishing.xml";
@@ -66,6 +71,7 @@ namespace EnjoyFishing
                 this.Fishing = new SettingsPlayerFishingModel();
                 this.Etc = new SettingsPlayerEtcModel();
                 this.History = new SettingsPlayerHistoryModel();
+                this.Harakiri = new SettingsPlayerHarakiriModel();
             }
         }
         /// <summary>
@@ -118,6 +124,7 @@ namespace EnjoyFishing
                     this.Fishing = v.Fishing;
                     this.Etc = v.Etc;
                     this.History = v.History;
+                    this.Harakiri = v.Harakiri;
                 }
             }
             if (!foundFlg)
@@ -128,7 +135,7 @@ namespace EnjoyFishing
                 this.Fishing = player.Fishing;
                 this.Etc = player.Etc;
                 this.History = player.History;
-
+                this.Harakiri = player.Harakiri;
             }
 
             return true;
@@ -162,6 +169,7 @@ namespace EnjoyFishing
                     v.Fishing = this.Fishing;
                     v.Etc = this.Etc;
                     v.History = this.History;
+                    v.Harakiri = this.Harakiri;
                 }
             }
             if (!foundFlg)
@@ -173,6 +181,7 @@ namespace EnjoyFishing
                 player.Fishing = this.Fishing;
                 player.Etc = this.Etc;
                 player.History = this.History;
+                player.Harakiri = this.Harakiri;
 
                 xmlSettings.Player.Add(player);
             }
@@ -213,6 +222,8 @@ namespace EnjoyFishing
     [XmlRoot("EnjoyFishing")]
     public class SettingsModel
     {
+        [XmlAttribute("version")]
+        public string Version { get; set; }
         public SettingsGlobalModel Global { get; set; }
         [XmlArray("Players")]
         [XmlArrayItem("Player")]
@@ -220,6 +231,7 @@ namespace EnjoyFishing
 
         public SettingsModel()
         {
+            this.Version = "1.0.0";
             this.Global = new SettingsGlobalModel();
             this.Player = new List<SettingsPlayerModel>();
         }
@@ -247,6 +259,7 @@ namespace EnjoyFishing
         public SettingsPlayerFishingModel Fishing { get; set; }
         public SettingsPlayerEtcModel Etc { get; set; }
         public SettingsPlayerHistoryModel History { get; set; }
+        public SettingsPlayerHarakiriModel Harakiri { get; set; }
 
         public SettingsPlayerModel()
         {
@@ -256,6 +269,7 @@ namespace EnjoyFishing
             this.Fishing = new SettingsPlayerFishingModel();
             this.Etc = new SettingsPlayerEtcModel();
             this.History = new SettingsPlayerHistoryModel();
+            this.Harakiri = new SettingsPlayerHarakiriModel();
         }
     }
     public class SettingsPlayerFormModel
@@ -513,7 +527,7 @@ namespace EnjoyFishing
         public SettingsPlayerHistoryModel()
         {
             this.ColEarthTime = new SettingsPlayerHistoryColModel("EarthTime", 0, true, 63);
-            this.ColVanaTime = new SettingsPlayerHistoryColModel("VanaTime", 1, true, 114);
+            this.ColVanaTime = new SettingsPlayerHistoryColModel("VanaTime", 1, true, 130);
             this.ColVanaWeekDay = new SettingsPlayerHistoryColModel("VanaWeekDay", 2, true, 20);
             this.ColMoonPhase = new SettingsPlayerHistoryColModel("MoonPhase", 3, true, 20);
             this.ColResult = new SettingsPlayerHistoryColModel("Result", 4, true, 60);
@@ -523,7 +537,6 @@ namespace EnjoyFishing
             this.ColID = new SettingsPlayerHistoryColModel("ID", 8, false, 100);
             this.ColFishName = new SettingsPlayerHistoryColModel("FishName", 9, true, 160);
             this.ColFishCount = new SettingsPlayerHistoryColModel("FishCount", 10, false, 23);
-
         }
     }
     public class SettingsPlayerHistoryColModel
@@ -549,6 +562,18 @@ namespace EnjoyFishing
             this.DisplayIndex = iDisplayIndex;
             this.Visible = iVisible;
             this.Width = iWidth;
+        }
+    }
+    public class SettingsPlayerHarakiriModel
+    {
+        public Settings.HarakiriInputTypeKind InputType { get; set; }
+        public string FishNameSelect { get; set; }
+        public string FishNameInput { get; set; }
+        public SettingsPlayerHarakiriModel()
+        {
+            this.InputType = Settings.HarakiriInputTypeKind.Select;
+            this.FishNameSelect = string.Empty;
+            this.FishNameInput = string.Empty;
         }
     }
     public class SettingsArgsModel

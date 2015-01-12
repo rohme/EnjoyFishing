@@ -180,9 +180,10 @@ namespace MiscTools
         /// メニューが閉じるまでエスケープキーを連打
         /// </summary>
         /// <returns></returns>
-        public bool CloseDialog()
+        public bool CloseDialog(int iTryCount = -1)
         {
-            for (int i = 0; i < this.MaxLoopCount; i++)
+            if (iTryCount == -1) iTryCount = this.MaxLoopCount;
+            for (int i = 0; i < iTryCount; i++)
             {
                 if (fface.Menu.IsOpen)
                 {
@@ -269,7 +270,7 @@ namespace MiscTools
             fface.Windower.SendString("//lua list");
             Thread.Sleep(this.BaseWait);
             fface.Windower.SendString("//echo " + KeyEnd);
-            Thread.Sleep(500);
+            Thread.Sleep(300);
             File.Copy(fileNameOrg, fileName, true);
 
             bool foundFlg = false;
@@ -504,7 +505,7 @@ namespace MiscTools
         /// <returns>True:ターゲット完了 False:ターゲット出来なかった</returns>
         public bool SetTargetFromId(int iId, bool iWithEnter = false)
         {
-            logger.Output(LogLevelKind.INFO,  "SetTargetFromId", string.Format("Id={0} WithEnter={1}", iId, iWithEnter));
+            logger.Output(LogLevelKind.DEBUG,  "SetTargetFromId", string.Format("Id={0} WithEnter={1}", iId, iWithEnter));
             for (int i = 0; i < this.MaxLoopCount; i++)
             {
                 fface.Target.SetNPCTarget(iId);

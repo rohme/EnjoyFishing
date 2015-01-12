@@ -66,6 +66,24 @@ namespace EnjoyFishing
         #endregion
         
         #region FishDB
+        public List<string> SelectAllFishName()
+        {
+            logger.Output(LogLevelKind.DEBUG, string.Format("{0}", MethodBase.GetCurrentMethod().Name));
+            List<string> ret = new List<string>();
+            foreach (string rod in _Rods)
+            {
+                FishDBModel fishDB = getFishDB(rod);
+                foreach (FishDBFishModel fish in fishDB.Fishes)
+                {
+                    if (!ret.Contains(fish.FishName))
+                    {
+                        ret.Add(fish.FishName);
+                    }
+                }
+            }
+            ret.Sort();
+            return ret;
+        }
         /// <summary>
         /// 魚リストの取得
         /// </summary>

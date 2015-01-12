@@ -59,7 +59,6 @@ namespace EnjoyFishing
         private Thread thHarakiri;
         private FishDB fishDB;
         private HarakiriDB harakiriDB;
-        private string harakiriFishName;
 
 
         #region メンバ
@@ -87,6 +86,11 @@ namespace EnjoyFishing
             get;
             private set;
         }
+        public string HarakiriFishName 
+        { 
+            get; 
+            set; 
+        }
         #endregion
 
         #region イベント
@@ -96,8 +100,8 @@ namespace EnjoyFishing
         /// </summary>
         public class HarakiriOnceEventArgs : EventArgs
         {
-            public HarakiriStatusKind HarakiriStatus;
-            public string Message;
+            public string FishName;
+            public string ItemName;
         }
         public delegate void HarakiriOnceEventHandler(object sender, HarakiriOnceEventArgs e);
         public event HarakiriOnceEventHandler HarakiriOnce;
@@ -108,12 +112,12 @@ namespace EnjoyFishing
                 HarakiriOnce(this, e);
             }
         }
-        private void EventHarakiriOnce(HarakiriStatusKind iHarakiriStatus)
+        private void EventHarakiriOnce(string iFishName, string iItemName)
         {
             //返すデータの設定
             HarakiriOnceEventArgs e = new HarakiriOnceEventArgs();
-            e.HarakiriStatus = iHarakiriStatus;
-            e.Message = this.Message;
+            e.FishName = iFishName;
+            e.ItemName = iItemName;
             //イベントの発生
             OnHarakiriOnce(e);
         }
@@ -214,10 +218,8 @@ namespace EnjoyFishing
         /// ハラキリ開始
         /// </summary>
         /// <returns></returns>
-        public HarakiriStatusKind HarakiriStart(string iFishName)
+        public HarakiriStatusKind HarakiriStart()
         {
-            this.harakiriFishName = iFishName;
-
             setRunningStatus(RunningStatusKind.Running);
             setHarakiriStatus(HarakiriStatusKind.Normal);
             setMessage(string.Empty);
@@ -265,29 +267,30 @@ namespace EnjoyFishing
         {
             chat.CurrentIndex = chat.MaxIndex;
             setHarakiriStatus(HarakiriStatusKind.Normal);
-            HarakiriDBHistoryModel fish = new HarakiriDBHistoryModel();
             bool firsttime = true;
 
             logger.Output(LogLevelKind.DEBUG, "ハラキリスレッド開始");
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 //未入力チェック
-                if (this.harakiriFishName.Length == 0)
+                if (this.HarakiriFishName.Length == 0)
                 {
                     setRunningStatus(RunningStatusKind.Stop);
                     setHarakiriStatus(HarakiriStatusKind.Error);
                     setMessage("ハラキリする魚を入力してください");
                     return;
                 }
+                //鞄が満杯？
+                //if (fface.Item.InventoryCount >= fface.Item.InventoryMax)
+                //{
+                //    setRunningStatus(RunningStatusKind.Stop);
+                //    setHarakiriStatus(HarakiriStatusKind.Error);
+                //    setMessage("鞄が満杯です");
+                //    return;
+                //}
                 //鞄に入っている魚の総数を取得
-                int itemId = FFACE.ParseResources.GetItemId(this.harakiriFishName);
-                uint remain = fface.Item.GetItemCount(itemId, InventoryType.Inventory);
-                if (settings.UseItemizer)
-                {
-                    remain += fface.Item.GetItemCount(itemId, InventoryType.Satchel);
-                    remain += fface.Item.GetItemCount(itemId, InventoryType.Sack);
-                    remain += fface.Item.GetItemCount(itemId, InventoryType.Case);
-                }
+                int itemId = FFACE.ParseResources.GetItemId(this.HarakiriFishName);
+                uint remain = GetHarakiriRemain(this.HarakiriFishName);
                 if (remain <= 0)
                 {
                     setRunningStatus(RunningStatusKind.Stop);
@@ -304,21 +307,21 @@ namespace EnjoyFishing
                     return;
                 }
                 firsttime = false;
-                setMessage(string.Format("ハラキリ中：{0} 残り{1}匹", this.harakiriFishName, remain));
+                setMessage(string.Format("ハラキリ中：{0} 残り{1}匹", this.HarakiriFishName, remain));
                 //鞄に対象の魚を移動させる
                 if (fface.Item.GetItemCount(itemId, InventoryType.Inventory) <= 0)
                 {
                     if (fface.Item.GetItemCount(itemId, InventoryType.Satchel) > 0)
                     {
-                        control.GetItem(this.harakiriFishName, InventoryType.Satchel);
+                        control.GetItem(this.HarakiriFishName, InventoryType.Satchel);
                     }
                     else if (fface.Item.GetItemCount(itemId, InventoryType.Sack) > 0)
                     {
-                        control.GetItem(this.harakiriFishName, InventoryType.Sack);
+                        control.GetItem(this.HarakiriFishName, InventoryType.Sack);
                     }
                     else if (fface.Item.GetItemCount(itemId, InventoryType.Case) > 0)
                     {
-                        control.GetItem(this.harakiriFishName, InventoryType.Case);
+                        control.GetItem(this.HarakiriFishName, InventoryType.Case);
                     }
                 }
                 //Zaldonの近くかチェック
@@ -331,11 +334,11 @@ namespace EnjoyFishing
                     return;
                 }
                 //メニュー開いていたら閉じる
-                if (!control.CloseDialog())
+                if (!control.CloseDialog(10))
                 {
                     setRunningStatus(RunningStatusKind.Stop);
                     setHarakiriStatus(HarakiriStatusKind.Error);
-                    setMessage("メニューが閉じられない");
+                    setMessage("エラー：会話を終了させてから実行してください");
                     break;
                 }
 
@@ -343,15 +346,18 @@ namespace EnjoyFishing
                 control.SetTargetFromId(NPCID_ZALDON);
                 Thread.Sleep(settings.Global.WaitChat);//Wait
                 //アイテムトレード
-                fface.Windower.SendString(string.Format("/item {0} <t>", this.harakiriFishName));
+                fface.Windower.SendString(string.Format("/item {0} <t>", this.HarakiriFishName));
 
-                HarakiriResultStatusKind result = HarakiriResultStatusKind.Unknown;
+                //チャット監視開始
                 string itemName = string.Empty;
                 FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
                 while (this.RunningStatus == RunningStatusKind.Running)
                 {
-                    Thread.Sleep(settings.Global.WaitChat);
-                    if (!chat.GetNextChatLine(out cl)) continue;
+                    if (!chat.GetNextChatLine(out cl)) 
+                    {
+                        Thread.Sleep(settings.Global.WaitBase);//wait
+                        continue; 
+                    } 
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
@@ -361,22 +367,18 @@ namespace EnjoyFishing
                         if (!settings.UseEnternity)
                         {
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
-                            Thread.Sleep(settings.Global.WaitChat);
                         }
                     }
                     else if (chatKbn == ChatKbnKind.Zaldon2)
                     {
-                        result = HarakiriResultStatusKind.NotFound;
                         setMessage("ハラキリ結果：何も見つからなかった");
                         if (!settings.UseEnternity)
                         {
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
-                            Thread.Sleep(settings.Global.WaitChat);
                         }
                     }
                     else if (chatKbn == ChatKbnKind.Zaldon3)
                     {
-                        result = HarakiriResultStatusKind.Found;
                         itemName = chatKbnArgs[0];
                         setMessage(string.Format("ハラキリ結果：{0}を見つけた", itemName));
                         fface.Windower.SendKeyPress(KeyCode.EnterKey);
@@ -384,413 +386,26 @@ namespace EnjoyFishing
                     }
                     else if (chatKbn == ChatKbnKind.Zaldon4 || chatKbn == ChatKbnKind.Zaldon5)
                     {
-                        HarakiriDBHistoryModel history = new HarakiriDBHistoryModel();
-                        history.FishName = this.harakiriFishName;
-                        history.ItemName = itemName;
-                        history.Result = result;
-                        harakiriDB.Add(history);
-                        Thread.Sleep(settings.Global.WaitChat);
+                        FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
+                        string vanadate = string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}", 
+                                                                                    int.Parse(vt.Year.ToString()),
+                                                                                    int.Parse(vt.Month.ToString()),
+                                                                                    int.Parse(vt.Day.ToString()),
+                                                                                    int.Parse(vt.Hour.ToString()),
+                                                                                    int.Parse(vt.Minute.ToString()),
+                                                                                    int.Parse(vt.Second.ToString()));
+                        harakiriDB.Add(DateTime.Now.ToString(), vanadate, this.HarakiriFishName, itemName);
+                        EventHarakiriOnce(this.HarakiriFishName, itemName);//イベント発生
+                        Thread.Sleep(2000);
                         break;
                     }
+                    Thread.Sleep(settings.Global.WaitBase);//wait
                 }
-
+                Thread.Sleep(settings.Global.WaitChat);//wait
             }
             logger.Output(LogLevelKind.DEBUG, "ハラキリスレッド終了");
         }
-        /// <summary>
-        /// 魚を１回釣る
-        /// </summary>
-        /// <param name="oFish"></param>
-        /// <param name="oMessage"></param>
-        /// <returns></returns>
-        //private bool FishingOnce(out FishHistoryDBFishModel oFish, out bool oChatReceive, out bool oEnemyAttack, out bool oSneakWarning)
-        //{
-        //    //戻り値初期化
-        //    oFish = new FishHistoryDBFishModel();
-        //    oFish.FishName = string.Empty;
-        //    oFish.FishCount = 0;
-        //    oFish.ZoneName = this.ZoneName;
-        //    oFish.RodName = this.RodName;
-        //    oFish.BaitName = this.BaitName;
-        //    oFish.ID1 = 0;
-        //    oFish.ID2 = 0;
-        //    oFish.ID3 = 0;
-        //    oFish.ID4 = 0;
-        //    oFish.Critical = false;
-        //    oFish.FishType = FishDBFishTypeKind.Unknown;
-        //    oFish.Result = FishResultStatusKind.NoBite;
-        //    oFish.EarthTime = this.EarthDateTime;
-        //    oFish.VanaTime = this.VanaDateTimeYmdhm;
-        //    oFish.VanaWeekDay = this.DayType;
-        //    oFish.MoonPhase = this.MoonPhase;
-        //    oFish.X = this.Position.X;
-        //    oFish.Y = this.Position.Y;
-        //    oFish.Z = this.Position.Z;
-        //    oFish.H = this.Position.H;
 
-        //    oChatReceive = false;
-        //    oEnemyAttack = false;
-        //    oSneakWarning = false;
-
-        //    setHarakiriStatus(FishingStatusKind.Normal);
-        //    setMessage(string.Format("キャスト中：{0}x{1}", this.RodNameWithRemain, this.BaitNameWithRemain));
-
-        //    //キャスト
-        //    while (this.RunningStatus == RunningStatusKind.Running && fface.Player.Status != FFACETools.Status.Fishing)
-        //    {
-        //        fface.Windower.SendString("/fish");
-        //        Thread.Sleep(settings.Global.WaitChat);
-
-        //        FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
-        //        while (chat.GetNextChatLine(out cl))
-        //        {
-        //            //チャット区分の取得
-        //            List<string> chatKbnArgs = new List<string>();
-        //            ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
-        //            logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
-        //            //エラーチェック
-        //            if (chatKbn == ChatKbnKind.CanNotFishing)
-        //            {
-        //                setHarakiriStatus(FishingStatusKind.Error);
-        //                setMessage("釣りができない場所だったので停止");
-        //                return false;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.NotEquipRod)
-        //            {
-        //                setHarakiriStatus(FishingStatusKind.Error);
-        //                setMessage("竿を装備していないので停止");
-        //                return false;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.NotEquipBait)
-        //            {
-        //                setHarakiriStatus(FishingStatusKind.Error);
-        //                setMessage("エサを装備していないので停止");
-        //                return false;
-        //            }
-        //            else if (oChatReceive) //チャット感知
-        //            {
-        //                return true;
-        //            }
-        //            else if (oEnemyAttack) //敵の攻撃感知
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //    }
-        //    this.lastRodName = this.RodName;
-        //    this.lastBaitName = this.BaitName;
-        //    while (this.RunningStatus == RunningStatusKind.Running)
-        //    {
-        //        FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
-        //        while(chat.GetNextChatLine(out cl))
-        //        {
-        //            //チャット区分の取得
-        //            List<string> chatKbnArgs = new List<string>();
-        //            ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning);
-        //            logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
-                    
-        //            if (chatKbn == ChatKbnKind.BaitSmallFish || chatKbn == ChatKbnKind.BaitLargeFish ||
-        //                chatKbn == ChatKbnKind.BaitItem || chatKbn == ChatKbnKind.BaitMonster)//魚がかかった
-        //            {
-        //                //プレイヤステータスがFishBiteになるまで待つ
-        //                while (this.PlayerStatus != FFACETools.Status.FishBite)
-        //                {
-        //                    Thread.Sleep(settings.Global.WaitBase);
-        //                }
-        //                Thread.Sleep(500);
-        //                //IDの設定
-        //                oFish.ID1 = fface.Fish.ID.ID1;
-        //                oFish.ID2 = fface.Fish.ID.ID2;
-        //                oFish.ID3 = fface.Fish.ID.ID3;
-        //                oFish.ID4 = fface.Fish.ID.ID4;
-        //                //魚名称・タイプの設定
-        //                List<FishDBFishModel> fishList = fishDB.SelectFishFromID(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, false);
-        //                FishDBFishModel fish = new FishDBFishModel();
-        //                if (fishList.Count > 0)
-        //                {
-        //                    fish = fishList[0];
-        //                    oFish.FishName = fish.FishName;
-        //                    oFish.FishType = fish.FishType;
-        //                    oFish.FishCount = fish.GetId(oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4).Count;
-        //                    oFish.Critical = fish.GetId(oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4).Critical;
-        //                }
-        //                else
-        //                {
-        //                    oFish.FishType = getTmpFishTypeFromChat(cl.Text);
-        //                    oFish.FishName = getTmpFishNameFromFishType(oFish.FishType, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4);
-        //                }
-        //                setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                logger.Output(LogLevelKind.INFO, string.Format("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType));
-        //                //日時の設定
-        //                oFish.EarthTime = this.EarthDateTime;
-        //                oFish.VanaTime = this.VanaDateTimeYmdhm;
-        //                oFish.VanaWeekDay = this.DayType;
-        //                oFish.MoonPhase = this.MoonPhase;
-        //                //HP0の設定
-        //                int waitHP0 = MiscTool.GetRandomNumber(settings.Fishing.HP0Min, settings.Fishing.HP0Max);
-        //                //反応時間待機
-        //                Thread.Sleep(settings.Global.WaitChat); //wait
-        //                if (settings.Fishing.ReactionTime)
-        //                {
-        //                    wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical));
-        //                }
-        //                //リリース判定
-        //                if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType))
-        //                {
-        //                    //リリースする
-        //                    logger.Output(LogLevelKind.DEBUG, string.Format("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                    while (this.PlayerStatus == FFACETools.Status.FishBite)
-        //                    {
-        //                        fface.Windower.SendKeyPress(KeyCode.EscapeKey);
-        //                        Thread.Sleep(settings.Global.WaitBase);
-        //                    }
-        //                    continue;
-        //                } 
-        //                setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //釣り格闘
-        //                while (fface.Fish.HPCurrent > 0 && fface.Player.Status == Status.FishBite)
-        //                {
-        //                    //強制HP0
-        //                    if (settings.Fishing.HP0)
-        //                    {
-        //                        if (isExecHp0(oFish.EarthTime, waitHP0))
-        //                        {
-        //                            logger.Output(LogLevelKind.INFO,"制限時間を過ぎたので、魚のHPを強制的にゼロにします");
-        //                            fface.Fish.SetHP(0);
-        //                            Thread.Sleep(settings.Global.WaitBase);
-        //                        }
-        //                    }
-        //                    fface.Fish.FightFish();
-        //                    Thread.Sleep(settings.Global.WaitBase);
-        //                }
-        //                //釣り上げる
-        //                //プレイヤステータスがFishBite以外になるまで待つ
-        //                while (this.PlayerStatus == FFACETools.Status.FishBite)
-        //                {
-        //                    fface.Windower.SendKeyPress(KeyCode.EnterKey);
-        //                    Thread.Sleep(settings.Global.WaitBase);
-        //                } 
-        //            }
-        //            else if (chatKbn == ChatKbnKind.CatchSingle)//釣れた
-        //            {
-        //                oFish.FishName = chatKbnArgs[0];
-        //                oFish.FishCount = 1;
-        //                oFish.Result = FishResultStatusKind.Catch;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.CatchMultiple)//複数釣れた
-        //            {
-        //                oFish.FishName = chatKbnArgs[0];
-        //                oFish.FishCount = int.Parse(chatKbnArgs[1]);
-        //                oFish.Result = FishResultStatusKind.Catch;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.CatchMonster)//モンスター釣れた
-        //            {
-        //                //oFish.FishName = chatKbnArgs[0];
-        //                oFish.FishCount = 1;
-        //                oFish.Result = FishResultStatusKind.Catch;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：{0}", oFish.FishName));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.InventoryFull)//鞄いっぱい
-        //            {
-        //                oFish.FishName = chatKbnArgs[0];
-        //                oFish.FishCount = 1;
-        //                oFish.Result = FishResultStatusKind.Release;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：鞄いっぱいでリリース {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.NoBait)//何も釣れなかった
-        //            {
-        //                oFish.Result = FishResultStatusKind.NoBite;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントアップ
-        //                noCatchCount++;
-        //                setMessage(string.Format("釣果：何も釣れなかった {0}連続", noCatchCount));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.Release)//リリース
-        //            {
-        //                oFish.Result = FishResultStatusKind.Release;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：リリース {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.NoCatch)//逃げられた
-        //            {
-        //                oFish.Result = FishResultStatusKind.NoCatch;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：逃げられた {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.LineBreak)//糸切れ
-        //            {
-        //                oFish.Result = FishResultStatusKind.LineBreak;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：糸切れ {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.RodBreak)//竿折れ
-        //            {
-        //                oFish.Result = FishResultStatusKind.RodBreak;
-        //                //データベースへの登録
-        //                if (!putDatabase(oFish)) return false;
-        //                //連続釣果無しカウントクリア
-        //                noCatchCount = 0;
-        //                setMessage(string.Format("釣果：竿折れ {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
-        //                //イベント発生
-        //                EventFished(oFish.Result);
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                waitChangePlayerStatus(FFACETools.Status.Standing);
-        //                return true;
-        //            }
-        //            else if (chatKbn == ChatKbnKind.BaitCritical)//クリティカル
-        //            {
-        //                oFish.Critical = true;
-        //            }
-        //            else if (oChatReceive) //チャット感知
-        //            {
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                while (this.PlayerStatus != FFACETools.Status.Standing)
-        //                {
-        //                    fface.Windower.SendKeyPress(KeyCode.EscapeKey);
-        //                    Thread.Sleep(settings.Global.WaitBase);
-        //                }
-        //                return true;
-        //            }
-        //            else if (oEnemyAttack) //敵の攻撃感知
-        //            {
-        //                //プレイヤステータスがStandingになるまで待つ
-        //                while (this.PlayerStatus != FFACETools.Status.Standing)
-        //                {
-        //                    fface.Windower.SendKeyPress(KeyCode.EscapeKey);
-        //                    Thread.Sleep(settings.Global.WaitBase);
-        //                }
-        //                return true;
-        //            }
-        //        }
-        //        Thread.Sleep(settings.Global.WaitChat);
-        //    }
-
-        //    return true;
-
-        //}
-
-        /// <summary>
-        /// FishDB・FishHistoryDBへの登録処理
-        /// </summary>
-        /// <param name="iFish">FishHistoryDBFishModel</param>
-        /// <returns></returns>
-        private bool putDatabase(HarakiriDBHistoryModel iHistory)
-        {
-            ////FishDBに登録
-            //if (iFish.ID1 != 0 && iFish.ID2 != 0 && iFish.ID3 != 0 && iFish.ID4 != 0)
-            //{
-            //    //FishDBから魚情報取得（不明魚以外で）
-            //    FishDBFishModel fish = fishDB.SelectFishFromIDName(iFish.RodName, iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, iFish.FishName, false);
-            //    FishDBIdModel id = fish.GetId(iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4);
-            //    //FishCount Critical Wanted
-            //    if (fish.FishName != string.Empty)
-            //    {
-            //        iFish.FishCount = id.Count;
-            //        iFish.Critical = id.Critical;
-            //    }
-            //    //FishTypeの設定
-            //    if(!isTmpFishFromName(iFish.FishName))
-            //    {
-            //        if (iFish.FishType == FishDBFishTypeKind.UnknownSmallFish) iFish.FishType = FishDBFishTypeKind.SmallFish;
-            //        if (iFish.FishType == FishDBFishTypeKind.UnknownLargeFish) iFish.FishType = FishDBFishTypeKind.LargeFish;
-            //        if (iFish.FishType == FishDBFishTypeKind.UnknownItem) iFish.FishType = FishDBFishTypeKind.Item;
-            //    }
-            //    //登録情報の設定 
-            //    FishDBFishModel fishDBFish = new FishDBFishModel();
-            //    fishDBFish.FishName = iFish.FishName;
-            //    FishDBIdModel fishDBId = new FishDBIdModel();
-            //    fishDBId.ID1 = iFish.ID1;
-            //    fishDBId.ID2 = iFish.ID2;
-            //    fishDBId.ID3 = iFish.ID3;
-            //    fishDBId.ID4 = iFish.ID4;
-            //    fishDBId.Count = iFish.FishCount;
-            //    fishDBId.Critical = iFish.Critical;
-            //    fishDBFish.IDs.Add(fishDBId);
-            //    fishDBFish.FishType = iFish.FishType;
-            //    fishDBFish.ZoneNames.Add(iFish.ZoneName);
-            //    fishDBFish.BaitNames.Add(iFish.BaitName);
-            //    if (!fishDB.UpdateFish(iFish.RodName, fishDBFish))
-            //    {
-            //        setMessage("FishDBデータベースへの登録に失敗");
-            //        return false;
-            //    } 
-            //}
-            ////FishHistoryDBに登録
-            //if (!harakiriDB.Add(this.PlayerName, iFish))
-            //{
-            //    setMessage("FishHistoryDBデータベースへの登録に失敗");
-            //    return false;
-            //}
-            return true;
-        }
         /// <summary>
         /// チャット内容からChatKbnKindを取得する
         /// </summary>
@@ -812,78 +427,23 @@ namespace EnjoyFishing
         }
         #endregion
 
-        #region 装備アイテム
         /// <summary>
-        /// アイテムを鞄へ移動する
+        /// ハラキリ対象の魚の残数を取得
         /// </summary>
-        /// <param name="iItemName"></param>
-        /// <returns></returns>
-        private bool getItem(string iItemName)
+        /// <param name="iFishName">魚名称</param>
+        /// <returns>残数</returns>
+        public uint GetHarakiriRemain(string iFishName)
         {
-            bool moveOkFlg = false;
-            //if (settings.UseItemizer)
-            //{
-            //    if (!moveOkFlg && settings.Fishing.NoBaitNoRodSatchel)
-            //        if (control.GetItem(iItemName, InventoryType.Satchel))
-            //        {
-            //            moveOkFlg = true;
-            //            setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Satchel.ToString()));
-            //            Thread.Sleep(1000);
-            //        }
-            //    if (!moveOkFlg && settings.Fishing.NoBaitNoRodSack)
-            //        if (control.GetItem(iItemName, InventoryType.Sack))
-            //        {
-            //            moveOkFlg = true;
-            //            setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Sack.ToString()));
-            //            Thread.Sleep(1000);
-            //        }
-            //    if (!moveOkFlg && settings.Fishing.NoBaitNoRodCase)
-            //        if (control.GetItem(iItemName, InventoryType.Case))
-            //        {
-            //            moveOkFlg = true;
-            //            setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Case.ToString()));
-            //            Thread.Sleep(1000);
-            //        }
-            //}
-            return moveOkFlg;
+            int itemId = FFACE.ParseResources.GetItemId(iFishName);
+            uint remain = fface.Item.GetItemCount(itemId, InventoryType.Inventory);
+            if (settings.UseItemizer)
+            {
+                remain += fface.Item.GetItemCount(itemId, InventoryType.Satchel);
+                remain += fface.Item.GetItemCount(itemId, InventoryType.Sack);
+                remain += fface.Item.GetItemCount(itemId, InventoryType.Case);
+            }
+            return remain;
         }
-        /// <summary>
-        /// 魚を鞄から移動する
-        /// </summary>
-        /// <returns></returns>
-        private bool putFish()
-        {
-            bool moveOkFlg = false;
-            //if (settings.UseItemizer)
-            //{
-            //    if (!moveOkFlg && settings.Fishing.InventoryFullSatchel) moveOkFlg = putFish(InventoryType.Satchel);
-            //    if (!moveOkFlg && settings.Fishing.InventoryFullSack) moveOkFlg = putFish(InventoryType.Sack);
-            //    if (!moveOkFlg && settings.Fishing.InventoryFullCase) moveOkFlg = putFish(InventoryType.Case);
-            //}
-            return moveOkFlg;
-        }
-        /// <summary>
-        /// 指定した場所へ魚を移動する
-        /// </summary>
-        /// <param name="iInventoryType"></param>
-        /// <returns></returns>
-        private bool putFish(InventoryType iInventoryType)
-        {
-            //if (control.GetInventoryCountByType(iInventoryType) >= control.GetInventoryMaxByType(iInventoryType)) return false;
-            //List<FishDBFishModel> fishes = fishDB.SelectFishList(this.RodName, string.Empty, string.Empty);
-            //foreach (FishDBFishModel fish in fishes)
-            //{
-            //    if (control.IsExistItem(fish.FishName, InventoryType.Inventory))
-            //    {
-            //        control.PutItem(fish.FishName, iInventoryType);
-            //        setMessage(string.Format("{0}を{1}に移動しました", fish.FishName, iInventoryType.ToString()));
-            //        Thread.Sleep(1000);
-            //        return true;
-            //    }
-            //}
-            return false;
-        }
-        #endregion
 
         #region ステータス・メッセージ 
         private void setRunningStatus(RunningStatusKind iRunningStatus)
