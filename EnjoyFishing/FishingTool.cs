@@ -1462,6 +1462,10 @@ namespace EnjoyFishing
                 case ChatMode.SentYell:
                     if(settings.Fishing.ChatShout) rChatRecieve = true;
                     return ChatKbnKind.Shout;
+                case ChatMode.RcvdEmote:
+                case ChatMode.SentEmote:
+                    if (settings.Fishing.ChatEmote && iCl.Text.Contains(this.PlayerName)) rChatRecieve = true;
+                    return ChatKbnKind.Shout;
             }
             foreach (KeyValuePair<ChatKbnKind, string> v in dictionaryChat)
             {

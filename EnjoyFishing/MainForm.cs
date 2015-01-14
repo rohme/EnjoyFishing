@@ -357,6 +357,7 @@ namespace EnjoyFishing
                 chkChatParty.Checked = settings.Fishing.ChatParty;
                 chkChatLs.Checked = settings.Fishing.ChatLs;
                 chkChatShout.Checked = settings.Fishing.ChatShout;
+                chkChatEmote.Checked = settings.Fishing.ChatEmote;
                 chkChatRestart.Checked = settings.Fishing.ChatRestart;
                 txtChatRestartMinute.Value = settings.Fishing.ChatRestartMinute;
                 chkEntryPort.Checked = settings.Fishing.EntryPort;
@@ -1527,6 +1528,7 @@ namespace EnjoyFishing
                 settings.Fishing.ChatParty = chkChatParty.Checked;
                 settings.Fishing.ChatLs = chkChatLs.Checked;
                 settings.Fishing.ChatShout = chkChatShout.Checked;
+                settings.Fishing.ChatEmote = chkChatEmote.Checked;
                 settings.Fishing.ChatRestart = chkChatRestart.Checked;
                 settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
                 settings.Fishing.EntryPort = chkEntryPort.Checked;
@@ -1902,6 +1904,10 @@ namespace EnjoyFishing
         {
             settings.Fishing.ChatShout = chkChatShout.Checked;
         }
+        private void chkChatEmote_CheckedChanged(object sender, EventArgs e)
+        {
+            settings.Fishing.ChatEmote = chkChatEmote.Checked;
+        }
         private void chkChatRestart_CheckedChanged(object sender, EventArgs e)
         {
             settings.Fishing.ChatRestart = chkChatRestart.Checked;
@@ -2255,6 +2261,7 @@ namespace EnjoyFishing
         }
         
         #endregion
+
 
 
 

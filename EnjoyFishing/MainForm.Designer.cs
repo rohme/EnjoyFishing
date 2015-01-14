@@ -189,6 +189,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
+            this.chkChatEmote = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxCatchCount)).BeginInit();
@@ -285,7 +286,7 @@
             this.statusStrip.Location = new System.Drawing.Point(0, 351);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.ShowItemToolTips = true;
-            this.statusStrip.Size = new System.Drawing.Size(560, 22);
+            this.statusStrip.Size = new System.Drawing.Size(569, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -323,7 +324,7 @@
             // lblMessage
             // 
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(90, 17);
+            this.lblMessage.Size = new System.Drawing.Size(99, 17);
             this.lblMessage.Spring = true;
             this.lblMessage.Text = "メッセージ";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -392,25 +393,26 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtChatRestartMinute);
+            this.groupBox1.Controls.Add(this.chkChatRestart);
+            this.groupBox1.Controls.Add(this.chkChatEmote);
+            this.groupBox1.Controls.Add(this.chkChatShout);
+            this.groupBox1.Controls.Add(this.chkChatLs);
+            this.groupBox1.Controls.Add(this.chkChatParty);
+            this.groupBox1.Controls.Add(this.chkChatSay);
             this.groupBox1.Controls.Add(this.chkEntryPort);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtMaxCatchCount);
             this.groupBox1.Controls.Add(this.txtMaxNoCatchCount);
             this.groupBox1.Controls.Add(this.chkMaxNoCatch);
-            this.groupBox1.Controls.Add(this.txtChatRestartMinute);
             this.groupBox1.Controls.Add(this.txtMaxSkillValue);
-            this.groupBox1.Controls.Add(this.chkChatRestart);
             this.groupBox1.Controls.Add(this.chkMaxSkill);
             this.groupBox1.Controls.Add(this.chkChatTell);
-            this.groupBox1.Controls.Add(this.chkChatShout);
-            this.groupBox1.Controls.Add(this.chkChatLs);
-            this.groupBox1.Controls.Add(this.chkChatParty);
-            this.groupBox1.Controls.Add(this.chkChatSay);
             this.groupBox1.Controls.Add(this.chkMaxCatch);
             this.groupBox1.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.groupBox1.Location = new System.Drawing.Point(0, 120);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(401, 99);
+            this.groupBox1.Size = new System.Drawing.Size(411, 99);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
@@ -430,7 +432,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label1.Location = new System.Drawing.Point(364, 47);
+            this.label1.Location = new System.Drawing.Point(377, 47);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(29, 14);
             this.label1.TabIndex = 13;
@@ -496,7 +498,7 @@
             // txtChatRestartMinute
             // 
             this.txtChatRestartMinute.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtChatRestartMinute.Location = new System.Drawing.Point(327, 45);
+            this.txtChatRestartMinute.Location = new System.Drawing.Point(340, 45);
             this.txtChatRestartMinute.Maximum = new decimal(new int[] {
             99,
             0,
@@ -542,7 +544,7 @@
             // 
             this.chkChatRestart.AutoSize = true;
             this.chkChatRestart.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatRestart.Location = new System.Drawing.Point(272, 46);
+            this.chkChatRestart.Location = new System.Drawing.Point(285, 46);
             this.chkChatRestart.Name = "chkChatRestart";
             this.chkChatRestart.Size = new System.Drawing.Size(59, 18);
             this.chkChatRestart.TabIndex = 11;
@@ -578,7 +580,7 @@
             // 
             this.chkChatShout.AutoSize = true;
             this.chkChatShout.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatShout.Location = new System.Drawing.Point(212, 46);
+            this.chkChatShout.Location = new System.Drawing.Point(180, 46);
             this.chkChatShout.Name = "chkChatShout";
             this.chkChatShout.Size = new System.Drawing.Size(58, 18);
             this.chkChatShout.TabIndex = 10;
@@ -590,7 +592,7 @@
             // 
             this.chkChatLs.AutoSize = true;
             this.chkChatLs.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatLs.Location = new System.Drawing.Point(167, 46);
+            this.chkChatLs.Location = new System.Drawing.Point(145, 46);
             this.chkChatLs.Name = "chkChatLs";
             this.chkChatLs.Size = new System.Drawing.Size(39, 18);
             this.chkChatLs.TabIndex = 9;
@@ -602,7 +604,7 @@
             // 
             this.chkChatParty.AutoSize = true;
             this.chkChatParty.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatParty.Location = new System.Drawing.Point(107, 46);
+            this.chkChatParty.Location = new System.Drawing.Point(92, 46);
             this.chkChatParty.Name = "chkChatParty";
             this.chkChatParty.Size = new System.Drawing.Size(54, 18);
             this.chkChatParty.TabIndex = 8;
@@ -614,7 +616,7 @@
             // 
             this.chkChatSay.AutoSize = true;
             this.chkChatSay.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatSay.Location = new System.Drawing.Point(56, 46);
+            this.chkChatSay.Location = new System.Drawing.Point(48, 46);
             this.chkChatSay.Name = "chkChatSay";
             this.chkChatSay.Size = new System.Drawing.Size(45, 18);
             this.chkChatSay.TabIndex = 7;
@@ -686,7 +688,7 @@
             this.groupBox3.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(401, 120);
+            this.groupBox3.Size = new System.Drawing.Size(411, 120);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "動作";
@@ -1036,7 +1038,7 @@
             this.tabFishingMain.Name = "tabFishingMain";
             this.tabFishingMain.Padding = new System.Drawing.Point(0, 0);
             this.tabFishingMain.SelectedIndex = 0;
-            this.tabFishingMain.Size = new System.Drawing.Size(412, 318);
+            this.tabFishingMain.Size = new System.Drawing.Size(421, 318);
             this.tabFishingMain.TabIndex = 9;
             // 
             // tabFishingMainSetting
@@ -1048,7 +1050,7 @@
             this.tabFishingMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainSetting.Name = "tabFishingMainSetting";
             this.tabFishingMainSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainSetting.Size = new System.Drawing.Size(404, 291);
+            this.tabFishingMainSetting.Size = new System.Drawing.Size(413, 291);
             this.tabFishingMainSetting.TabIndex = 0;
             this.tabFishingMainSetting.Text = "釣り設定";
             this.tabFishingMainSetting.UseVisualStyleBackColor = true;
@@ -1057,9 +1059,9 @@
             // 
             this.groupNoBiteNoRod.Controls.Add(this.flowLayoutPanel4);
             this.groupNoBiteNoRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupNoBiteNoRod.Location = new System.Drawing.Point(203, 219);
+            this.groupNoBiteNoRod.Location = new System.Drawing.Point(206, 220);
             this.groupNoBiteNoRod.Name = "groupNoBiteNoRod";
-            this.groupNoBiteNoRod.Size = new System.Drawing.Size(198, 71);
+            this.groupNoBiteNoRod.Size = new System.Drawing.Size(205, 71);
             this.groupNoBiteNoRod.TabIndex = 3;
             this.groupNoBiteNoRod.TabStop = false;
             this.groupNoBiteNoRod.Text = "竿・エサなし";
@@ -1074,7 +1076,7 @@
             this.flowLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel4.Location = new System.Drawing.Point(3, 17);
             this.flowLayoutPanel4.Name = "flowLayoutPanel4";
-            this.flowLayoutPanel4.Size = new System.Drawing.Size(192, 51);
+            this.flowLayoutPanel4.Size = new System.Drawing.Size(199, 51);
             this.flowLayoutPanel4.TabIndex = 0;
             // 
             // chkNoBaitNoRodSatchel
@@ -1140,7 +1142,7 @@
             this.groupInventoryFull.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.groupInventoryFull.Location = new System.Drawing.Point(0, 219);
             this.groupInventoryFull.Name = "groupInventoryFull";
-            this.groupInventoryFull.Size = new System.Drawing.Size(200, 71);
+            this.groupInventoryFull.Size = new System.Drawing.Size(203, 71);
             this.groupInventoryFull.TabIndex = 2;
             this.groupInventoryFull.TabStop = false;
             this.groupInventoryFull.Text = "鞄いっぱい";
@@ -1155,7 +1157,7 @@
             this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel3.Location = new System.Drawing.Point(3, 17);
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-            this.flowLayoutPanel3.Size = new System.Drawing.Size(194, 51);
+            this.flowLayoutPanel3.Size = new System.Drawing.Size(197, 51);
             this.flowLayoutPanel3.TabIndex = 0;
             // 
             // chkInventoryFullSatchel
@@ -1595,7 +1597,7 @@
             // splitMain.Panel2
             // 
             this.splitMain.Panel2.Controls.Add(this.tabFishingMain);
-            this.splitMain.Size = new System.Drawing.Size(546, 318);
+            this.splitMain.Size = new System.Drawing.Size(555, 318);
             this.splitMain.SplitterDistance = 130;
             this.splitMain.TabIndex = 8;
             // 
@@ -1692,7 +1694,7 @@
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(560, 351);
+            this.tabMain.Size = new System.Drawing.Size(569, 351);
             this.tabMain.TabIndex = 0;
             // 
             // tabMainFishing
@@ -1701,7 +1703,7 @@
             this.tabMainFishing.Location = new System.Drawing.Point(4, 23);
             this.tabMainFishing.Name = "tabMainFishing";
             this.tabMainFishing.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainFishing.Size = new System.Drawing.Size(552, 324);
+            this.tabMainFishing.Size = new System.Drawing.Size(561, 324);
             this.tabMainFishing.TabIndex = 0;
             this.tabMainFishing.Text = "釣り";
             this.tabMainFishing.UseVisualStyleBackColor = true;
@@ -2245,12 +2247,24 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
+            // chkChatEmote
+            // 
+            this.chkChatEmote.AutoSize = true;
+            this.chkChatEmote.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatEmote.Location = new System.Drawing.Point(236, 46);
+            this.chkChatEmote.Name = "chkChatEmote";
+            this.chkChatEmote.Size = new System.Drawing.Size(51, 18);
+            this.chkChatEmote.TabIndex = 15;
+            this.chkChatEmote.Text = "Emo";
+            this.chkChatEmote.UseVisualStyleBackColor = true;
+            this.chkChatEmote.CheckedChanged += new System.EventHandler(this.chkChatEmote_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(560, 373);
+            this.ClientSize = new System.Drawing.Size(569, 373);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -2485,5 +2499,6 @@
         private System.Windows.Forms.RadioButton rdoHarakiriInputTypeSelect;
         private System.Windows.Forms.CheckBox chkEntryPort;
         private System.Windows.Forms.Button btnHarakiriUpdate;
+        private System.Windows.Forms.CheckBox chkChatEmote;
     }
 }

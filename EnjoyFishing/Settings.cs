@@ -422,6 +422,7 @@ namespace EnjoyFishing
         public bool ChatParty { get; set; }
         public bool ChatLs { get; set; }
         public bool ChatShout { get; set; }
+        public bool ChatEmote { get; set; }
         public bool ChatRestart { get; set; }
         public int ChatRestartMinute { get; set; }
         public bool EntryPort { get; set; }
@@ -470,6 +471,7 @@ namespace EnjoyFishing
             this.ChatParty = false;
             this.ChatLs = false;
             this.ChatShout = true;
+            this.ChatEmote = true;
             this.ChatRestart = false;
             this.ChatRestartMinute = 10;
             this.EntryPort = true;
