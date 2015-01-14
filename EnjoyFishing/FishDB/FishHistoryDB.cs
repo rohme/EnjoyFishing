@@ -23,10 +23,28 @@ namespace EnjoyFishing
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public FishHistoryDB(LoggerTool iLogger)
+        public FishHistoryDB(string iPlayerName, DateTime iYmd, LoggerTool iLogger)
         {
-            logger = iLogger;
+            this.logger = iLogger;
+            FishHistoryDBModel history = getHistoryDB(iPlayerName, iYmd);
+            this.TimeElapsed = history.TimeElapsed;
         }
+
+        #region メンバー
+        /// <summary>
+        /// 釣果数(ResultがCatchの数)
+        /// </summary>
+        public int CatchCount
+        {
+            get;
+            private set;
+        }
+        public int TimeElapsed
+        {
+            get;
+            set;
+        }
+        #endregion
 
         /// <summary>
         /// 日付別の履歴を取得
@@ -107,13 +125,8 @@ namespace EnjoyFishing
             historydb.Version = VERSION;
             historydb.PlayerName = iPlayername;
             historydb.EarthDate = DateTime.Parse(iFish.EarthTime).ToShortDateString();
+            historydb.TimeElapsed = this.TimeElapsed;
             historydb.Fishes.Add(iFish);
-            //合計数を算出
-            historydb.CatchCount = 0;
-            for (int i = 0; i < historydb.Fishes.Count; i++)
-            {
-                if (historydb.Fishes[i].Result == FishResultStatusKind.Catch) historydb.CatchCount++;
-            }
 
             return putHistoryDB(iPlayername, historydb);
         }
@@ -160,7 +173,6 @@ namespace EnjoyFishing
             history1_0_5.Version = "1.0.5";
             history1_0_5.PlayerName = history1_0_0.PlayerName;
             history1_0_5.EarthDate = history1_0_0.EarthDate.ToShortDateString();
-            history1_0_5.CatchCount = history1_0_0.CatchCount;
             foreach (FishHistoryDBFishModel1_0_0 fish1_0_0 in history1_0_0.Fishes)
             {
                 FishHistoryDBFishModel fish1_0_5 = new FishHistoryDBFishModel();
@@ -201,7 +213,7 @@ namespace EnjoyFishing
         private FishHistoryDBModel getHistoryDB(string iPlayerName, DateTime iYmd)
         {
             string xmlFilename =getXmlName(iPlayerName,iYmd);
-            FishHistoryDBModel historydb = new FishHistoryDBModel();
+            FishHistoryDBModel history = new FishHistoryDBModel();
             if(!Directory.Exists(DIRECTORY_FISHHISTORYDB))
             {
                 Directory.CreateDirectory(DIRECTORY_FISHHISTORYDB);
@@ -215,7 +227,7 @@ namespace EnjoyFishing
                         using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
                             XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel));
-                            historydb = (FishHistoryDBModel)serializer.Deserialize(fs);
+                            history = (FishHistoryDBModel)serializer.Deserialize(fs);
                             fs.Close();
                         }
                         break;
@@ -227,7 +239,9 @@ namespace EnjoyFishing
                     }
                 }
             }
-            return historydb;
+            //CatchCountの更新
+            updateCatchCount(history);
+            return history;
         }
         /// <summary>
         /// xmlへ書き込む
@@ -267,6 +281,8 @@ namespace EnjoyFishing
                     continue;
                 }
             }
+            //CatchCountの更新
+            updateCatchCount(iHistoryDB);
             return true;
         }
         /// <summary>
@@ -335,6 +351,19 @@ namespace EnjoyFishing
                 ret = "1.0.0";
             }
             return ret;
+        }
+        private void updateCatchCount(FishHistoryDBModel iFishHistoryDB)
+        {
+            int cnt = 0;
+            foreach (FishHistoryDBFishModel fish in iFishHistoryDB.Fishes)
+            {
+                if (fish.Result == FishResultStatusKind.Catch &&
+                    (fish.FishType == FishDBFishTypeKind.SmallFish || fish.FishType == FishDBFishTypeKind.LargeFish))
+                {
+                    cnt++;
+                }
+            }
+            this.CatchCount = cnt;
         }
     }
 }

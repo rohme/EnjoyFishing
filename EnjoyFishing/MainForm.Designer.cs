@@ -47,20 +47,21 @@
             this.chkIgnoreSmallFish = new System.Windows.Forms.CheckBox();
             this.chkIgnoreLargeFish = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtChatRestartMinute = new System.Windows.Forms.NumericUpDown();
+            this.chkChatRestart = new System.Windows.Forms.CheckBox();
+            this.chkChatEmote = new System.Windows.Forms.CheckBox();
+            this.chkChatShout = new System.Windows.Forms.CheckBox();
+            this.chkChatLs = new System.Windows.Forms.CheckBox();
+            this.chkChatParty = new System.Windows.Forms.CheckBox();
+            this.chkChatSay = new System.Windows.Forms.CheckBox();
             this.chkEntryPort = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtMaxCatchCount = new System.Windows.Forms.NumericUpDown();
             this.txtMaxNoCatchCount = new System.Windows.Forms.NumericUpDown();
             this.chkMaxNoCatch = new System.Windows.Forms.CheckBox();
-            this.txtChatRestartMinute = new System.Windows.Forms.NumericUpDown();
             this.txtMaxSkillValue = new System.Windows.Forms.NumericUpDown();
-            this.chkChatRestart = new System.Windows.Forms.CheckBox();
             this.chkMaxSkill = new System.Windows.Forms.CheckBox();
             this.chkChatTell = new System.Windows.Forms.CheckBox();
-            this.chkChatShout = new System.Windows.Forms.CheckBox();
-            this.chkChatLs = new System.Windows.Forms.CheckBox();
-            this.chkChatParty = new System.Windows.Forms.CheckBox();
-            this.chkChatSay = new System.Windows.Forms.CheckBox();
             this.chkMaxCatch = new System.Windows.Forms.CheckBox();
             this.chkIgnoreItem = new System.Windows.Forms.CheckBox();
             this.chkIgnoreMonster = new System.Windows.Forms.CheckBox();
@@ -104,16 +105,18 @@
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tabFishingMainInfo = new System.Windows.Forms.TabPage();
+            this.lblFishingInfoSkill = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.lblFishingInfoNoCatchCount = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.lblFishingInfoBaitName = new System.Windows.Forms.Label();
             this.lblFishingInfoRodName = new System.Windows.Forms.Label();
-            this.lblFishingInfoNoCatchCount = new System.Windows.Forms.Label();
-            this.lblFishingInfoSkill = new System.Windows.Forms.Label();
+            this.lblFishingInfoCatchCount = new System.Windows.Forms.Label();
             this.lblFishingInfoCase = new System.Windows.Forms.Label();
             this.lblFishingInfoSack = new System.Windows.Forms.Label();
             this.lblFishingInfoSatchel = new System.Windows.Forms.Label();
             this.gridFishingInfo = new System.Windows.Forms.DataGridView();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -189,12 +192,13 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.chkChatEmote = new System.Windows.Forms.CheckBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.lblFishingInfoTimeElapsed = new System.Windows.Forms.Label();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxCatchCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxNoCatchCount)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxSkillValue)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtHP0Max)).BeginInit();
@@ -417,6 +421,103 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
             // 
+            // txtChatRestartMinute
+            // 
+            this.txtChatRestartMinute.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtChatRestartMinute.Location = new System.Drawing.Point(340, 45);
+            this.txtChatRestartMinute.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this.txtChatRestartMinute.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.txtChatRestartMinute.Name = "txtChatRestartMinute";
+            this.txtChatRestartMinute.Size = new System.Drawing.Size(35, 21);
+            this.txtChatRestartMinute.TabIndex = 12;
+            this.txtChatRestartMinute.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtChatRestartMinute.Value = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this.txtChatRestartMinute.ValueChanged += new System.EventHandler(this.txtChatRestartCount_ValueChanged);
+            // 
+            // chkChatRestart
+            // 
+            this.chkChatRestart.AutoSize = true;
+            this.chkChatRestart.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatRestart.Location = new System.Drawing.Point(285, 46);
+            this.chkChatRestart.Name = "chkChatRestart";
+            this.chkChatRestart.Size = new System.Drawing.Size(59, 18);
+            this.chkChatRestart.TabIndex = 11;
+            this.chkChatRestart.Text = "再始動";
+            this.chkChatRestart.UseVisualStyleBackColor = true;
+            this.chkChatRestart.CheckedChanged += new System.EventHandler(this.chkChatRestart_CheckedChanged);
+            // 
+            // chkChatEmote
+            // 
+            this.chkChatEmote.AutoSize = true;
+            this.chkChatEmote.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatEmote.Location = new System.Drawing.Point(236, 46);
+            this.chkChatEmote.Name = "chkChatEmote";
+            this.chkChatEmote.Size = new System.Drawing.Size(51, 18);
+            this.chkChatEmote.TabIndex = 15;
+            this.chkChatEmote.Text = "Emo";
+            this.chkChatEmote.UseVisualStyleBackColor = true;
+            this.chkChatEmote.CheckedChanged += new System.EventHandler(this.chkChatEmote_CheckedChanged);
+            // 
+            // chkChatShout
+            // 
+            this.chkChatShout.AutoSize = true;
+            this.chkChatShout.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatShout.Location = new System.Drawing.Point(180, 46);
+            this.chkChatShout.Name = "chkChatShout";
+            this.chkChatShout.Size = new System.Drawing.Size(58, 18);
+            this.chkChatShout.TabIndex = 10;
+            this.chkChatShout.Text = "Shout";
+            this.chkChatShout.UseVisualStyleBackColor = true;
+            this.chkChatShout.CheckedChanged += new System.EventHandler(this.chkChatShout_CheckedChanged);
+            // 
+            // chkChatLs
+            // 
+            this.chkChatLs.AutoSize = true;
+            this.chkChatLs.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatLs.Location = new System.Drawing.Point(145, 46);
+            this.chkChatLs.Name = "chkChatLs";
+            this.chkChatLs.Size = new System.Drawing.Size(39, 18);
+            this.chkChatLs.TabIndex = 9;
+            this.chkChatLs.Text = "LS";
+            this.chkChatLs.UseVisualStyleBackColor = true;
+            this.chkChatLs.CheckedChanged += new System.EventHandler(this.chkChatLs_CheckedChanged);
+            // 
+            // chkChatParty
+            // 
+            this.chkChatParty.AutoSize = true;
+            this.chkChatParty.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatParty.Location = new System.Drawing.Point(92, 46);
+            this.chkChatParty.Name = "chkChatParty";
+            this.chkChatParty.Size = new System.Drawing.Size(54, 18);
+            this.chkChatParty.TabIndex = 8;
+            this.chkChatParty.Text = "Party";
+            this.chkChatParty.UseVisualStyleBackColor = true;
+            this.chkChatParty.CheckedChanged += new System.EventHandler(this.chkChatParty_CheckedChanged);
+            // 
+            // chkChatSay
+            // 
+            this.chkChatSay.AutoSize = true;
+            this.chkChatSay.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkChatSay.Location = new System.Drawing.Point(48, 46);
+            this.chkChatSay.Name = "chkChatSay";
+            this.chkChatSay.Size = new System.Drawing.Size(45, 18);
+            this.chkChatSay.TabIndex = 7;
+            this.chkChatSay.Text = "Say";
+            this.chkChatSay.UseVisualStyleBackColor = true;
+            this.chkChatSay.CheckedChanged += new System.EventHandler(this.chkChatSay_CheckedChanged);
+            // 
             // chkEntryPort
             // 
             this.chkEntryPort.AutoSize = true;
@@ -495,31 +596,6 @@
             this.chkMaxNoCatch.UseVisualStyleBackColor = true;
             this.chkMaxNoCatch.CheckedChanged += new System.EventHandler(this.chkMaxNoCatch_CheckedChanged);
             // 
-            // txtChatRestartMinute
-            // 
-            this.txtChatRestartMinute.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtChatRestartMinute.Location = new System.Drawing.Point(340, 45);
-            this.txtChatRestartMinute.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.txtChatRestartMinute.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.txtChatRestartMinute.Name = "txtChatRestartMinute";
-            this.txtChatRestartMinute.Size = new System.Drawing.Size(35, 21);
-            this.txtChatRestartMinute.TabIndex = 12;
-            this.txtChatRestartMinute.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtChatRestartMinute.Value = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.txtChatRestartMinute.ValueChanged += new System.EventHandler(this.txtChatRestartCount_ValueChanged);
-            // 
             // txtMaxSkillValue
             // 
             this.txtMaxSkillValue.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -539,18 +615,6 @@
             0,
             0});
             this.txtMaxSkillValue.ValueChanged += new System.EventHandler(this.txtMaxSkillValue_ValueChanged);
-            // 
-            // chkChatRestart
-            // 
-            this.chkChatRestart.AutoSize = true;
-            this.chkChatRestart.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatRestart.Location = new System.Drawing.Point(285, 46);
-            this.chkChatRestart.Name = "chkChatRestart";
-            this.chkChatRestart.Size = new System.Drawing.Size(59, 18);
-            this.chkChatRestart.TabIndex = 11;
-            this.chkChatRestart.Text = "再始動";
-            this.chkChatRestart.UseVisualStyleBackColor = true;
-            this.chkChatRestart.CheckedChanged += new System.EventHandler(this.chkChatRestart_CheckedChanged);
             // 
             // chkMaxSkill
             // 
@@ -575,54 +639,6 @@
             this.chkChatTell.Text = "Tell";
             this.chkChatTell.UseVisualStyleBackColor = true;
             this.chkChatTell.CheckedChanged += new System.EventHandler(this.chkChatTell_CheckedChanged);
-            // 
-            // chkChatShout
-            // 
-            this.chkChatShout.AutoSize = true;
-            this.chkChatShout.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatShout.Location = new System.Drawing.Point(180, 46);
-            this.chkChatShout.Name = "chkChatShout";
-            this.chkChatShout.Size = new System.Drawing.Size(58, 18);
-            this.chkChatShout.TabIndex = 10;
-            this.chkChatShout.Text = "Shout";
-            this.chkChatShout.UseVisualStyleBackColor = true;
-            this.chkChatShout.CheckedChanged += new System.EventHandler(this.chkChatShout_CheckedChanged);
-            // 
-            // chkChatLs
-            // 
-            this.chkChatLs.AutoSize = true;
-            this.chkChatLs.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatLs.Location = new System.Drawing.Point(145, 46);
-            this.chkChatLs.Name = "chkChatLs";
-            this.chkChatLs.Size = new System.Drawing.Size(39, 18);
-            this.chkChatLs.TabIndex = 9;
-            this.chkChatLs.Text = "LS";
-            this.chkChatLs.UseVisualStyleBackColor = true;
-            this.chkChatLs.CheckedChanged += new System.EventHandler(this.chkChatLs_CheckedChanged);
-            // 
-            // chkChatParty
-            // 
-            this.chkChatParty.AutoSize = true;
-            this.chkChatParty.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatParty.Location = new System.Drawing.Point(92, 46);
-            this.chkChatParty.Name = "chkChatParty";
-            this.chkChatParty.Size = new System.Drawing.Size(54, 18);
-            this.chkChatParty.TabIndex = 8;
-            this.chkChatParty.Text = "Party";
-            this.chkChatParty.UseVisualStyleBackColor = true;
-            this.chkChatParty.CheckedChanged += new System.EventHandler(this.chkChatParty_CheckedChanged);
-            // 
-            // chkChatSay
-            // 
-            this.chkChatSay.AutoSize = true;
-            this.chkChatSay.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatSay.Location = new System.Drawing.Point(48, 46);
-            this.chkChatSay.Name = "chkChatSay";
-            this.chkChatSay.Size = new System.Drawing.Size(45, 18);
-            this.chkChatSay.TabIndex = 7;
-            this.chkChatSay.Text = "Say";
-            this.chkChatSay.UseVisualStyleBackColor = true;
-            this.chkChatSay.CheckedChanged += new System.EventHandler(this.chkChatSay_CheckedChanged);
             // 
             // chkMaxCatch
             // 
@@ -1224,7 +1240,7 @@
             this.tabFishingMainEquip.Controls.Add(this.comboBox1);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
-            this.tabFishingMainEquip.Size = new System.Drawing.Size(404, 291);
+            this.tabFishingMainEquip.Size = new System.Drawing.Size(413, 291);
             this.tabFishingMainEquip.TabIndex = 2;
             this.tabFishingMainEquip.Text = "装備";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
@@ -1259,16 +1275,20 @@
             // 
             // tabFishingMainInfo
             // 
+            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoTimeElapsed);
+            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoSkill);
+            this.tabFishingMainInfo.Controls.Add(this.label7);
+            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoNoCatchCount);
+            this.tabFishingMainInfo.Controls.Add(this.label17);
+            this.tabFishingMainInfo.Controls.Add(this.label14);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoBaitName);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoRodName);
-            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoNoCatchCount);
-            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoSkill);
+            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoCatchCount);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoCase);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoSack);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoSatchel);
             this.tabFishingMainInfo.Controls.Add(this.gridFishingInfo);
-            this.tabFishingMainInfo.Controls.Add(this.label14);
-            this.tabFishingMainInfo.Controls.Add(this.label7);
+            this.tabFishingMainInfo.Controls.Add(this.label16);
             this.tabFishingMainInfo.Controls.Add(this.label6);
             this.tabFishingMainInfo.Controls.Add(this.label5);
             this.tabFishingMainInfo.Controls.Add(this.label11);
@@ -1281,10 +1301,48 @@
             this.tabFishingMainInfo.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainInfo.Name = "tabFishingMainInfo";
             this.tabFishingMainInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainInfo.Size = new System.Drawing.Size(404, 291);
+            this.tabFishingMainInfo.Size = new System.Drawing.Size(413, 291);
             this.tabFishingMainInfo.TabIndex = 1;
             this.tabFishingMainInfo.Text = "情報";
             this.tabFishingMainInfo.UseVisualStyleBackColor = true;
+            // 
+            // lblFishingInfoSkill
+            // 
+            this.lblFishingInfoSkill.AutoSize = true;
+            this.lblFishingInfoSkill.Location = new System.Drawing.Point(349, 17);
+            this.lblFishingInfoSkill.Name = "lblFishingInfoSkill";
+            this.lblFishingInfoSkill.Size = new System.Drawing.Size(28, 14);
+            this.lblFishingInfoSkill.TabIndex = 7;
+            this.lblFishingInfoSkill.Text = "999";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label7.Location = new System.Drawing.Point(313, 17);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(45, 14);
+            this.label7.TabIndex = 6;
+            this.label7.Text = "スキル：";
+            // 
+            // lblFishingInfoNoCatchCount
+            // 
+            this.lblFishingInfoNoCatchCount.AutoSize = true;
+            this.lblFishingInfoNoCatchCount.Location = new System.Drawing.Point(294, 17);
+            this.lblFishingInfoNoCatchCount.Name = "lblFishingInfoNoCatchCount";
+            this.lblFishingInfoNoCatchCount.Size = new System.Drawing.Size(21, 14);
+            this.lblFishingInfoNoCatchCount.TabIndex = 7;
+            this.lblFishingInfoNoCatchCount.Text = "99";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label14.Location = new System.Drawing.Point(241, 17);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(59, 14);
+            this.label14.TabIndex = 6;
+            this.label14.Text = "釣果無し：";
             // 
             // lblFishingInfoBaitName
             // 
@@ -1306,23 +1364,14 @@
             this.lblFishingInfoRodName.TabIndex = 1;
             this.lblFishingInfoRodName.Text = "ＸＸＸＸＸＸＸＸＸ";
             // 
-            // lblFishingInfoNoCatchCount
+            // lblFishingInfoCatchCount
             // 
-            this.lblFishingInfoNoCatchCount.AutoSize = true;
-            this.lblFishingInfoNoCatchCount.Location = new System.Drawing.Point(58, 17);
-            this.lblFishingInfoNoCatchCount.Name = "lblFishingInfoNoCatchCount";
-            this.lblFishingInfoNoCatchCount.Size = new System.Drawing.Size(21, 14);
-            this.lblFishingInfoNoCatchCount.TabIndex = 7;
-            this.lblFishingInfoNoCatchCount.Text = "99";
-            // 
-            // lblFishingInfoSkill
-            // 
-            this.lblFishingInfoSkill.AutoSize = true;
-            this.lblFishingInfoSkill.Location = new System.Drawing.Point(113, 17);
-            this.lblFishingInfoSkill.Name = "lblFishingInfoSkill";
-            this.lblFishingInfoSkill.Size = new System.Drawing.Size(28, 14);
-            this.lblFishingInfoSkill.TabIndex = 7;
-            this.lblFishingInfoSkill.Text = "999";
+            this.lblFishingInfoCatchCount.AutoSize = true;
+            this.lblFishingInfoCatchCount.Location = new System.Drawing.Point(49, 17);
+            this.lblFishingInfoCatchCount.Name = "lblFishingInfoCatchCount";
+            this.lblFishingInfoCatchCount.Size = new System.Drawing.Size(70, 14);
+            this.lblFishingInfoCatchCount.TabIndex = 7;
+            this.lblFishingInfoCatchCount.Text = "999(999.9)";
             // 
             // lblFishingInfoCase
             // 
@@ -1360,29 +1409,19 @@
             this.gridFishingInfo.Location = new System.Drawing.Point(-1, 46);
             this.gridFishingInfo.Name = "gridFishingInfo";
             this.gridFishingInfo.RowTemplate.Height = 21;
-            this.gridFishingInfo.Size = new System.Drawing.Size(404, 245);
+            this.gridFishingInfo.Size = new System.Drawing.Size(413, 245);
             this.gridFishingInfo.TabIndex = 8;
             this.gridFishingInfo.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
-            // label14
+            // label16
             // 
-            this.label14.AutoSize = true;
-            this.label14.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label14.Location = new System.Drawing.Point(5, 17);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(59, 14);
-            this.label14.TabIndex = 6;
-            this.label14.Text = "釣果無し：";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label7.Location = new System.Drawing.Point(77, 17);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(45, 14);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "スキル：";
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label16.Location = new System.Drawing.Point(5, 17);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(51, 14);
+            this.label16.TabIndex = 6;
+            this.label16.Text = "釣果数：";
             // 
             // label6
             // 
@@ -1718,7 +1757,7 @@
             this.tabMainHistory.Location = new System.Drawing.Point(4, 23);
             this.tabMainHistory.Name = "tabMainHistory";
             this.tabMainHistory.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainHistory.Size = new System.Drawing.Size(552, 324);
+            this.tabMainHistory.Size = new System.Drawing.Size(561, 324);
             this.tabMainHistory.TabIndex = 1;
             this.tabMainHistory.Text = "履歴";
             this.tabMainHistory.UseVisualStyleBackColor = true;
@@ -1800,7 +1839,7 @@
             this.tabMainHarakiri.Controls.Add(this.btnExecHarakiri);
             this.tabMainHarakiri.Location = new System.Drawing.Point(4, 23);
             this.tabMainHarakiri.Name = "tabMainHarakiri";
-            this.tabMainHarakiri.Size = new System.Drawing.Size(552, 324);
+            this.tabMainHarakiri.Size = new System.Drawing.Size(561, 324);
             this.tabMainHarakiri.TabIndex = 3;
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
@@ -1886,7 +1925,7 @@
             this.tabMainSetting.Controls.Add(this.groupBox7);
             this.tabMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabMainSetting.Name = "tabMainSetting";
-            this.tabMainSetting.Size = new System.Drawing.Size(552, 324);
+            this.tabMainSetting.Size = new System.Drawing.Size(561, 324);
             this.tabMainSetting.TabIndex = 2;
             this.tabMainSetting.Text = "設定";
             this.tabMainSetting.UseVisualStyleBackColor = true;
@@ -2247,17 +2286,24 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // chkChatEmote
+            // label17
             // 
-            this.chkChatEmote.AutoSize = true;
-            this.chkChatEmote.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkChatEmote.Location = new System.Drawing.Point(236, 46);
-            this.chkChatEmote.Name = "chkChatEmote";
-            this.chkChatEmote.Size = new System.Drawing.Size(51, 18);
-            this.chkChatEmote.TabIndex = 15;
-            this.chkChatEmote.Text = "Emo";
-            this.chkChatEmote.UseVisualStyleBackColor = true;
-            this.chkChatEmote.CheckedChanged += new System.EventHandler(this.chkChatEmote_CheckedChanged);
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label17.Location = new System.Drawing.Point(125, 17);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(62, 14);
+            this.label17.TabIndex = 6;
+            this.label17.Text = "経過時間：";
+            // 
+            // lblFishingInfoTimeElapsed
+            // 
+            this.lblFishingInfoTimeElapsed.AutoSize = true;
+            this.lblFishingInfoTimeElapsed.Location = new System.Drawing.Point(180, 17);
+            this.lblFishingInfoTimeElapsed.Name = "lblFishingInfoTimeElapsed";
+            this.lblFishingInfoTimeElapsed.Size = new System.Drawing.Size(59, 14);
+            this.lblFishingInfoTimeElapsed.TabIndex = 7;
+            this.lblFishingInfoTimeElapsed.Text = "99:99:99";
             // 
             // MainForm
             // 
@@ -2278,9 +2324,9 @@
             this.statusStrip.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxCatchCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxNoCatchCount)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaxSkillValue)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -2500,5 +2546,9 @@
         private System.Windows.Forms.CheckBox chkEntryPort;
         private System.Windows.Forms.Button btnHarakiriUpdate;
         private System.Windows.Forms.CheckBox chkChatEmote;
+        private System.Windows.Forms.Label lblFishingInfoCatchCount;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label lblFishingInfoTimeElapsed;
+        private System.Windows.Forms.Label label17;
     }
 }

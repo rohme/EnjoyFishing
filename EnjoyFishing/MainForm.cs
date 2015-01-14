@@ -266,7 +266,7 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "監視スレッド起動");
             //DB
             fishDB = new FishDB(logger);
-            fishHistoryDB = new FishHistoryDB(logger);
+            fishHistoryDB = new FishHistoryDB(fishing.PlayerName, fishing.EarthDateTime, logger);
             harakiriDB = new HarakiriDB(logger);
             //古いデータをコンバート
             converter();
@@ -1331,14 +1331,33 @@ namespace EnjoyFishing
             }
             else
             {
+                //エリア名
                 lblFishingInfoZoneName.Text = fishing.ZoneName;
+                //竿名
                 lblFishingInfoRodName.Text = fishing.RodNameWithRemain;
+                //エサ名
                 lblFishingInfoBaitName.Text = fishing.BaitNameWithRemain;
+                //釣果数
+                float catchCountPerHour = 0;
+                if (fishing.FishHistoryDB.TimeElapsed > 0)
+                {
+                    catchCountPerHour = ((float)fishing.FishHistoryDB.CatchCount / (float)fishing.FishHistoryDB.TimeElapsed) * 60f * 60f;
+                }
+                lblFishingInfoCatchCount.Text = string.Format("{0}({1:0.0})", fishing.FishHistoryDB.CatchCount, catchCountPerHour);
+                //経過時間
+                DateTime timeElapsed = new DateTime(2000, 12, 31, 0, 0, 0).AddSeconds(fishing.FishHistoryDB.TimeElapsed);
+                lblFishingInfoTimeElapsed.Text = timeElapsed.ToString("HH:mm:ss");
+                //連続釣果なし
                 lblFishingInfoNoCatchCount.Text = fishing.NoCatchCount.ToString();
+                //釣りスキル
                 lblFishingInfoSkill.Text = fishing.FishingSkill.ToString();
+                //鞄
                 lblFishingInfoInventory.Text = string.Format("{0:00}/{1:00}", fishing.InventoryCount, fishing.InventoryMax);
+                //サッチェル
                 lblFishingInfoSatchel.Text = string.Format("{0:00}/{1:00}", fishing.SatchelCount, fishing.SatchelMax);
+                //サック
                 lblFishingInfoSack.Text = string.Format("{0:00}/{1:00}", fishing.SackCount, fishing.SackMax);
+                //ケース
                 lblFishingInfoCase.Text = string.Format("{0:00}/{1:00}", fishing.CaseCount, fishing.CaseMax);
             }
         }
@@ -2261,13 +2280,6 @@ namespace EnjoyFishing
         }
         
         #endregion
-
-
-
-
-
-
-
 
     }
 }
