@@ -179,12 +179,12 @@ namespace EnjoyFishing
             get
             {
                 FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
-                return string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}", int.Parse(vt.Year.ToString()),
-                                                                             int.Parse(vt.Month.ToString()),
-                                                                             int.Parse(vt.Day.ToString()),
-                                                                             int.Parse(vt.Hour.ToString()),
-                                                                             int.Parse(vt.Minute.ToString()),
-                                                                             int.Parse(vt.Second.ToString()));
+                return string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}", int.Parse(vt.Year.ToString()),
+                                                                                    int.Parse(vt.Month.ToString()),
+                                                                                    int.Parse(vt.Day.ToString()),
+                                                                                    int.Parse(vt.Hour.ToString()),
+                                                                                    int.Parse(vt.Minute.ToString()),
+                                                                                    int.Parse(vt.Second.ToString()));
             }
         }
         /// <summary>
@@ -931,14 +931,14 @@ namespace EnjoyFishing
             oFish.Critical = false;
             oFish.FishType = FishDBFishTypeKind.Unknown;
             oFish.Result = FishResultStatusKind.NoBite;
-            oFish.EarthTime = this.EarthDateTime;
+            oFish.EarthTime = this.EarthDateTime.ToString();
             oFish.VanaTime = this.VanaDateTimeYmdhms;
             oFish.VanaWeekDay = this.DayType;
             oFish.MoonPhase = this.MoonPhase;
-            oFish.X = this.Position.X;
-            oFish.Y = this.Position.Y;
-            oFish.Z = this.Position.Z;
-            oFish.H = this.Position.H;
+            oFish.X = (float)Math.Round(this.Position.X, 1, MidpointRounding.AwayFromZero);
+            oFish.Y = (float)Math.Round(this.Position.Y, 1, MidpointRounding.AwayFromZero);
+            oFish.Z = (float)Math.Round(this.Position.Z, 1, MidpointRounding.AwayFromZero);
+            oFish.H = (float)Math.Round(this.Position.H, 1, MidpointRounding.AwayFromZero);
 
             bool fishedFlg = false;
             oChatReceive = false;
@@ -1032,11 +1032,9 @@ namespace EnjoyFishing
                         oFish.ID3 = fface.Fish.ID.ID3;
                         oFish.ID4 = fface.Fish.ID.ID4;
                         //魚名称・タイプの設定
-                        List<FishDBFishModel> fishList = fishDB.SelectFishFromID(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, false);
-                        FishDBFishModel fish = new FishDBFishModel();
-                        if (fishList.Count > 0)
+                        FishDBFishModel fish = fishDB.SelectFishFromIDZone(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, false);
+                        if (!string.IsNullOrEmpty(fish.FishName))
                         {
-                            fish = fishList[0];
                             oFish.FishName = fish.FishName;
                             oFish.FishType = fish.FishType;
                             oFish.FishCount = fish.GetId(oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4).Count;
@@ -1045,12 +1043,12 @@ namespace EnjoyFishing
                         else
                         {
                             oFish.FishType = getTmpFishTypeFromChat(cl.Text);
-                            oFish.FishName = getTmpFishNameFromFishType(oFish.FishType, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4);
+                            oFish.FishName = FishDB.GetTmpFishNameFromFishType(oFish.FishType, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4);
                         }
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
                         logger.Output(LogLevelKind.INFO, string.Format("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType));
                         //日時の設定
-                        oFish.EarthTime = this.EarthDateTime;
+                        oFish.EarthTime = this.EarthDateTime.ToString();
                         oFish.VanaTime = this.VanaDateTimeYmdhms;
                         oFish.VanaWeekDay = this.DayType;
                         oFish.MoonPhase = this.MoonPhase;
@@ -1063,7 +1061,7 @@ namespace EnjoyFishing
                             wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical));
                         }
                         //リリース判定
-                        if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType))
+                        if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, oFish.FishType))
                         {
                             //リリースする
                             logger.Output(LogLevelKind.DEBUG, string.Format("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical)));
@@ -1081,7 +1079,7 @@ namespace EnjoyFishing
                             //強制HP0
                             if (settings.Fishing.HP0)
                             {
-                                if (isExecHp0(oFish.EarthTime, waitHP0))
+                                if (isExecHp0(DateTime.Parse(oFish.EarthTime), waitHP0))
                                 {
                                     logger.Output(LogLevelKind.INFO,"制限時間を過ぎたので、魚のHPを強制的にゼロにします");
                                     fface.Fish.SetHP(0);
@@ -1291,42 +1289,56 @@ namespace EnjoyFishing
             //FishDBに登録
             if (iFish.ID1 != 0 && iFish.ID2 != 0 && iFish.ID3 != 0 && iFish.ID4 != 0)
             {
-                //魚名の名寄せ
-                string renameFishname = renameFish(iFish.FishName);
-                //FishDBから魚情報取得（不明魚以外で）
-                FishDBFishModel fish = fishDB.SelectFishFromIDName(iFish.RodName, iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, renameFishname, false);
-                FishDBIdModel id = fish.GetId(iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4);
-                if (fish.FishName != string.Empty)
-                {
-                    iFish.FishCount = id.Count;
-                    iFish.Critical = id.Critical;
-                }
                 //FishTypeの設定
-                if (!isTmpFishFromName(renameFishname))
+                if (!isTmpFishFromName(iFish.FishName))
                 {
                     if (iFish.FishType == FishDBFishTypeKind.UnknownSmallFish) iFish.FishType = FishDBFishTypeKind.SmallFish;
                     if (iFish.FishType == FishDBFishTypeKind.UnknownLargeFish) iFish.FishType = FishDBFishTypeKind.LargeFish;
                     if (iFish.FishType == FishDBFishTypeKind.UnknownItem) iFish.FishType = FishDBFishTypeKind.Item;
                 }
-                //登録情報の設定 
-                FishDBFishModel fishDBFish = new FishDBFishModel();
-                fishDBFish.FishName = renameFishname;
-                FishDBIdModel fishDBId = new FishDBIdModel();
-                fishDBId.ID1 = iFish.ID1;
-                fishDBId.ID2 = iFish.ID2;
-                fishDBId.ID3 = iFish.ID3;
-                fishDBId.ID4 = iFish.ID4;
-                fishDBId.Count = iFish.FishCount;
-                fishDBId.Critical = iFish.Critical;
-                fishDBFish.IDs.Add(fishDBId);
-                fishDBFish.FishType = iFish.FishType;
-                fishDBFish.ZoneNames.Add(iFish.ZoneName);
-                fishDBFish.BaitNames.Add(iFish.BaitName);
-                if (!fishDB.UpdateFish(iFish.RodName, fishDBFish))
+                FishDBIdModel id = new FishDBIdModel(iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, iFish.FishCount, iFish.Critical);
+                if (!fishDB.AddFish(iFish.RodName, iFish.FishName, iFish.FishType, id, iFish.ZoneName, iFish.BaitName))
                 {
                     setMessage("FishDBデータベースへの登録に失敗");
                     return false;
                 } 
+
+                ////魚名の名寄せ
+                //string renameFishname = renameFish(iFish.FishName);
+                ////FishDBから魚情報取得（不明魚以外で）
+                //FishDBFishModel fish = fishDB.SelectFishFromIDName(iFish.RodName, iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, renameFishname, false);
+                //FishDBIdModel id = fish.GetId(iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4);
+                //if (fish.FishName != string.Empty)
+                //{
+                //    iFish.FishCount = id.Count;
+                //    iFish.Critical = id.Critical;
+                //}
+                ////FishTypeの設定
+                //if (!isTmpFishFromName(renameFishname))
+                //{
+                //    if (iFish.FishType == FishDBFishTypeKind.UnknownSmallFish) iFish.FishType = FishDBFishTypeKind.SmallFish;
+                //    if (iFish.FishType == FishDBFishTypeKind.UnknownLargeFish) iFish.FishType = FishDBFishTypeKind.LargeFish;
+                //    if (iFish.FishType == FishDBFishTypeKind.UnknownItem) iFish.FishType = FishDBFishTypeKind.Item;
+                //}
+                ////登録情報の設定 
+                //FishDBFishModel fishDBFish = new FishDBFishModel();
+                //fishDBFish.FishName = renameFishname;
+                //FishDBIdModel fishDBId = new FishDBIdModel();
+                //fishDBId.ID1 = iFish.ID1;
+                //fishDBId.ID2 = iFish.ID2;
+                //fishDBId.ID3 = iFish.ID3;
+                //fishDBId.ID4 = iFish.ID4;
+                //fishDBId.Count = iFish.FishCount;
+                //fishDBId.Critical = iFish.Critical;
+                //fishDBFish.IDs.Add(fishDBId);
+                //fishDBFish.FishType = iFish.FishType;
+                //fishDBFish.ZoneNames.Add(iFish.ZoneName);
+                //fishDBFish.BaitNames.Add(iFish.BaitName);
+                //if (!fishDB.UpdateFish(iFish.RodName, fishDBFish))
+                //{
+                //    setMessage("FishDBデータベースへの登録に失敗");
+                //    return false;
+                //} 
             }
             //FishHistoryDBに登録
             if (!fishHistoryDB.Add(this.PlayerName, iFish))
@@ -1374,13 +1386,13 @@ namespace EnjoyFishing
         /// <param name="iID4">ID4</param>
         /// <param name="iFishType">魚タイプ</param>
         /// <returns>釣り上げ対象の場合True</returns>
-        private bool isWantedFish(string iRodName, int iID1, int iID2, int iID3, int iID4, FishDBFishTypeKind iFishType)
+        private bool isWantedFish(string iRodName, int iID1, int iID2, int iID3, int iID4, string iZoneName, FishDBFishTypeKind iFishType)
         {
             //FishType
             if ((settings.Fishing.IgnoreSmallFish && (iFishType == FishDBFishTypeKind.SmallFish || iFishType == FishDBFishTypeKind.UnknownSmallFish)) ||
                 (settings.Fishing.IgnoreLargeFish && (iFishType == FishDBFishTypeKind.LargeFish || iFishType == FishDBFishTypeKind.UnknownLargeFish)) ||
                 (settings.Fishing.IgnoreItem && (iFishType == FishDBFishTypeKind.Item || iFishType == FishDBFishTypeKind.UnknownItem)) ||
-                (settings.Fishing.IgnoreMonster && iFishType == FishDBFishTypeKind.Monster))
+                (settings.Fishing.IgnoreMonster && iFishType == FishDBFishTypeKind.UnknownMonster))
             { 
                 return false;
             }
@@ -1388,32 +1400,32 @@ namespace EnjoyFishing
             if (settings.Fishing.Learning && (iFishType == FishDBFishTypeKind.UnknownSmallFish ||
                                               iFishType == FishDBFishTypeKind.UnknownLargeFish ||
                                               iFishType == FishDBFishTypeKind.UnknownItem ||
-                                              iFishType == FishDBFishTypeKind.Monster||
+                                              iFishType == FishDBFishTypeKind.UnknownMonster||
                                               iFishType == FishDBFishTypeKind.Unknown))
             {
                 return true;
             }
             //Wanted
-            List<FishDBFishModel> fishes = fishDB.SelectFishFromID(iRodName, iID1, iID2, iID3, iID4, true);
-            foreach (SettingsPlayerFishListWantedModel fish in settings.FishList.Wanted)
+            FishDBFishModel fish = fishDB.SelectFishFromIDZone(iRodName, iID1, iID2, iID3, iID4, iZoneName, true);
+            foreach (SettingsPlayerFishListWantedModel wantedFish in settings.FishList.Wanted)
             {
                 if (settings.FishList.Mode == Settings.FishListModeKind.ID)
                 {
-                    if (fish.ID1 == iID1 && fish.ID2 == iID2 && fish.ID3 == iID3 && fish.ID4 == iID4)
+                    if (wantedFish.FishName == fish.FishName)
                     {
-                        return true;
+                        if (wantedFish.ID1 == iID1 && wantedFish.ID2 == iID2 && wantedFish.ID3 == iID3 && wantedFish.ID4 == iID4)
+                        {
+                            return true;
+                        }
+
                     }
                 }
                 else if (settings.FishList.Mode == Settings.FishListModeKind.Name)
                 {
-                    if (fishes.Count > 0)
+                    if (wantedFish.FishName == fish.FishName)
                     {
-                        if (fish.FishName == fishes[0].FishName)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
-
                 }
             }
             return false;
@@ -1490,7 +1502,7 @@ namespace EnjoyFishing
             if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitSmallFish])) return FishDBFishTypeKind.SmallFish;
             if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitLargeFish])) return FishDBFishTypeKind.LargeFish;
             if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitItem])) return FishDBFishTypeKind.Item;
-            if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitMonster])) return FishDBFishTypeKind.Monster;
+            if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitMonster])) return FishDBFishTypeKind.UnknownMonster;
             return FishDBFishTypeKind.Unknown;
         }
         /// <summary>
@@ -1503,42 +1515,10 @@ namespace EnjoyFishing
             if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitSmallFish])) return FishDBFishTypeKind.UnknownSmallFish;
             if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitLargeFish])) return FishDBFishTypeKind.UnknownLargeFish;
             if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitItem])) return FishDBFishTypeKind.UnknownItem;
-            if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitMonster])) return FishDBFishTypeKind.Monster;
+            if (MiscTool.IsRegexString(iChatText, dictionaryChat[ChatKbnKind.BaitMonster])) return FishDBFishTypeKind.UnknownMonster;
             return FishDBFishTypeKind.Unknown;
         }
-        /// <summary>
-        /// 名称不明の魚の一時名称を取得する
-        /// </summary>
-        /// <param name="iFishType">魚タイプ</param>
-        /// <param name="iID1">ID1</param>
-        /// <param name="iID2">ID2</param>
-        /// <param name="iID3">ID3</param>
-        /// <param name="iID4">ID4</param>
-        /// <returns>一時名称</returns>
-        private string getTmpFishNameFromFishType(FishDBFishTypeKind iFishType, int iID1, int iID2, int iID3, int iID4)
-        {
-            string tmpFishName = string.Empty;
-            switch (iFishType)
-            {
-                case FishDBFishTypeKind.SmallFish:
-                case FishDBFishTypeKind.UnknownSmallFish:
-                case FishDBFishTypeKind.LargeFish:
-                case FishDBFishTypeKind.UnknownLargeFish:
-                    tmpFishName = FishDB.FISHNAME_UNKNOWN_FISH;
-                    break;
-                case FishDBFishTypeKind.Item:
-                case FishDBFishTypeKind.UnknownItem:
-                    tmpFishName = FishDB.FISHNAME_UNKNOWN_ITEM;
-                    break;
-                case FishDBFishTypeKind.Monster:
-                    tmpFishName = FishDB.FISHNAME_UNKNOWN_MONSTER;
-                    break;
-                default:
-                    tmpFishName = FishDB.FISHNAME_UNKNOWN;
-                    break;
-            }
-            return string.Format("{0}{1:000}-{2:000}-{3:000}-{4:000}", tmpFishName, iID1, iID2, iID3, iID4);
-        }
+
         /// <summary>
         /// 魚の名称が一時名称かどうか判定
         /// </summary>
@@ -1591,29 +1571,29 @@ namespace EnjoyFishing
             string size = string.Empty;
             if (iFishType == FishDBFishTypeKind.SmallFish || iFishType == FishDBFishTypeKind.UnknownSmallFish)
             {
-                size = "(S)";
+                size = "S";
             }
             else if (iFishType == FishDBFishTypeKind.LargeFish || iFishType == FishDBFishTypeKind.UnknownLargeFish)
             {
-                size = "(L)";
+                size = "L";
             }
             else if (iFishType == FishDBFishTypeKind.Item || iFishType == FishDBFishTypeKind.UnknownItem)
             {
-                size = "(I)";
+                size = "I";
             }
-            else if (iFishType == FishDBFishTypeKind.Monster)
+            else if (iFishType == FishDBFishTypeKind.UnknownMonster)
             {
-                size = "(M)";
+                size = "M";
             }
             else
             {
-                size = "(?)";
+                size = "?";
             }
             string critical = string.Empty;
             if (iCritical) critical = "!";
             string count = string.Empty;
             if (iFishCount > 1) count = "x" + iFishCount.ToString();
-            return string.Format("{0}{1}{2}{3}", iFishName, count, size, critical);
+            return string.Format("{0}{1}{2}{3}", iFishName, size, count, critical);
 
         }
         /// <summary>

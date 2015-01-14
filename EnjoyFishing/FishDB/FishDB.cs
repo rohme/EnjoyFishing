@@ -9,20 +9,22 @@ using MiscTools;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml.XPath;
 
 namespace EnjoyFishing
 {
     public class FishDB
     {
         public const string FISHNAME_UNKNOWN_FISH = "魚_";
-        public const string FISHNAME_UNKNOWN_ITEM = "外道_";
-        public const string FISHNAME_UNKNOWN_MONSTER = "モンスター_";
-        public const string FISHNAME_UNKNOWN = "不明_";
+        public const string FISHNAME_UNKNOWN_ITEM = "外_";
+        public const string FISHNAME_UNKNOWN_MONSTER = "モ_";
+        public const string FISHNAME_UNKNOWN = "？_";
         private const string PATH_FISHDB = "FishDB";
         private const string FILENAME_RODDB = "Rod.xml";
         private const string FILENAME_BAITDB = "Bait.xml";
         private const string FILENAME_GEARDB = "Gear.xml";
         private const string FILENAME_RENAMEFISH = "RenameFish.xml";
+        private const string VERSION = "1.0.5";
 
         private LoggerTool logger;
         private List<string> _Rods = new List<string>();
@@ -30,6 +32,7 @@ namespace EnjoyFishing
         private List<string> _Gears = new List<string>();
         private Dictionary<string, string> _RenameFish = new Dictionary<string, string>();
 
+        #region コンストラクタ
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -57,6 +60,7 @@ namespace EnjoyFishing
                 }
             }
         }
+        #endregion
 
         #region メンバ
         public List<string> Rods { get { return _Rods; } }
@@ -66,6 +70,10 @@ namespace EnjoyFishing
         #endregion
         
         #region FishDB
+        /// <summary>
+        /// 全竿に登録されている魚名を取得する
+        /// </summary>
+        /// <returns>魚名称</returns>
         public List<string> SelectAllFishName()
         {
             logger.Output(LogLevelKind.DEBUG, string.Format("{0}", MethodBase.GetCurrentMethod().Name));
@@ -129,29 +137,7 @@ namespace EnjoyFishing
             return ret;
         }
         /// <summary>
-        /// 魚を取得する（魚名称）
-        /// </summary>
-        /// <param name="iRodName">竿名称</param>
-        /// <param name="iFishName">魚名称</param>
-        /// <returns></returns>
-        public FishDBFishModel SelectFishFromName(string iRodName, string iFishName)
-        {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} FishName={2}", MethodBase.GetCurrentMethod().Name, iRodName, iFishName));
-            FishDBFishModel ret = new FishDBFishModel();
-            FishDBModel fishDB = getFishDB(iRodName);
-            foreach (FishDBFishModel fish in fishDB.Fishes)
-            {
-                if (fish.FishName == iFishName)
-                {
-                    ret = fish;
-                    break;
-                }
-            }
-            logger.VarDump(ret);
-            return ret;
-        }
-        /// <summary>
-        /// 魚を取得する（ID,Name）
+        /// 魚を取得する（ID,Zone）
         /// </summary>
         /// <param name="iRodName">竿名称</param>
         /// <param name="iID1">ID1</param>
@@ -160,209 +146,89 @@ namespace EnjoyFishing
         /// <param name="iID4">ID4</param>
         /// <param name="iWithUnknownFish">不明魚も返す場合Trueを指定</param>
         /// <returns></returns>
-        public FishDBFishModel SelectFishFromIDName(string iRodName, int iID1, int iID2, int iID3, int iID4, string iFishName, bool iWithUnknownFish)
+        public FishDBFishModel SelectFishFromIDZone(string iRodName, int iID1, int iID2, int iID3, int iID4, string iZoneName, bool iWithUnknownFish)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ID1={2} ID2={3} ID3={4} ID4={5} WithUnknownFish={6}", MethodBase.GetCurrentMethod().Name, iRodName, iID1, iID2, iID3, iID4, iWithUnknownFish));
+            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ID1={2} ID2={3} ID3={4} ID4={5} ZoneName={6} WithUnknownFish={7}", MethodBase.GetCurrentMethod().Name, iRodName, iID1, iID2, iID3, iID4, iZoneName, iWithUnknownFish));
             FishDBModel fishDB = getFishDB(iRodName);
             foreach (FishDBFishModel fish in fishDB.Fishes)
             {
                 if (iWithUnknownFish == true ||
-                   (iWithUnknownFish == false && !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN_FISH + "(.*)") &&
-                                                 !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN_ITEM + "(.*)") &&
-                                                 !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN_MONSTER + "(.*)") &&
-                                                 !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN + "(.*)")))
+                   (iWithUnknownFish == false && fish.FishType != FishDBFishTypeKind.UnknownSmallFish &&
+                                                 fish.FishType != FishDBFishTypeKind.UnknownLargeFish &&
+                                                 fish.FishType != FishDBFishTypeKind.UnknownItem &&
+                                                 fish.FishType != FishDBFishTypeKind.UnknownMonster &&
+                                                 fish.FishType != FishDBFishTypeKind.Unknown))
                 {
-                    foreach (FishDBIdModel id in fish.IDs)
+                    if (fish.IDs.Contains(new FishDBIdModel(iID1, iID2, iID3, iID4)) &&
+                        fish.ZoneNames.Contains(iZoneName))
                     {
-                        if (fish.FishName == iFishName && id.ID1 == iID1 && id.ID2 == iID2 && id.ID3 == iID3 && id.ID4 == iID4)
-                        {
-                            logger.VarDump(fish);
-                            return fish;
-                        }
+                        logger.VarDump(fish);
+                        return fish;
                     }
                 }
             }
             return new FishDBFishModel();
         }
-        /// <summary>
-        /// 魚を取得する（ID）
-        /// </summary>
-        /// <param name="iRodName">竿名称</param>
-        /// <param name="iID1">ID1</param>
-        /// <param name="iID2">ID2</param>
-        /// <param name="iID3">ID3</param>
-        /// <param name="iID4">ID4</param>
-        /// <param name="iWithUnknownFish">不明魚も返す場合Trueを指定</param>
-        /// <returns></returns>
-        public List<FishDBFishModel> SelectFishFromID(string iRodName, int iID1, int iID2, int iID3, int iID4, bool iWithUnknownFish)
+        public bool AddFish(string iRodName, string iFishName, FishDBFishTypeKind iFishType, FishDBIdModel iID, string iZoneName, string iBaitName)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ID1={2} ID2={3} ID3={4} ID4={5} WithUnknownFish={6}", MethodBase.GetCurrentMethod().Name, iRodName, iID1, iID2, iID3, iID4, iWithUnknownFish));
-            List<FishDBFishModel> ret = new List<FishDBFishModel>();
+            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} FishName={2} FishType={3} ID={4} ZoneName={5} BaitName={6}", 
+                MethodBase.GetCurrentMethod().Name, iRodName, iFishName, iFishType, iID, iZoneName, iBaitName));
             FishDBModel fishDB = getFishDB(iRodName);
-            foreach (FishDBFishModel fish in fishDB.Fishes)
-            {
-                if (iWithUnknownFish == true ||
-                   (iWithUnknownFish == false && !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN_FISH + "(.*)") &&
-                                                 !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN_ITEM + "(.*)") &&
-                                                 !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN_MONSTER + "(.*)") &&
-                                                 !MiscTool.IsRegexString(fish.FishName, FISHNAME_UNKNOWN + "(.*)")))
-                {
-                    foreach (FishDBIdModel id in fish.IDs)
-                    {
-                        if (id.ID1 == iID1 && id.ID2 == iID2 && id.ID3 == iID3 && id.ID4 == iID4)
-                        {
-                            ret.Add(fish);
-                        }
-                    }
-                }
-            }
-            logger.VarDump(ret);
-            return ret;
-        }
-        /// <summary>
-        /// 魚を取得する（エリア・竿）
-        /// </summary>
-        /// <param name="iZoneName">エリア名称</param>
-        /// <param name="iRodName">竿名称</param>
-        /// <returns></returns>
-        public List<FishDBFishModel> SelectFishFromZoneRod(string iZoneName, string iRodName)
-        {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ZoneName={2}", MethodBase.GetCurrentMethod().Name, iRodName, iZoneName));
-            List<FishDBFishModel> ret = new List<FishDBFishModel>();
-            FishDBModel fishDB = getFishDB(iRodName);
-            foreach (FishDBFishModel fish in fishDB.Fishes)
-            {
-                if (fish.ZoneNames.Contains(iZoneName))
-                {
-                    ret.Add(fish);
-                }
-            }
-            logger.VarDump(ret);
-            return ret;
-        }
-        /// <summary>
-        /// 魚を取得する（エリア・竿・餌）
-        /// </summary>
-        /// <param name="iZoneName">エリア名称</param>
-        /// <param name="iRodName">竿名称</param>
-        /// <param name="iBaitName">餌名称</param>
-        /// <returns></returns>
-        public List<FishDBFishModel> SelectFishFromZoneRodBait(string iZoneName, string iRodName, string iBaitName)
-        {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ZoneName={2} BaitName={3}", MethodBase.GetCurrentMethod().Name, iRodName, iZoneName, iBaitName));
-            List<FishDBFishModel> ret = new List<FishDBFishModel>();
-            FishDBModel fishDB = getFishDB(iRodName);
-            foreach (FishDBFishModel fish in fishDB.Fishes)
-            {
-                if (fish.ZoneNames.Contains(iZoneName) && fish.BaitNames.Contains(iBaitName))
-                {
-                    ret.Add(fish);
-                }
-            }
-            logger.VarDump(ret);
-            return ret;
-        }
-        /// <summary>
-        /// 魚を更新する
-        /// </summary>
-        /// <param name="iRodName">竿名称</param>
-        /// <param name="iFish">魚</param>
-        /// <returns>True:成功</returns>
-        public bool UpdateFish(string iRodName, FishDBFishModel iFish)
-        {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1}", MethodBase.GetCurrentMethod().Name, iRodName));
-            logger.VarDump(iFish, "引数");
-            FishDBModel fishDB = getFishDB(iRodName);
-            bool foundFishFlg = false;
+            fishDB.Version = VERSION;
+            fishDB.RodName = iRodName;
 
-            //不明魚として登録されている魚を削除する
-            if (!MiscTool.IsRegexString(iFish.FishName, FISHNAME_UNKNOWN_FISH + "(.*)") &&
-                !MiscTool.IsRegexString(iFish.FishName, FISHNAME_UNKNOWN_ITEM + "(.*)") &&
-                !MiscTool.IsRegexString(iFish.FishName, FISHNAME_UNKNOWN_MONSTER + "(.*)") &&
-                !MiscTool.IsRegexString(iFish.FishName, FISHNAME_UNKNOWN + "(.*)"))
+            //不明魚として登録されている場合、削除する
+            for (int fishIdx = 0; fishIdx < fishDB.Fishes.Count; fishIdx++)
             {
-                int deleteIdx = -1;
-                for (int i = 0; i < fishDB.Fishes.Count; i++)
+                if (fishDB.Fishes[fishIdx].IDs.Contains(iID) &&
+                    fishDB.Fishes[fishIdx].ZoneNames.Contains(iZoneName) &&
+                    (fishDB.Fishes[fishIdx].FishType == FishDBFishTypeKind.UnknownSmallFish ||
+                     fishDB.Fishes[fishIdx].FishType == FishDBFishTypeKind.UnknownLargeFish ||
+                     fishDB.Fishes[fishIdx].FishType == FishDBFishTypeKind.UnknownItem ||
+                     fishDB.Fishes[fishIdx].FishType == FishDBFishTypeKind.UnknownMonster ||
+                     fishDB.Fishes[fishIdx].FishType == FishDBFishTypeKind.Unknown))
                 {
-                    if (MiscTool.IsRegexString(fishDB.Fishes[i].FishName, FISHNAME_UNKNOWN_FISH + "(.*)") ||
-                        MiscTool.IsRegexString(fishDB.Fishes[i].FishName, FISHNAME_UNKNOWN_ITEM + "(.*)") ||
-                        MiscTool.IsRegexString(fishDB.Fishes[i].FishName, FISHNAME_UNKNOWN_MONSTER + "(.*)") ||
-                        MiscTool.IsRegexString(fishDB.Fishes[i].FishName, FISHNAME_UNKNOWN + "(.*)"))
+                    fishDB.Fishes[fishIdx].ZoneNames.Remove(iZoneName);
+                    //エリア情報が無くなっった場合、魚情報を削除する
+                    if (fishDB.Fishes[fishIdx].ZoneNames.Count == 0)
                     {
-                        for (int j = 0; j < fishDB.Fishes[i].IDs.Count; j++)
-                        {
-                            if (iFish.IDs.Count > 0 &&
-                                iFish.IDs[0].ID1 == fishDB.Fishes[i].IDs[j].ID1 &&
-                                iFish.IDs[0].ID2 == fishDB.Fishes[i].IDs[j].ID2 &&
-                                iFish.IDs[0].ID3 == fishDB.Fishes[i].IDs[j].ID3 &&
-                                iFish.IDs[0].ID4 == fishDB.Fishes[i].IDs[j].ID4)
-                            {
-                                deleteIdx = i;
-                            }
-                        }
+                        fishDB.Fishes.RemoveAt(fishIdx);
                     }
-                        
+                    break;
                 }
-                if (deleteIdx >= 0)
-                {
-                    fishDB.Fishes.RemoveAt(deleteIdx);
-                }
+
             }
 
-            //xmlに存在すれば更新する
-            for (int i = 0; i < fishDB.Fishes.Count; i++)
+            //更新処理
+            bool foundFlg = false;
+            for (int fishIdx = 0; fishIdx < fishDB.Fishes.Count; fishIdx++)
             {
-                if (fishDB.Fishes[i].FishName == iFish.FishName)
+                if (fishDB.Fishes[fishIdx].FishName == iFishName)
                 {
-                    fishDB.Fishes[i].FishType = iFish.FishType;
-                    if (iFish.IDs.Count > 0)
-                    {
-                        bool foundFlg = false;
-                        for (int ii = 0; ii < fishDB.Fishes[i].IDs.Count; ii++)
-                        {
-                            if (fishDB.Fishes[i].IDs[ii].ID1 == iFish.IDs[0].ID1 &&
-                                fishDB.Fishes[i].IDs[ii].ID2 == iFish.IDs[0].ID2 &&
-                                fishDB.Fishes[i].IDs[ii].ID3 == iFish.IDs[0].ID3 &&
-                                fishDB.Fishes[i].IDs[ii].ID4 == iFish.IDs[0].ID4)
-                            {
-                                foundFlg = true;
-                                fishDB.Fishes[i].IDs[ii].Count = iFish.IDs[0].Count;
-                                fishDB.Fishes[i].IDs[ii].Critical = iFish.IDs[0].Critical;
-                                break;
-                            }
-                        }
-                        if (!foundFlg)
-                        {
-                            fishDB.Fishes[i].IDs.Add(iFish.IDs[0]);
-                        }
-                    }
-                    if (iFish.ZoneNames.Count > 0)
-                    {
-                        if (!fishDB.Fishes[i].ZoneNames.Contains(iFish.ZoneNames[0]))
-                        {
-                            fishDB.Fishes[i].ZoneNames.Add(iFish.ZoneNames[0]);
-                        }
-                    }
-                    if (iFish.BaitNames.Count > 0)
-                    {
-                        if (!fishDB.Fishes[i].BaitNames.Contains(iFish.BaitNames[0]))
-                        {
-                            fishDB.Fishes[i].BaitNames.Add(iFish.BaitNames[0]);
-                        }
-                    }
-                    foundFishFlg = true;
+                    foundFlg = true;
+                    fishDB.Fishes[fishIdx].FishName = iFishName;
+                    fishDB.Fishes[fishIdx].FishType = iFishType;
+                    if (!fishDB.Fishes[fishIdx].IDs.Contains(iID)) fishDB.Fishes[fishIdx].IDs.Add(iID);
+                    if (!fishDB.Fishes[fishIdx].ZoneNames.Contains(iZoneName)) fishDB.Fishes[fishIdx].ZoneNames.Add(iZoneName);
+                    if (!fishDB.Fishes[fishIdx].BaitNames.Contains(iBaitName)) fishDB.Fishes[fishIdx].BaitNames.Add(iBaitName);
                 }
             }
-            //xmlに存在しない場合は追加する
-            if (!foundFishFlg)
+            //新規追加処理
+            if (!foundFlg)
             {
-                fishDB.Fishes.Add(iFish);
+                FishDBFishModel fish = new FishDBFishModel();
+                fish.FishName = iFishName;
+                fish.FishType = iFishType;
+                fish.IDs.Add(iID);
+                fish.ZoneNames.Add(iZoneName);
+                fish.BaitNames.Add(iBaitName);
+                fishDB.Fishes.Add(fish);
             }
             //ソート
             fishDB.Fishes.Sort(FishDBFishModel.SortTypeName);
             for (int i = 0; i < fishDB.Fishes.Count; i++)
             {
-                fishDB.Fishes[i].IDs.Sort(FishDBIdModel.SortCountID);
+                fishDB.Fishes[i].IDs.Sort(FishDBIdModel.SortCountCritical);
             }
             //Rod.xmlへ出力する
             if (!putFishDB(iRodName, fishDB)) return false;
@@ -391,6 +257,105 @@ namespace EnjoyFishing
             return true;
         }
         /// <summary>
+        /// ファイルコンバーター
+        /// </summary>
+        /// <returns></returns>
+        public void Converter()
+        {
+            string[] xmlFileNames = Directory.GetFiles(PATH_FISHDB);
+            foreach (string xmlFileName in xmlFileNames)
+            {
+                //string filename = Path.GetFileName(xmlFileName);
+                List<string> regGroupStr = new List<string>();
+                if (MiscTool.GetRegexString(xmlFileName, PATH_FISHDB + "\\\\(.*)\\.xml$", out regGroupStr))
+                {
+                    string rodName = regGroupStr[0];
+                    if (!_Rods.Contains(rodName)) continue;
+                    //最新版までコンバート
+                    for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+                    {
+                        string version = getXmlVersion(xmlFileName);
+                        if (version == VERSION)
+                        {
+                            break;
+                        }
+                        if (version == "1.0.0")////1.0.0→1.0.5
+                        {
+                            logger.Output(LogLevelKind.INFO, string.Format("FishDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName));
+                            convert1_0_0to1_0_5(xmlFileName, rodName);
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// xmlファイルをコンバートする（1.0.0→1.0.5）
+        /// </summary>
+        private void convert1_0_0to1_0_5(string iXmlFileName, string iRodName)
+        {
+            FishDBModel1_0_0 fishdb1_0_0 = getFishDB1_0_0(iRodName);
+            FishDBModel fishdb1_0_5 = new FishDBModel();
+            fishdb1_0_5.Version = "1.0.5";
+            fishdb1_0_5.RodName = fishdb1_0_0.RodName;
+            foreach (FishDBFishModel1_0_0 fish1_0_0 in fishdb1_0_0.Fishes)
+            {
+                FishDBFishModel fish1_0_5 = new FishDBFishModel();
+                //FishDBFishTypeKind.Monster→FishDBFishTypeKind.UnknownMonster
+                if (fish1_0_0.FishType == FishDBFishTypeKind.Monster)
+                {
+                    fish1_0_0.FishType = FishDBFishTypeKind.UnknownMonster;
+                }
+                fish1_0_5.FishType = fish1_0_0.FishType;
+                //FishName
+                if (fish1_0_0.FishType == FishDBFishTypeKind.UnknownSmallFish ||
+                    fish1_0_0.FishType == FishDBFishTypeKind.UnknownLargeFish ||
+                    fish1_0_0.FishType == FishDBFishTypeKind.UnknownItem ||
+                    fish1_0_0.FishType == FishDBFishTypeKind.UnknownMonster ||
+                    fish1_0_0.FishType == FishDBFishTypeKind.Unknown)
+                {
+                    if (fish1_0_0.IDs.Count > 0)
+                    {
+                        fish1_0_5.FishName = FishDB.GetTmpFishNameFromFishType(fish1_0_0.FishType, fish1_0_0.IDs[0].ID1, fish1_0_0.IDs[0].ID2, fish1_0_0.IDs[0].ID3, fish1_0_0.IDs[0].ID4);
+                    }
+                    else
+                    {
+                        fish1_0_5.FishName = fish1_0_0.FishName;
+                    }
+                }
+                else
+                {
+                    fish1_0_5.FishName = fish1_0_0.FishName;
+                }
+                //ID
+                foreach (FishDBIdModel1_0_0 id1_0_0 in fish1_0_0.IDs)
+                {
+                    FishDBIdModel id1_0_5 = new FishDBIdModel();
+                    id1_0_5.ID1 = id1_0_0.ID1;
+                    id1_0_5.ID2 = id1_0_0.ID2;
+                    id1_0_5.ID3 = id1_0_0.ID3;
+                    id1_0_5.ID4 = id1_0_0.ID4;
+                    id1_0_5.Count = id1_0_0.Count;
+                    id1_0_5.Critical = id1_0_0.Critical;
+                    fish1_0_5.IDs.Add(id1_0_5);
+                }
+                //エリア 初期化する
+                fish1_0_5.ZoneNames = new List<string>();
+                //エサ
+                fish1_0_5.BaitNames = fish1_0_0.BaitNames;
+
+                fishdb1_0_5.Fishes.Add(fish1_0_5);
+            }
+
+            //バックアップ
+            string backupFileName = iXmlFileName + ".bak";
+            if (File.Exists(backupFileName)) File.Delete(backupFileName);
+            File.Copy(iXmlFileName, backupFileName);
+            //xml書き込み
+            putFishDB(iRodName, fishdb1_0_5);
+        }
+
+
+        /// <summary>
         /// xmlの内容を全て取得する
         /// </summary>
         /// <returns>RodDBModel</returns>
@@ -408,6 +373,36 @@ namespace EnjoyFishing
                         {
                             XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel));
                             fishdb = (FishDBModel)serializer.Deserialize(fs);
+                        }
+                        break;
+                    }
+                    catch (IOException)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
+                }
+            }
+            return fishdb;
+        }
+        /// <summary>
+        /// xmlの内容を全て取得する(1.0.0)
+        /// </summary>
+        /// <returns>RodDBModel</returns>
+        private FishDBModel1_0_0 getFishDB1_0_0(string iRodName)
+        {
+            string xmlFilename = PATH_FISHDB + @"\" + iRodName + ".xml";
+            FishDBModel1_0_0 fishdb = new FishDBModel1_0_0(iRodName);
+            if (File.Exists(xmlFilename))
+            {
+                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                {
+                    try
+                    {
+                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel1_0_0));
+                            fishdb = (FishDBModel1_0_0)serializer.Deserialize(fs);
                         }
                         break;
                     }
@@ -730,6 +725,58 @@ namespace EnjoyFishing
                 return true;
             }
             return false;
+        }
+        /// <summary>
+        /// 名称不明の魚の一時名称を取得する
+        /// </summary>
+        /// <param name="iFishType">魚タイプ</param>
+        /// <param name="iID1">ID1</param>
+        /// <param name="iID2">ID2</param>
+        /// <param name="iID3">ID3</param>
+        /// <param name="iID4">ID4</param>
+        /// <returns>一時名称</returns>
+        public static string GetTmpFishNameFromFishType(FishDBFishTypeKind iFishType, int iID1, int iID2, int iID3, int iID4)
+        {
+            string tmpFishName = string.Empty;
+            switch (iFishType)
+            {
+                case FishDBFishTypeKind.SmallFish:
+                case FishDBFishTypeKind.UnknownSmallFish:
+                case FishDBFishTypeKind.LargeFish:
+                case FishDBFishTypeKind.UnknownLargeFish:
+                    tmpFishName = FishDB.FISHNAME_UNKNOWN_FISH;
+                    break;
+                case FishDBFishTypeKind.Item:
+                case FishDBFishTypeKind.UnknownItem:
+                    tmpFishName = FishDB.FISHNAME_UNKNOWN_ITEM;
+                    break;
+                case FishDBFishTypeKind.UnknownMonster:
+                    tmpFishName = FishDB.FISHNAME_UNKNOWN_MONSTER;
+                    break;
+                default:
+                    tmpFishName = FishDB.FISHNAME_UNKNOWN;
+                    break;
+            }
+            return string.Format("{0}{1:000}-{2:000}-{3:000}-{4:000}", tmpFishName, iID1, iID2, iID3, iID4);
+        }        /// <summary>
+        /// xmlファイルのバージョン番号を取得する
+        /// </summary>
+        /// <param name="iXmlFileName"></param>
+        /// <returns></returns>
+        private string getXmlVersion(string iXmlFileName)
+        {
+            XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
+            XPathNavigator xNavi = xmlDoc.CreateNavigator();
+            string ret = string.Empty;
+            try
+            {
+                ret = xNavi.SelectSingleNode("/Rod/@version").Value;
+            }
+            catch (NullReferenceException)
+            {
+                ret = "1.0.0";
+            }
+            return ret;
         }
     }
 }

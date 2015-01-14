@@ -13,6 +13,7 @@ namespace EnjoyFishing
     {
         private const string DIRECTORY_HARAKIRIDB = "History";
         private const string FILENAME_HARAKIRIDB = "Harakiri.xml";
+        private const string VERSION = "1.0.0";
 
         private LoggerTool logger;
 
@@ -42,6 +43,7 @@ namespace EnjoyFishing
         public bool Add(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
         {
             HarakiriDBModel harakiriDB = getHarakiriDB();
+            harakiriDB.Version = VERSION;
             if (harakiriDB.Fishes.Contains(new HarakiriDBFishModel(iFishName)))
             {
                 HarakiriDBFishModel fish = harakiriDB.Fishes[harakiriDB.Fishes.IndexOf(new HarakiriDBFishModel(iFishName))];

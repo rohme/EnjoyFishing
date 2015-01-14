@@ -299,7 +299,7 @@ namespace EnjoyFishing
         public SettingsPlayerFishListModel()
         {
             this.Mode = Settings.FishListModeKind.Name;
-            this.NarrowArea = false;
+            this.NarrowArea = true;
             this.NarrowBait = false;
             Wanted = new List<SettingsPlayerFishListWantedModel>();
         }

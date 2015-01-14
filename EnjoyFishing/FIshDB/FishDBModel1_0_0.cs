@@ -2,46 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace EnjoyFishing
 {
-    public enum FishDBFishTypeKind
-    {
-        SmallFish,
-        LargeFish,
-        Item,
-        Monster,
-        UnknownSmallFish,
-        UnknownLargeFish,
-        UnknownItem,
-        UnknownMonster,
-        Unknown,
-    }
-
-    #region FishDBModel
     [XmlRoot("Rod")]
-    public class FishDBModel
+    public class FishDBModel1_0_0
     {
-        [XmlAttribute("version")]
-        public string Version { get; set; }
         [XmlAttribute("name")]
         public string RodName { get; set; }
-        [XmlArray("Fishes")]
-        [XmlArrayItem("Fish")]
-        public List<FishDBFishModel> Fishes { get; set; }
-        public FishDBModel() : this(string.Empty)
+        [XmlElement("Fish")]
+        public List<FishDBFishModel1_0_0> Fishes { get; set; }
+        public FishDBModel1_0_0()
+            : this(string.Empty)
         {
         }
-        public FishDBModel(string iRodName)
+        public FishDBModel1_0_0(string iRodName)
         {
-            this.Version = string.Empty;
             this.RodName = iRodName;
-            this.Fishes = new List<FishDBFishModel>();
+            this.Fishes = new List<FishDBFishModel1_0_0>();
         }
     }
-    public class FishDBFishModel
+    public class FishDBFishModel1_0_0
     {
         [XmlAttribute("name")]
         public string FishName { get; set; }
@@ -49,33 +31,33 @@ namespace EnjoyFishing
         public FishDBFishTypeKind FishType { get; set; }
         [XmlArray("Ids")]
         [XmlArrayItem("Id")]
-        public List<FishDBIdModel> IDs { get; set; }
+        public List<FishDBIdModel1_0_0> IDs { get; set; }
         [XmlArray("Zones")]
         [XmlArrayItem("Zone")]
         public List<string> ZoneNames { get; set; }
         [XmlArray("Baits")]
         [XmlArrayItem("Bait")]
         public List<string> BaitNames { get; set; }
-        public FishDBFishModel()
+        public FishDBFishModel1_0_0()
         {
             this.FishName = string.Empty;
             this.FishType = FishDBFishTypeKind.Unknown;
-            this.IDs = new List<FishDBIdModel>();
+            this.IDs = new List<FishDBIdModel1_0_0>();
             this.ZoneNames = new List<string>();
             this.BaitNames = new List<string>();
         }
-       public FishDBIdModel GetId(int iID1, int iID2, int iID3, int iID4)
+        public FishDBIdModel1_0_0 GetId(int iID1, int iID2, int iID3, int iID4)
         {
-            foreach (FishDBIdModel id in this.IDs)
+            foreach (FishDBIdModel1_0_0 id in this.IDs)
             {
                 if (id.ID1 == iID1 && id.ID2 == iID2 && id.ID3 == iID3 && id.ID4 == iID4)
                 {
                     return id;
                 }
             }
-            return new FishDBIdModel();
+            return new FishDBIdModel1_0_0();
         }
-        public static int SortTypeName(FishDBFishModel iFish1, FishDBFishModel iFish2)
+        public static int SortTypeName(FishDBFishModel1_0_0 iFish1, FishDBFishModel iFish2)
         {
             //1番目のキー：FishTypeでソート
             if (iFish1.FishType > iFish2.FishType)
@@ -93,7 +75,7 @@ namespace EnjoyFishing
             }
         }
     }
-    public class FishDBIdModel : IEquatable<FishDBIdModel>
+    public class FishDBIdModel1_0_0
     {
         [XmlAttribute("id1")]
         public int ID1 { get; set; }
@@ -107,7 +89,7 @@ namespace EnjoyFishing
         public int Count { get; set; }
         [XmlAttribute("critical")]
         public bool Critical { get; set; }
-        public FishDBIdModel()
+        public FishDBIdModel1_0_0()
         {
             this.ID1 = 0;
             this.ID2 = 0;
@@ -116,34 +98,7 @@ namespace EnjoyFishing
             this.Count = 0;
             this.Critical = false;
         }
-        public FishDBIdModel(int iID1, int iID2, int iID3, int iID4, int iCount, bool iCritical)
-        {
-            this.ID1 = iID1;
-            this.ID2 = iID2;
-            this.ID3 = iID3;
-            this.ID4 = iID4;
-            this.Count = iCount;
-            this.Critical = iCritical;
-        }
-        public FishDBIdModel(int iID1, int iID2, int iID3, int iID4)
-        {
-            this.ID1 = iID1;
-            this.ID2 = iID2;
-            this.ID3 = iID3;
-            this.ID4 = iID4;
-            this.Count = 0;
-            this.Critical = false;
-        }
-        public override int GetHashCode()
-        {
-            return this.ID1.GetHashCode() ^ this.ID2.GetHashCode() ^ this.ID3.GetHashCode() ^ this.ID4.GetHashCode();
-        }
-        bool IEquatable<FishDBIdModel>.Equals(FishDBIdModel other)
-        {
-            if (other == null) return false;
-            return (this.ID1 == other.ID1 && this.ID2 == other.ID2 && this.ID3 == other.ID3 && this.ID4 == other.ID4);
-        }
-       public static int SortCountCritical(FishDBIdModel iID1, FishDBIdModel iID2)
+        public static int SortCountID(FishDBIdModel1_0_0 iID1, FishDBIdModel1_0_0 iID2)
         {
             //1番目のキー：Countでソート
             if (iID1.Count > iID2.Count)
@@ -220,79 +175,4 @@ namespace EnjoyFishing
             }
         }
     }
-    #endregion
-
-    #region RodModel
-    [XmlRoot("Rods")]
-    public class RodDBModel
-    {
-        [XmlElement("Rod")]
-        public List<RodDBRodModel> Rod { get; set; }
-        public RodDBModel()
-        {
-            this.Rod = new List<RodDBRodModel>();
-        }
-    }
-    public class RodDBRodModel
-    {
-        [XmlAttribute("name")]
-        public string RodName { get; set; }
-    }
-    #endregion
-
-    #region BaitModel
-    [XmlRoot("Baits")]
-    public class BaitDBModel
-    {
-        [XmlElement("Bait")]
-        public List<BaitDBBaitModel> Bait { get; set; }
-        public BaitDBModel()
-        {
-            this.Bait = new List<BaitDBBaitModel>();
-        }
-    }
-    public class BaitDBBaitModel
-    {
-        [XmlAttribute("name")]
-        public string BaitName { get; set; }
-    }
-    #endregion
-
-    #region GearModel
-    [XmlRoot("Gears")]
-    public class GearDBModel
-    {
-        [XmlElement("Gear")]
-        public List<GearDBGearModel> Gear { get; set; }
-        public GearDBModel()
-        {
-            this.Gear = new List<GearDBGearModel>();
-        }
-    }
-    public class GearDBGearModel
-    {
-        [XmlAttribute("name")]
-        public string GearName { get; set; }
-    }
-    #endregion
-
-    #region RenameFishModel
-    [XmlRoot("RenameFish")]
-    public class RenameFishDBModel
-    {
-        [XmlElement("Fish")]
-        public List<RenameFishDBFishModel> Fishes { get; set; }
-        public RenameFishDBModel()
-        {
-            this.Fishes = new List<RenameFishDBFishModel>();
-        }
-    }
-    public class RenameFishDBFishModel
-    {
-        [XmlAttribute("name")]
-        public string FishName { get; set; }
-        [XmlAttribute("rename")]
-        public string FishRename { get; set; }
-    }
-    #endregion
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Rods>
+<Rods version="1.0.0">
     <Rod name="ヤナギの釣竿" />
     <Rod name="イチイの釣竿" />
     <Rod name="バンブーロッド" />

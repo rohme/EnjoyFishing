@@ -11,6 +11,7 @@ using MiscTools;
 
 namespace EnjoyFishing
 {
+
     /// <summary>
     /// 釣り結果ステータス
     /// </summary>
@@ -28,18 +29,22 @@ namespace EnjoyFishing
     [XmlRoot("History")]
     public class FishHistoryDBModel
     {
+        [XmlAttribute("version")]
+        public string Version { get; set; }
         [XmlAttribute("player")]
         public string PlayerName { get; set; }
         [XmlAttribute("date")]
-        public DateTime EarthDate { get; set; }
+        public string EarthDate { get; set; }
+        [XmlAttribute("catchcount")]
         public int CatchCount { get; set; }
         [XmlArray("Fishes")]
         [XmlArrayItem("Fish")]
         public List<FishHistoryDBFishModel> Fishes { get; set; }
         public FishHistoryDBModel()
         {
+            this.Version = string.Empty;
             this.PlayerName = string.Empty;
-            this.EarthDate = DateTime.Today;
+            this.EarthDate = DateTime.Today.ToString();
             this.CatchCount = 0;
             this.Fishes = new List<FishHistoryDBFishModel>();
             
@@ -72,7 +77,7 @@ namespace EnjoyFishing
         [XmlAttribute("result")]
         public FishResultStatusKind Result { get; set; }
         [XmlAttribute("earthtime")]
-        public DateTime EarthTime { get; set; }
+        public string EarthTime { get; set; }
         [XmlAttribute("vanatime")]
         public string VanaTime { get; set; }
         [XmlAttribute("weekday")]
@@ -101,7 +106,7 @@ namespace EnjoyFishing
             this.FishCount = 0;
             this.FishType = FishDBFishTypeKind.Unknown;
             this.Result = FishResultStatusKind.NoBite;
-            this.EarthTime = DateTime.Today;
+            this.EarthTime = DateTime.Today.ToString();
             this.VanaTime = string.Empty;
             this.VanaWeekDay = Weekday.Unknown;
             this.MoonPhase = FFACETools.MoonPhase.Unknown;
@@ -111,6 +116,7 @@ namespace EnjoyFishing
             this.H = 0.0f;
         }
     }
+
     public class FishHistoryDBSummaryModel
     {
         public int Count { get; set; }

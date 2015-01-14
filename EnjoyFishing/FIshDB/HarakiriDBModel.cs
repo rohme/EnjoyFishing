@@ -19,7 +19,7 @@ namespace EnjoyFishing
         public List<HarakiriDBHistoryModel> Histories { get; set; }
         public HarakiriDBModel()
         {
-            this.Version = "1.0.0";
+            this.Version = string.Empty;
             this.Fishes = new List<HarakiriDBFishModel>();
             this.Histories = new List<HarakiriDBHistoryModel>();
         }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Gears>
+<Gears version="1.0.0">
   <!-- Body -->
   <Gear name="アングラーチュニカ" />
   <Gear name="漁師エプロン" />

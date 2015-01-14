@@ -268,6 +268,8 @@ namespace EnjoyFishing
             fishDB = new FishDB(logger);
             fishHistoryDB = new FishHistoryDB(logger);
             harakiriDB = new HarakiriDB(logger);
+            //古いデータをコンバート
+            converter();
         }
         #endregion
 
@@ -1625,6 +1627,14 @@ namespace EnjoyFishing
                 btnAddonUpdate.Enabled = enabled;
             }
         }
+        /// <summary>
+        /// 古い形式のデータがある場合コンバートする
+        /// </summary>
+        private void converter()
+        {
+            fishDB.Converter();
+            fishHistoryDB.Converter();
+        }
         #endregion
 
         #region 監視スレッド
@@ -2245,6 +2255,7 @@ namespace EnjoyFishing
         }
         
         #endregion
+
 
 
 
