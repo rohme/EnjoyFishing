@@ -14,8 +14,8 @@ namespace EnjoyFishing
 {
     public class FishHistoryDB
     {
-        private const string DIRECTORY_FISHHISTORYDB = "History";
-        private const string PATH_FISHHISTORYDB = "{0}_{1}.xml";
+        public const string PATH_FISHHISTORYDB = "History";
+        public const string FILENAME_FISHHISTORYDB = "{0}_{1}.xml";
         private const string VERSION = "1.0.5";
 
         private LoggerTool logger;
@@ -136,12 +136,12 @@ namespace EnjoyFishing
         /// <returns></returns>
         public void Converter()
         {
-            string[] xmlFileNames = Directory.GetFiles(DIRECTORY_FISHHISTORYDB);
+            string[] xmlFileNames = Directory.GetFiles(PATH_FISHHISTORYDB);
             foreach (string xmlFileName in xmlFileNames)
             {
                 //string filename = Path.GetFileName(xmlFileName);
                 List<string> regGroupStr = new List<string>();
-                if (MiscTool.GetRegexString(xmlFileName, DIRECTORY_FISHHISTORYDB + "\\\\(.*)_([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])\\.xml$", out regGroupStr))
+                if (MiscTool.GetRegexString(xmlFileName, PATH_FISHHISTORYDB + "\\\\(.*)_([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])\\.xml$", out regGroupStr))
                 {
                     string playerName = regGroupStr[0];
                     DateTime ymd = DateTime.Parse(string.Format("{0}/{1}/{2}", regGroupStr[1], regGroupStr[2], regGroupStr[3]));
@@ -214,9 +214,9 @@ namespace EnjoyFishing
         {
             string xmlFilename =getXmlName(iPlayerName,iYmd);
             FishHistoryDBModel history = new FishHistoryDBModel();
-            if(!Directory.Exists(DIRECTORY_FISHHISTORYDB))
+            if(!Directory.Exists(PATH_FISHHISTORYDB))
             {
-                Directory.CreateDirectory(DIRECTORY_FISHHISTORYDB);
+                Directory.CreateDirectory(PATH_FISHHISTORYDB);
             }
             if (File.Exists(xmlFilename))
             {
@@ -252,9 +252,9 @@ namespace EnjoyFishing
         private bool putHistoryDB(string iPlayerName, FishHistoryDBModel iHistoryDB)
         {
             string xmlFilename = getXmlName(iPlayerName, DateTime.Parse(iHistoryDB.EarthDate));
-            if (!Directory.Exists(DIRECTORY_FISHHISTORYDB))
+            if (!Directory.Exists(PATH_FISHHISTORYDB))
             {
-                Directory.CreateDirectory(DIRECTORY_FISHHISTORYDB);
+                Directory.CreateDirectory(PATH_FISHHISTORYDB);
             }
 
             for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
@@ -293,9 +293,9 @@ namespace EnjoyFishing
         {
             string xmlFilename = getXmlName(iPlayerName, iYmd);
             FishHistoryDBModel1_0_0 historydb = new FishHistoryDBModel1_0_0();
-            if (!Directory.Exists(DIRECTORY_FISHHISTORYDB))
+            if (!Directory.Exists(PATH_FISHHISTORYDB))
             {
-                Directory.CreateDirectory(DIRECTORY_FISHHISTORYDB);
+                Directory.CreateDirectory(PATH_FISHHISTORYDB);
             }
             if (File.Exists(xmlFilename))
             {
@@ -330,7 +330,7 @@ namespace EnjoyFishing
         private string getXmlName(string iPlayerName, DateTime iYmd)
         {
             string ymd = iYmd.ToString("yyyyMMdd");
-            return DIRECTORY_FISHHISTORYDB + @"\" + string.Format(PATH_FISHHISTORYDB, iPlayerName, ymd);
+            return PATH_FISHHISTORYDB + @"\" + string.Format(FILENAME_FISHHISTORYDB, iPlayerName, ymd);
         }
         /// <summary>
         /// xmlファイルのバージョン番号を取得する

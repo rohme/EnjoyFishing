@@ -19,11 +19,11 @@ namespace EnjoyFishing
         public const string FISHNAME_UNKNOWN_ITEM = "外_";
         public const string FISHNAME_UNKNOWN_MONSTER = "モ_";
         public const string FISHNAME_UNKNOWN = "？_";
-        private const string PATH_FISHDB = "FishDB";
-        private const string FILENAME_RODDB = "Rod.xml";
-        private const string FILENAME_BAITDB = "Bait.xml";
-        private const string FILENAME_GEARDB = "Gear.xml";
-        private const string FILENAME_RENAMEFISH = "RenameFish.xml";
+        public const string PATH_FISHDB = "FishDB";
+        public const string FILENAME_RODDB = "Rod.xml";
+        public const string FILENAME_BAITDB = "Bait.xml";
+        public const string FILENAME_GEARDB = "Gear.xml";
+        public const string FILENAME_RENAMEFISH = "RenameFish.xml";
         private const string VERSION = "1.0.5";
 
         private LoggerTool logger;
@@ -70,6 +70,15 @@ namespace EnjoyFishing
         #endregion
         
         #region FishDB
+        /// <summary>
+        /// 指定された竿の魚情報を取得する
+        /// </summary>
+        /// <param name="iRodName"></param>
+        /// <returns></returns>
+        public FishDBModel SelectAll(string iRodName)
+        {
+            return getFishDB(iRodName);
+        }
         /// <summary>
         /// 全竿に登録されている魚名を取得する
         /// </summary>

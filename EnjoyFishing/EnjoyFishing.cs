@@ -57,8 +57,15 @@ namespace EnjoyFishing
                 MessageBox.Show("キャラクター選択後に起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 System.Environment.Exit(0);//プログラム終了
             }
-
-            //フォーム表示
+            //シフトキーでテストフォーム表示
+            if (Control.ModifierKeys == Keys.Shift)
+            {
+                //テストモード
+                FFACETestForm testForm = new FFACETestForm(pol);
+                testForm.ShowDialog();
+                System.Environment.Exit(0);//プログラム終了
+            }
+            //メインフォーム表示
             MainForm mainForm = new MainForm(pol, ARGS);
             mainForm.ShowDialog();
         }

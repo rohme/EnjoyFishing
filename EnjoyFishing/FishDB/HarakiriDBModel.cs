@@ -80,25 +80,25 @@ namespace EnjoyFishing
     }
     public class HarakiriDBHistoryModel
     {
-        [XmlAttribute("earthdate")]
-        public string EarthDate { get; set; }
-        [XmlAttribute("vanadate")]
-        public string VanaDate { get; set; }
+        [XmlAttribute("earthtime")]
+        public string EarthTime { get; set; }
+        [XmlAttribute("vanatime")]
+        public string VanaTime { get; set; }
         [XmlAttribute("fishname")]
         public string FishName { get; set; }
         [XmlAttribute("itemname")]
         public string ItemName { get; set; }
         public HarakiriDBHistoryModel()
         {
-            this.EarthDate = string.Empty;
-            this.VanaDate = string.Empty;
+            this.EarthTime = string.Empty;
+            this.VanaTime = string.Empty;
             this.FishName = string.Empty;
             this.ItemName = string.Empty;
         }
         public HarakiriDBHistoryModel(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
         {
-            this.EarthDate = iEarthDate;
-            this.VanaDate = iVanaDate;
+            this.EarthTime = iEarthDate;
+            this.VanaTime = iVanaDate;
             this.FishName = iFishName;
             this.ItemName = iItemName;
         }

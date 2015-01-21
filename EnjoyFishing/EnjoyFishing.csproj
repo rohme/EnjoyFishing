@@ -104,6 +104,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="FFACETestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FFACETestForm.Designer.cs">
+      <DependentUpon>FFACETestForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FishDB\FishDBModel1_0_0.cs" />
     <Compile Include="FishDB\FishHistoryDBModel1_0_0.cs" />
     <Compile Include="FishDB\FishDB.cs" />
@@ -139,6 +145,9 @@
     </Compile>
     <Compile Include="MiscTools\MiscTool.cs" />
     <Compile Include="Settings.cs" />
+    <EmbeddedResource Include="FFACETestForm.resx">
+      <DependentUpon>FFACETestForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
