@@ -11,7 +11,7 @@ namespace EnjoyFishing
 {
     public class HarakiriDB
     {
-        private const string DIRECTORY_HARAKIRIDB = "History";
+        private const string DIRECTORY_HARAKIRIDB = "FishDB";
         private const string FILENAME_HARAKIRIDB = "Harakiri.xml";
         private const string VERSION = "1.0.0";
 
@@ -40,7 +40,7 @@ namespace EnjoyFishing
         /// <param name="iPlayername">プレイヤー名</param>
         /// <param name="iHistory">FishHistoryDBFishModel</param>
         /// <returns>True:成功</returns>
-        public bool Add(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
+        public bool Add(string iPlayerName, DateTime iEarthDate, string iVanaDate, string iFishName, string iItemName)
         {
             HarakiriDBModel harakiriDB = getHarakiriDB();
             harakiriDB.Version = VERSION;
@@ -81,8 +81,14 @@ namespace EnjoyFishing
                 }
                 harakiriDB.Fishes.Add(fish);
             }
-            harakiriDB.Histories.Add(new HarakiriDBHistoryModel(iEarthDate, iVanaDate, iFishName, iItemName));
-            return putHarakiriDB(harakiriDB);
+            //履歴DBに保存
+            FishHistoryDB historyDB = new FishHistoryDB(iPlayerName, iEarthDate, logger);
+            if(historyDB.AddHarakiri(iPlayerName, new FishHistoryDBHarakiriModel(iEarthDate.ToString("yyyy/MM/dd HH:mm:ss"),iVanaDate,iFishName,iItemName)))
+            {
+                //ハラキリDBに保存
+                return putHarakiriDB(harakiriDB);
+            }
+            return false;
         }
 
         /// <summary>

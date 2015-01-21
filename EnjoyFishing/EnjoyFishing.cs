@@ -45,7 +45,7 @@ namespace EnjoyFishing
             PolTool pol = new PolTool();
             if (PolTool.GetPolProcess().Count < 1)
             {
-                MessageBox.Show("FF11を起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("FF11を起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 System.Environment.Exit(0);//プログラム終了
             }
             if (!pol.NewPol())
@@ -54,7 +54,7 @@ namespace EnjoyFishing
             }
             if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn)
             {
-                MessageBox.Show("キャラクター選択後に起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("キャラクター選択後に起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 System.Environment.Exit(0);//プログラム終了
             }
             //シフトキーでテストフォーム表示

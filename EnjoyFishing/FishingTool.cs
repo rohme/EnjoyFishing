@@ -114,10 +114,12 @@ namespace EnjoyFishing
         private Thread thFishing;
         private Thread thSneak;
         private Thread thTimeElapsed;
+        private FishHistoryDB fishHistoryDB;
         private int remainTimeMAX = 0;
         private string lastRodName = string.Empty;
         private string lastBaitName = string.Empty;
         private string lastZoneName = string.Empty;
+        private DateTime lastCastDate = new DateTime(2000, 1, 1);
         private int noCatchCount = 0;
 
         #region メンバ
@@ -125,14 +127,6 @@ namespace EnjoyFishing
         /// FishDB
         /// </summary>
         public FishDB FishDB
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// FishHistoryDB
-        /// </summary>
-        public FishHistoryDB FishHistoryDB
         {
             get;
             private set;
@@ -501,6 +495,20 @@ namespace EnjoyFishing
                 return fface.Player.Position;
             }
         }
+        /// <summary>
+        /// 経過時間
+        /// </summary>
+        public int TimeElapsed { get; private set; }
+        /// <summary>
+        /// 釣果数
+        /// </summary>
+        public int CatchCount
+        {
+            get
+            {
+                return fishHistoryDB.CatchCount;
+            }
+        }
         #endregion
 
         #region イベント
@@ -605,7 +613,9 @@ namespace EnjoyFishing
             settings = iSettings;
             logger = iLogger;
             FishDB = new FishDB(logger);
-            FishHistoryDB = new FishHistoryDB(this.PlayerName,this.EarthDateTime, logger);
+            fishHistoryDB = new FishHistoryDB(this.PlayerName,this.EarthDateTime, logger);
+            FishHistoryDBModel history = fishHistoryDB.SelectDayly(this.PlayerName, this.EarthDateTime);
+            this.TimeElapsed = history.TimeElapsed;
             control = new FFACEControl(pol, chat, logger);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
@@ -702,7 +712,14 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "釣りスレッド開始");
             while (this.RunningStatus == RunningStatusKind.Running)
             {
-                FishHistoryDBModel history = FishHistoryDB.SelectDayly(this.PlayerName, DateTime.Today);
+                //日付が変わったら経過時間クリア
+                if (DateTime.Now.Date != lastCastDate.Date)
+                {
+                    fishHistoryDB = new FishHistoryDB(this.PlayerName, this.EarthDateTime, logger);
+                    FishHistoryDBModel history = fishHistoryDB.SelectDayly(this.PlayerName, this.EarthDateTime);
+                    this.TimeElapsed = history.TimeElapsed;
+                }
+                lastCastDate = DateTime.Now.Date;
                 //敵からの攻撃感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (enemyAttack)
@@ -758,7 +775,7 @@ namespace EnjoyFishing
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (settings.Fishing.MaxCatch)
                 {
-                    if (this.FishHistoryDB.CatchCount >= settings.Fishing.MaxCatchCount)
+                    if (this.fishHistoryDB.CatchCount >= settings.Fishing.MaxCatchCount)
                     {
                         setRunningStatus(RunningStatusKind.Stop);
                         setFishingStatus(FishingStatusKind.Normal);
@@ -1323,66 +1340,14 @@ namespace EnjoyFishing
                     return false;
                 } 
 
-                ////魚名の名寄せ
-                //string renameFishname = renameFish(iFish.FishName);
-                ////FishDBから魚情報取得（不明魚以外で）
-                //FishDBFishModel fish = fishDB.SelectFishFromIDName(iFish.RodName, iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4, renameFishname, false);
-                //FishDBIdModel id = fish.GetId(iFish.ID1, iFish.ID2, iFish.ID3, iFish.ID4);
-                //if (fish.FishName != string.Empty)
-                //{
-                //    iFish.FishCount = id.Count;
-                //    iFish.Critical = id.Critical;
-                //}
-                ////FishTypeの設定
-                //if (!isTmpFishFromName(renameFishname))
-                //{
-                //    if (iFish.FishType == FishDBFishTypeKind.UnknownSmallFish) iFish.FishType = FishDBFishTypeKind.SmallFish;
-                //    if (iFish.FishType == FishDBFishTypeKind.UnknownLargeFish) iFish.FishType = FishDBFishTypeKind.LargeFish;
-                //    if (iFish.FishType == FishDBFishTypeKind.UnknownItem) iFish.FishType = FishDBFishTypeKind.Item;
-                //}
-                ////登録情報の設定 
-                //FishDBFishModel fishDBFish = new FishDBFishModel();
-                //fishDBFish.FishName = renameFishname;
-                //FishDBIdModel fishDBId = new FishDBIdModel();
-                //fishDBId.ID1 = iFish.ID1;
-                //fishDBId.ID2 = iFish.ID2;
-                //fishDBId.ID3 = iFish.ID3;
-                //fishDBId.ID4 = iFish.ID4;
-                //fishDBId.Count = iFish.FishCount;
-                //fishDBId.Critical = iFish.Critical;
-                //fishDBFish.IDs.Add(fishDBId);
-                //fishDBFish.FishType = iFish.FishType;
-                //fishDBFish.ZoneNames.Add(iFish.ZoneName);
-                //fishDBFish.BaitNames.Add(iFish.BaitName);
-                //if (!fishDB.UpdateFish(iFish.RodName, fishDBFish))
-                //{
-                //    setMessage("FishDBデータベースへの登録に失敗");
-                //    return false;
-                //} 
             }
             //FishHistoryDBに登録
-            if (!FishHistoryDB.Add(this.PlayerName, iFish))
+            if (!fishHistoryDB.AddFish(this.PlayerName, this.TimeElapsed, iFish))
             {
                 setMessage("FishHistoryDBデータベースへの登録に失敗");
                 return false;
             }
             return true;
-        }
-        /// <summary>
-        /// 名寄せ情報に基づき、魚名を変更する
-        /// </summary>
-        /// <param name="iFishName">魚名</param>
-        /// <returns>名寄せした魚名</returns>
-        private string renameFish(string iFishName)
-        {
-            if (FishDB.RenameFish.ContainsKey(iFishName))
-            {
-                return FishDB.RenameFish[iFishName];
-            }
-            else
-            {
-                return iFishName;
-            }
         }
         /// <summary>
         /// 強制HP0して良いか判定
@@ -1741,12 +1706,15 @@ namespace EnjoyFishing
             }
             Thread.Sleep(5000);
         }
+        /// <summary>
+        /// 経過時間メインスレッド
+        /// </summary>
         private void threadthTimeElapsed()
         {
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 Thread.Sleep(1000);
-                FishHistoryDB.TimeElapsed++;
+                this.TimeElapsed++;
             }
         }
         #endregion

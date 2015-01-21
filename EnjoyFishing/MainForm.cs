@@ -1339,13 +1339,13 @@ namespace EnjoyFishing
                 lblFishingInfoBaitName.Text = fishing.BaitNameWithRemain;
                 //釣果数
                 float catchCountPerHour = 0;
-                if (fishing.FishHistoryDB.TimeElapsed > 0)
+                if (fishing.TimeElapsed > 0)
                 {
-                    catchCountPerHour = ((float)fishing.FishHistoryDB.CatchCount / (float)fishing.FishHistoryDB.TimeElapsed) * 60f * 60f;
+                    catchCountPerHour = ((float)fishing.CatchCount / (float)fishing.TimeElapsed) * 60f * 60f;
                 }
-                lblFishingInfoCatchCount.Text = string.Format("{0}({1:0.0})", fishing.FishHistoryDB.CatchCount, catchCountPerHour);
+                lblFishingInfoCatchCount.Text = string.Format("{0}({1:0.0})", fishing.CatchCount, catchCountPerHour);
                 //経過時間
-                DateTime timeElapsed = new DateTime(2000, 12, 31, 0, 0, 0).AddSeconds(fishing.FishHistoryDB.TimeElapsed);
+                DateTime timeElapsed = new DateTime(2000, 12, 31, 0, 0, 0).AddSeconds(fishing.TimeElapsed);
                 lblFishingInfoTimeElapsed.Text = timeElapsed.ToString("HH:mm:ss");
                 //連続釣果なし
                 lblFishingInfoNoCatchCount.Text = fishing.NoCatchCount.ToString();
@@ -1435,13 +1435,13 @@ namespace EnjoyFishing
         private void updateAddonPlugin()
         {
             //PlugIn
-            List<string> plugins = control.GetPlugin();
-            settings.UseItemizer = plugins.Contains("itemizer");
-            logger.Output(LogLevelKind.DEBUG, "使用中のプラグイン");
-            foreach (string plugin in plugins) logger.Output(LogLevelKind.DEBUG, plugin);
+            //List<string> plugins = control.GetPlugin();
+            //settings.UseItemizer = plugins.Contains("itemizer");
+            //logger.Output(LogLevelKind.DEBUG, "使用中のプラグイン");
+            //foreach (string plugin in plugins) logger.Output(LogLevelKind.DEBUG, plugin);
             //AddOn
             List<string> addons = control.GetAddon();
-            //settings.UseItemizer = addons.Contains("Itemizer");
+            settings.UseItemizer = addons.Contains("Itemizer");
             settings.UseEnternity = addons.Contains("enternity");
             settings.UseCancel = addons.Contains("Cancel");
             logger.Output(LogLevelKind.DEBUG, "使用中のアドオン");
@@ -1454,9 +1454,13 @@ namespace EnjoyFishing
                 chkInventoryFullSack.Enabled = true;
                 chkInventoryFullSatchel.Enabled = true;
                 chkInventoryFullCase.Enabled = true;
+                txtInventoryFullCmdLine.Enabled = true;
+                chkInventoryFullCmd.Enabled = true;
                 chkNoBaitNoRodSack.Enabled = true;
                 chkNoBaitNoRodSatchel.Enabled = true;
                 chkNoBaitNoRodCase.Enabled = true;
+                txtNoBaitNoRodCmdLine.Enabled = true;
+                chkNoBaitNoRodCmd.Enabled = true;
             }
             else
             {
@@ -1464,9 +1468,13 @@ namespace EnjoyFishing
                 chkInventoryFullSack.Enabled = false;
                 chkInventoryFullSatchel.Enabled = false;
                 chkInventoryFullCase.Enabled = false;
+                txtInventoryFullCmdLine.Enabled = false;
+                chkInventoryFullCmd.Enabled = false;
                 chkNoBaitNoRodSack.Enabled = false;
                 chkNoBaitNoRodSatchel.Enabled = false;
                 chkNoBaitNoRodCase.Enabled = false;
+                txtNoBaitNoRodCmdLine.Enabled = false;
+                chkNoBaitNoRodCmd.Enabled = false;
             }
             if (settings.UseEnternity)
             {
@@ -1726,23 +1734,27 @@ namespace EnjoyFishing
         #region 魚リスト
         private void rdoFishListModeID_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.Mode = Settings.FishListModeKind.ID;
-            if (!startupFlg) settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
+            settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
             updateFishList();
         }
         private void rdoFishListName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.Mode = Settings.FishListModeKind.Name;
-            if (!startupFlg) settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
+            settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
             updateFishList();
         }
         private void chkFIshListViewArea_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.NarrowArea = chkFIshListNarrowArea.Checked;
             updateFishList();
         }
         private void chkFIshListViewBait_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.NarrowBait = chkFIshListNarrowBait.Checked;
             updateFishList();
         }
@@ -1751,192 +1763,239 @@ namespace EnjoyFishing
         #region 釣り設定・動作
         private void chkLearning_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.Learning = chkLearning.Checked;
         }
         private void chkSneakFishing_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.SneakFishing = chkSneakFishing.Checked;
         }
         private void txtSneakFishingRemain_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.SneakFishingRemain = (float)txtSneakFishingRemain.Value;
         }
         private void chkHP0_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.HP0 = chkHP0.Checked;
         }
         private void txtHP0Min_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.HP0Min = (int)txtHP0Min.Value;
         }
         private void txtHP0Max_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.HP0Max = (int)txtHP0Max.Value;
         }
         private void chkReactionTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ReactionTime = chkReactionTime.Checked;
         }
         private void txtReactionTimeMin_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ReactionTimeMin = (float)txtReactionTimeMin.Value;
         }
         private void txtReactionTimeMax_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ReactionTimeMax = (float)txtReactionTimeMax.Value;
         }
         private void chkVanaTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.VanaTime = chkVanaTime.Checked;
         }
         private void txtVanaTimeFrom_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.VanaTimeFrom = (int)txtVanaTimeFrom.Value;
         }
         private void txtVanaTimeTo_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.VanaTimeTo = (int)txtVanaTimeTo.Value;
         }
         private void chkRecastTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.RecastTime = chkRecastTime.Checked;
         }
         private void txtRecastTimeMin_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.RecastTimeMin = (float)txtRecastTimeMin.Value;
         }
         private void txtRecastTimeMax_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.RecastTimeMax = (float)txtRecastTimeMax.Value;
         }
         private void chkEarthTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EarthTime = chkEarthTime.Checked;
         }
         private void txtEarthTimeFrom_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EarthTimeFrom = (int)txtEarthTimeFrom.Value;
         }
         private void txtEarthTimeTo_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
         }
         private void chkIgnoreSmallFish_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
         }
         private void chkIgnoreLargeFish_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
         }
         private void chkIgnoreMonster_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
         }
         private void chkIgnoreItem_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreItem = chkIgnoreItem.Checked;
         }
         private void chkInventoryFullSack_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
         }
         private void chkInventoryFullSatchel_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
         }
         private void chkInventoryFullCase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
         }
         private void chkInventoryFullCmd_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
         }
         private void txtInventoryFullCmdLine_TextChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
         }
         private void chkNoBaitNoRodSack_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
         }
         private void chkNoBaitNoRodSatchel_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
         }
         private void chkNoBaitNoRodCase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
         }
         private void chkNoBaitNoRodCmd_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
         }
         private void txtNoBaitNoRodCmdLine_TextChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
         }
         #endregion
         #region 釣り設定・停止条件
         private void chkMaxCatch_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxCatch = chkMaxCatch.Checked;
         }
         private void txtMaxCatchCount_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxCatchCount = (int)txtMaxCatchCount.Value;
         }
         private void chkMaxNoCatch_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxNoCatch = chkMaxNoCatch.Checked;
         }
         private void txtMaxNoCatchCount_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxNoCatchCount = (int)txtMaxNoCatchCount.Value;
         }
         private void chkMaxSkill_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxSkill = chkMaxSkill.Checked;
         }
         private void txtMaxSkillValue_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxSkillValue = (int)txtMaxSkillValue.Value;
         }
         private void chkChatTell_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatTell = chkChatTell.Checked;
         }
         private void chkChatSay_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatSay = chkChatSay.Checked;
         }
         private void chkChatParty_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatParty = chkChatParty.Checked;
         }
         private void chkChatLs_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatLs = chkChatLs.Checked;
         }
         private void chkChatShout_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatShout = chkChatShout.Checked;
         }
         private void chkChatEmote_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatEmote = chkChatEmote.Checked;
         }
         private void chkChatRestart_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatRestart = chkChatRestart.Checked;
         }
         private void txtChatRestartCount_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
         }
         private void chkEntryPort_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EntryPort = chkEntryPort.Checked;
         }
         #endregion
@@ -1944,22 +2003,26 @@ namespace EnjoyFishing
         #region ハラキリ
         private void rdoHarakiriInputTypeSelect_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Harakiri.InputType = Settings.HarakiriInputTypeKind.Select;
             cmbHarakiriFishname.Enabled = true;
             txtHarakiriFishname.Enabled = false;
         }
         private void rdoHarakiriInputTypeInput_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Harakiri.InputType = Settings.HarakiriInputTypeKind.Input;
             cmbHarakiriFishname.Enabled = false;
             txtHarakiriFishname.Enabled = true;
         }
         private void cmbHarakiriFishname_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
         }
         private void txtHarakiriFishname_TextChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
         }
         #endregion
@@ -1967,51 +2030,61 @@ namespace EnjoyFishing
         #region 設定・ステータスバー表示
         private void chkVisibleMoonPhase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleVanatime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleEarthTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleEarthTime = chkStatusBarVisibleEarthTime.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleDayType_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleDayType = chkStatusBarVisibleDayType.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleLoginStatus_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleLoginStatus = chkStatusBarVisibleLoginStatus.Checked;
             setStatusBarVisible();
         }
         private void chkVisiblePlayerStatus_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisiblePlayerStatus = chkStatusBarVisiblePlayerStatus.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleHpBar_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleHpBar = chkStatusBarVisibleHpBar.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleHP_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleHP = chkStatusBarVisibleHP.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleRemainTimeBar_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleRemainTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
             setStatusBarVisible();
         }
@@ -2019,56 +2092,67 @@ namespace EnjoyFishing
         #region 設定・履歴列表示
         private void chkHistoryVisibleEarthTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColEarthTime.Visible = chkHistoryVisibleEarthTime.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleVanaTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColVanaTime.Visible = chkHistoryVisibleVanaTime.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleVanaWeekDay_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColVanaWeekDay.Visible = chkHistoryVisibleVanaWeekDay.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleMoonPhase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColMoonPhase.Visible = chkHistoryVisibleMoonPhase.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleZoneName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColZoneName.Visible = chkHistoryVisibleZoneName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleRodName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColRodName.Visible = chkHistoryVisibleRodName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleBaitName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColBaitName.Visible = chkHistoryVisibleBaitName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleID_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColID.Visible = chkHistoryVisibleID.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleFishName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColFishName.Visible = chkHistoryVisibleFishName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleFishCount_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColFishCount.Visible = chkHistoryVisibleFishCount.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleResult_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColResult.Visible = chkHistoryVisibleResult.Checked;
             initGridHistory();
         }
@@ -2076,10 +2160,12 @@ namespace EnjoyFishing
         #region 設定・設定の保存
         private void rdoSaveModeShared_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Global.SaveMode = Settings.SaveModeKind.Shared;
         }
         private void rdoSaveModeByPlayer_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Global.SaveMode = Settings.SaveModeKind.ByPlayer;
         }
         #endregion

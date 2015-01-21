@@ -27,7 +27,7 @@ namespace EnjoyFishing
         {
             this.logger = iLogger;
             FishHistoryDBModel history = getHistoryDB(iPlayerName, iYmd);
-            this.TimeElapsed = history.TimeElapsed;
+            updateCatchCount(history);
         }
 
         #region メンバー
@@ -38,11 +38,6 @@ namespace EnjoyFishing
         {
             get;
             private set;
-        }
-        public int TimeElapsed
-        {
-            get;
-            set;
         }
         #endregion
 
@@ -113,20 +108,37 @@ namespace EnjoyFishing
         }
 
         /// <summary>
-        /// 履歴に追加
+        /// 魚を履歴に追加
         /// </summary>
         /// <param name="iPlayername">プレイヤー名</param>
         /// <param name="iFish">FishHistoryDBFishModel</param>
         /// <returns>True:成功</returns>
-        public bool Add(string iPlayername, FishHistoryDBFishModel iFish)
+        public bool AddFish(string iPlayername, int iTimeElapsed, FishHistoryDBFishModel iFish)
         {
             FishHistoryDBModel historydb = getHistoryDB(iPlayername, DateTime.Parse(iFish.EarthTime));
 
             historydb.Version = VERSION;
             historydb.PlayerName = iPlayername;
             historydb.EarthDate = DateTime.Parse(iFish.EarthTime).ToShortDateString();
-            historydb.TimeElapsed = this.TimeElapsed;
+            historydb.TimeElapsed = iTimeElapsed;
             historydb.Fishes.Add(iFish);
+
+            return putHistoryDB(iPlayername, historydb);
+        }
+        /// <summary>
+        /// ハラキリを履歴に追加
+        /// </summary>
+        /// <param name="iPlayername">プレイヤー名</param>
+        /// <param name="iFish">FishHistoryDBHarakiriModel</param>
+        /// <returns>成功ならTrueを返す</returns>
+        public bool AddHarakiri(string iPlayername, FishHistoryDBHarakiriModel iFish)
+        {
+            FishHistoryDBModel historydb = getHistoryDB(iPlayername, DateTime.Parse(iFish.EarthTime));
+
+            historydb.Version = VERSION;
+            historydb.PlayerName = iPlayername;
+            historydb.EarthDate = DateTime.Parse(iFish.EarthTime).ToShortDateString();
+            historydb.Harakiri.Add(iFish);
 
             return putHistoryDB(iPlayername, historydb);
         }

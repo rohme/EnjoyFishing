@@ -33,7 +33,6 @@
             this.lstFish = new System.Windows.Forms.CheckedListBox();
             this.btnExecFishing = new System.Windows.Forms.Button();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.lblMoonPhase = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblDayType = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblVanaTime = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblEarthTime = new System.Windows.Forms.ToolStripStatusLabel();
@@ -105,9 +104,11 @@
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tabFishingMainInfo = new System.Windows.Forms.TabPage();
+            this.lblFishingInfoTimeElapsed = new System.Windows.Forms.Label();
             this.lblFishingInfoSkill = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.lblFishingInfoNoCatchCount = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.lblFishingInfoBaitName = new System.Windows.Forms.Label();
             this.lblFishingInfoRodName = new System.Windows.Forms.Label();
@@ -143,7 +144,6 @@
             this.chkFIshListNarrowArea = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnUpdateFishList = new System.Windows.Forms.Button();
             this.tabMain = new System.Windows.Forms.TabControl();
             this.tabMainFishing = new System.Windows.Forms.TabPage();
             this.tabMainHistory = new System.Windows.Forms.TabPage();
@@ -169,7 +169,6 @@
             this.lblAddonEnternity = new System.Windows.Forms.Label();
             this.rdoSaveModeShared = new System.Windows.Forms.RadioButton();
             this.lblPluginItemizer = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -192,8 +191,8 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.label17 = new System.Windows.Forms.Label();
-            this.lblFishingInfoTimeElapsed = new System.Windows.Forms.Label();
+            this.btnUpdateFishList = new System.Windows.Forms.Button();
+            this.lblMoonPhase = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -293,16 +292,6 @@
             this.statusStrip.Size = new System.Drawing.Size(569, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
-            // 
-            // lblMoonPhase
-            // 
-            this.lblMoonPhase.AutoSize = false;
-            this.lblMoonPhase.Image = global::EnjoyFishing.Properties.Resources.IMAGE_MOON00;
-            this.lblMoonPhase.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.lblMoonPhase.Name = "lblMoonPhase";
-            this.lblMoonPhase.Size = new System.Drawing.Size(19, 17);
-            this.lblMoonPhase.Text = "月";
-            this.lblMoonPhase.ToolTipText = "てすと";
             // 
             // lblDayType
             // 
@@ -1306,6 +1295,15 @@
             this.tabFishingMainInfo.Text = "情報";
             this.tabFishingMainInfo.UseVisualStyleBackColor = true;
             // 
+            // lblFishingInfoTimeElapsed
+            // 
+            this.lblFishingInfoTimeElapsed.AutoSize = true;
+            this.lblFishingInfoTimeElapsed.Location = new System.Drawing.Point(180, 17);
+            this.lblFishingInfoTimeElapsed.Name = "lblFishingInfoTimeElapsed";
+            this.lblFishingInfoTimeElapsed.Size = new System.Drawing.Size(59, 14);
+            this.lblFishingInfoTimeElapsed.TabIndex = 7;
+            this.lblFishingInfoTimeElapsed.Text = "99:99:99";
+            // 
             // lblFishingInfoSkill
             // 
             this.lblFishingInfoSkill.AutoSize = true;
@@ -1333,6 +1331,16 @@
             this.lblFishingInfoNoCatchCount.Size = new System.Drawing.Size(21, 14);
             this.lblFishingInfoNoCatchCount.TabIndex = 7;
             this.lblFishingInfoNoCatchCount.Text = "99";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label17.Location = new System.Drawing.Point(125, 17);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(62, 14);
+            this.label17.TabIndex = 6;
+            this.label17.Text = "経過時間：";
             // 
             // label14
             // 
@@ -1643,6 +1651,7 @@
             // rdoFishListModeName
             // 
             this.rdoFishListModeName.AutoSize = true;
+            this.rdoFishListModeName.Checked = true;
             this.rdoFishListModeName.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.rdoFishListModeName.Location = new System.Drawing.Point(74, 36);
             this.rdoFishListModeName.Name = "rdoFishListModeName";
@@ -1668,6 +1677,7 @@
             // rdoFishListModeID
             // 
             this.rdoFishListModeID.AutoSize = true;
+            this.rdoFishListModeID.Checked = true;
             this.rdoFishListModeID.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.rdoFishListModeID.Location = new System.Drawing.Point(36, 36);
             this.rdoFishListModeID.Name = "rdoFishListModeID";
@@ -1709,18 +1719,6 @@
             this.label2.Size = new System.Drawing.Size(29, 14);
             this.label2.TabIndex = 5;
             this.label2.Text = "絞込";
-            // 
-            // btnUpdateFishList
-            // 
-            this.btnUpdateFishList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUpdateFishList.Font = new System.Drawing.Font("Meiryo UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnUpdateFishList.Image = global::EnjoyFishing.Properties.Resources.IMAGE_REFRESH;
-            this.btnUpdateFishList.Location = new System.Drawing.Point(90, 0);
-            this.btnUpdateFishList.Name = "btnUpdateFishList";
-            this.btnUpdateFishList.Size = new System.Drawing.Size(36, 36);
-            this.btnUpdateFishList.TabIndex = 1;
-            this.btnUpdateFishList.UseVisualStyleBackColor = true;
-            this.btnUpdateFishList.Click += new System.EventHandler(this.btnUpdateFishList_Click);
             // 
             // tabMain
             // 
@@ -1804,7 +1802,7 @@
             this.gridHistorySummary.Location = new System.Drawing.Point(3, 3);
             this.gridHistorySummary.Name = "gridHistorySummary";
             this.gridHistorySummary.RowTemplate.Height = 21;
-            this.gridHistorySummary.Size = new System.Drawing.Size(538, 266);
+            this.gridHistorySummary.Size = new System.Drawing.Size(538, 267);
             this.gridHistorySummary.TabIndex = 0;
             this.gridHistorySummary.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -1938,7 +1936,6 @@
             this.groupBox2.Controls.Add(this.lblAddonEnternity);
             this.groupBox2.Controls.Add(this.rdoSaveModeShared);
             this.groupBox2.Controls.Add(this.lblPluginItemizer);
-            this.groupBox2.Controls.Add(this.label15);
             this.groupBox2.Controls.Add(this.label13);
             this.groupBox2.Controls.Add(this.label12);
             this.groupBox2.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -1952,7 +1949,7 @@
             // btnAddonUpdate
             // 
             this.btnAddonUpdate.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnAddonUpdate.Location = new System.Drawing.Point(463, 18);
+            this.btnAddonUpdate.Location = new System.Drawing.Point(403, 18);
             this.btnAddonUpdate.Name = "btnAddonUpdate";
             this.btnAddonUpdate.Size = new System.Drawing.Size(48, 23);
             this.btnAddonUpdate.TabIndex = 6;
@@ -2010,20 +2007,11 @@
             // 
             this.lblPluginItemizer.AutoSize = true;
             this.lblPluginItemizer.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblPluginItemizer.Location = new System.Drawing.Point(405, 22);
+            this.lblPluginItemizer.Location = new System.Drawing.Point(350, 22);
             this.lblPluginItemizer.Name = "lblPluginItemizer";
             this.lblPluginItemizer.Size = new System.Drawing.Size(52, 14);
             this.lblPluginItemizer.TabIndex = 4;
             this.lblPluginItemizer.Text = "Itemizer";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(358, 22);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(53, 14);
-            this.label15.TabIndex = 3;
-            this.label15.Text = "Plugin：";
             // 
             // label13
             // 
@@ -2286,24 +2274,27 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // label17
+            // btnUpdateFishList
             // 
-            this.label17.AutoSize = true;
-            this.label17.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label17.Location = new System.Drawing.Point(125, 17);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(62, 14);
-            this.label17.TabIndex = 6;
-            this.label17.Text = "経過時間：";
+            this.btnUpdateFishList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUpdateFishList.Font = new System.Drawing.Font("Meiryo UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnUpdateFishList.Image = global::EnjoyFishing.Properties.Resources.IMAGE_REFRESH;
+            this.btnUpdateFishList.Location = new System.Drawing.Point(90, 0);
+            this.btnUpdateFishList.Name = "btnUpdateFishList";
+            this.btnUpdateFishList.Size = new System.Drawing.Size(36, 36);
+            this.btnUpdateFishList.TabIndex = 1;
+            this.btnUpdateFishList.UseVisualStyleBackColor = true;
+            this.btnUpdateFishList.Click += new System.EventHandler(this.btnUpdateFishList_Click);
             // 
-            // lblFishingInfoTimeElapsed
+            // lblMoonPhase
             // 
-            this.lblFishingInfoTimeElapsed.AutoSize = true;
-            this.lblFishingInfoTimeElapsed.Location = new System.Drawing.Point(180, 17);
-            this.lblFishingInfoTimeElapsed.Name = "lblFishingInfoTimeElapsed";
-            this.lblFishingInfoTimeElapsed.Size = new System.Drawing.Size(59, 14);
-            this.lblFishingInfoTimeElapsed.TabIndex = 7;
-            this.lblFishingInfoTimeElapsed.Text = "99:99:99";
+            this.lblMoonPhase.AutoSize = false;
+            this.lblMoonPhase.Image = global::EnjoyFishing.Properties.Resources.IMAGE_MOON00;
+            this.lblMoonPhase.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.lblMoonPhase.Name = "lblMoonPhase";
+            this.lblMoonPhase.Size = new System.Drawing.Size(19, 17);
+            this.lblMoonPhase.Text = "月";
+            this.lblMoonPhase.ToolTipText = "てすと";
             // 
             // MainForm
             // 
@@ -2535,7 +2526,6 @@
         private System.Windows.Forms.Label lblFishingInfoNoCatchCount;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label lblAddonCancel;
-        private System.Windows.Forms.Label label15;
         private System.Windows.Forms.NumericUpDown txtSneakFishingRemain;
         private System.Windows.Forms.DataGridView gridHarakiri;
         private System.Windows.Forms.ComboBox cmbHarakiriFishname;

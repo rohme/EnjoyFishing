@@ -23,14 +23,12 @@ namespace EnjoyFishing
         public const string FILENAME_RODDB = "Rod.xml";
         public const string FILENAME_BAITDB = "Bait.xml";
         public const string FILENAME_GEARDB = "Gear.xml";
-        public const string FILENAME_RENAMEFISH = "RenameFish.xml";
         private const string VERSION = "1.0.5";
 
         private LoggerTool logger;
         private List<string> _Rods = new List<string>();
         private List<string> _Baits = new List<string>();
         private List<string> _Gears = new List<string>();
-        private Dictionary<string, string> _RenameFish = new Dictionary<string, string>();
 
         #region コンストラクタ
         /// <summary>
@@ -52,13 +50,6 @@ namespace EnjoyFishing
             {
                 this._Gears.Add(gear.GearName);
             }
-            foreach (RenameFishDBFishModel fish in SelectRenameFish())
-            {
-                if (!this._RenameFish.ContainsKey(fish.FishName))
-                {
-                    this._RenameFish.Add(fish.FishName, fish.FishRename);
-                }
-            }
         }
         #endregion
 
@@ -66,7 +57,6 @@ namespace EnjoyFishing
         public List<string> Rods { get { return _Rods; } }
         public List<string> Baits { get { return _Baits; } }
         public List<string> Gears { get { return _Gears; } }
-        public Dictionary<string,string> RenameFish { get { return _RenameFish; } }
         #endregion
         
         #region FishDB
@@ -661,61 +651,6 @@ namespace EnjoyFishing
                 fs.Close();
             }
             return gearDB;
-        }
-        #endregion
-
-        #region RenameFishDB
-        /// <summary>
-        /// 名寄せ情報を取得する（引数無し）
-        /// </summary>
-        /// <returns>名寄せ情報の一覧</returns>
-        public List<RenameFishDBFishModel> SelectRenameFish()
-        {
-            return SelectRenameFish(string.Empty);
-        }
-        /// <summary>
-        /// 名寄せ情報を取得する
-        /// </summary>
-        /// <param name="iSearchString">魚名称（正規表現）</param>
-        /// <returns>名寄せ情報の一覧</returns>
-        public List<RenameFishDBFishModel> SelectRenameFish(string iSearchString)
-        {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
-            List<RenameFishDBFishModel> ret = new List<RenameFishDBFishModel>();
-            RenameFishDBModel renameFishDB = getRenameFishDB();
-            if (iSearchString == string.Empty)
-            {
-                ret = renameFishDB.Fishes;
-            }
-            else
-            {
-                foreach (RenameFishDBFishModel fish in renameFishDB.Fishes)
-                {
-                    if (MiscTool.IsRegexString(fish.FishName, iSearchString))
-                    {
-                        ret.Add(fish);
-                    }
-                }
-            }
-            logger.VarDump(ret);
-            return ret;
-        }
-        /// <summary>
-        /// RenameFish.xmlの内容を全て取得する
-        /// </summary>
-        /// <returns>GearDBModel</returns>
-        private RenameFishDBModel getRenameFishDB()
-        {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_RENAMEFISH;
-            RenameFishDBModel renameFishDB = new RenameFishDBModel();
-            if (File.Exists(xmlFilename))
-            {
-                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
-                XmlSerializer serializer = new XmlSerializer(typeof(RenameFishDBModel));
-                renameFishDB = (RenameFishDBModel)serializer.Deserialize(fs);
-                fs.Close();
-            }
-            return renameFishDB;
         }
         #endregion
 

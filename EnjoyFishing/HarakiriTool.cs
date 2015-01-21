@@ -19,7 +19,7 @@ namespace EnjoyFishing
             {ChatKbnKind.Zaldon3, "腹の中から(.*)が出てきたぜ！"},
             {ChatKbnKind.Zaldon4, "まあ、あきらめずにまた持ってきてくれや。"},
             {ChatKbnKind.Zaldon5, "まあ、魚をまた持ってきてくれや。"},
-            {ChatKbnKind.GetItem, "(.*)を手にいれた！"},
+            //{ChatKbnKind.GetItem, "(.*)を手にいれた！"},
         };
         #endregion
 
@@ -31,7 +31,7 @@ namespace EnjoyFishing
             Zaldon3,
             Zaldon4,
             Zaldon5,
-            GetItem,
+            //GetItem,
             Unknown,
         }
         public enum RunningStatusKind
@@ -350,12 +350,21 @@ namespace EnjoyFishing
 
                 //チャット監視開始
                 string itemName = string.Empty;
+                int noResponseCount = 0;
                 FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
                 while (this.RunningStatus == RunningStatusKind.Running)
                 {
                     if (!chat.GetNextChatLine(out cl)) 
                     {
-                        Thread.Sleep(settings.Global.WaitBase);//wait
+                        noResponseCount++;
+                        if (noResponseCount > 10)
+                        {
+                            setRunningStatus(RunningStatusKind.Stop);
+                            setHarakiriStatus(HarakiriStatusKind.Error);
+                            setMessage("ハラキリ対象の魚ですか？ 反応無し中止");
+                            break;
+                        }
+                        Thread.Sleep(settings.Global.WaitChat);//wait
                         continue; 
                     } 
                     //チャット区分の取得
@@ -364,6 +373,7 @@ namespace EnjoyFishing
                     logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                     if (chatKbn == ChatKbnKind.Zaldon1)
                     {
+                        noResponseCount = 0;
                         if (!settings.UseEnternity)
                         {
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
@@ -371,6 +381,15 @@ namespace EnjoyFishing
                     }
                     else if (chatKbn == ChatKbnKind.Zaldon2)
                     {
+                        noResponseCount = 0;
+                        if (!putDatabase(itemName))
+                        {
+                            setRunningStatus(RunningStatusKind.Stop);
+                            setHarakiriStatus(HarakiriStatusKind.Error);
+                            setMessage("データベースの更新に失敗しました");
+                            break;
+                        }
+                        EventHarakiriOnce(this.HarakiriFishName, itemName);//イベント発生
                         setMessage("ハラキリ結果：何も見つからなかった");
                         if (!settings.UseEnternity)
                         {
@@ -379,23 +398,23 @@ namespace EnjoyFishing
                     }
                     else if (chatKbn == ChatKbnKind.Zaldon3)
                     {
+                        noResponseCount = 0;
                         itemName = chatKbnArgs[0];
+                        if (!putDatabase(itemName))
+                        {
+                            setRunningStatus(RunningStatusKind.Stop);
+                            setHarakiriStatus(HarakiriStatusKind.Error);
+                            setMessage("データベースの更新に失敗しました");
+                            break;
+                        }
+                        EventHarakiriOnce(this.HarakiriFishName, itemName);//イベント発生
                         setMessage(string.Format("ハラキリ結果：{0}を見つけた", itemName));
                         fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         Thread.Sleep(settings.Global.WaitChat);
                     }
                     else if (chatKbn == ChatKbnKind.Zaldon4 || chatKbn == ChatKbnKind.Zaldon5)
                     {
-                        FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
-                        string vanadate = string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}", 
-                                                                                    int.Parse(vt.Year.ToString()),
-                                                                                    int.Parse(vt.Month.ToString()),
-                                                                                    int.Parse(vt.Day.ToString()),
-                                                                                    int.Parse(vt.Hour.ToString()),
-                                                                                    int.Parse(vt.Minute.ToString()),
-                                                                                    int.Parse(vt.Second.ToString()));
-                        harakiriDB.Add(DateTime.Now.ToString(), vanadate, this.HarakiriFishName, itemName);
-                        EventHarakiriOnce(this.HarakiriFishName, itemName);//イベント発生
+                        noResponseCount = 0;
                         Thread.Sleep(2000);
                         break;
                     }
@@ -406,6 +425,18 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "ハラキリスレッド終了");
         }
 
+        private bool putDatabase(string iItemName)
+        {
+            FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
+            string vanadate = string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}",
+                                                                        int.Parse(vt.Year.ToString()),
+                                                                        int.Parse(vt.Month.ToString()),
+                                                                        int.Parse(vt.Day.ToString()),
+                                                                        int.Parse(vt.Hour.ToString()),
+                                                                        int.Parse(vt.Minute.ToString()),
+                                                                        int.Parse(vt.Second.ToString()));
+            return harakiriDB.Add(fface.Player.Name, DateTime.Now, vanadate, this.HarakiriFishName, iItemName);
+        }
         /// <summary>
         /// チャット内容からChatKbnKindを取得する
         /// </summary>
@@ -452,11 +483,11 @@ namespace EnjoyFishing
             this.RunningStatus = iRunningStatus;
             EventChangeStatus(iRunningStatus, this.HarakiriStatus);
         }
-        private void setHarakiriStatus(HarakiriStatusKind iFishingStatus)
+        private void setHarakiriStatus(HarakiriStatusKind iHarakiriStatus)
         {
-            if (this.HarakiriStatus == iFishingStatus) return;
-            this.HarakiriStatus = iFishingStatus;
-            EventChangeStatus(this.RunningStatus, iFishingStatus);
+            if (this.HarakiriStatus == iHarakiriStatus) return;
+            this.HarakiriStatus = iHarakiriStatus;
+            EventChangeStatus(this.RunningStatus, iHarakiriStatus);
         }
         private void setMessage(string iMessage)
         {

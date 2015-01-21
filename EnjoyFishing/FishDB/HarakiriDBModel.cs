@@ -14,14 +14,10 @@ namespace EnjoyFishing
         [XmlArray("Fishes")]
         [XmlArrayItem("Fish")]
         public List<HarakiriDBFishModel> Fishes { get; set; }
-        [XmlArray("Histories")]
-        [XmlArrayItem("History")]
-        public List<HarakiriDBHistoryModel> Histories { get; set; }
         public HarakiriDBModel()
         {
             this.Version = string.Empty;
             this.Fishes = new List<HarakiriDBFishModel>();
-            this.Histories = new List<HarakiriDBHistoryModel>();
         }
     }
     public class HarakiriDBFishModel : IEquatable<HarakiriDBFishModel>
@@ -76,31 +72,6 @@ namespace EnjoyFishing
         {
             if (other == null) return false;
             return (this.ItemName == other.ItemName);
-        }
-    }
-    public class HarakiriDBHistoryModel
-    {
-        [XmlAttribute("earthtime")]
-        public string EarthTime { get; set; }
-        [XmlAttribute("vanatime")]
-        public string VanaTime { get; set; }
-        [XmlAttribute("fishname")]
-        public string FishName { get; set; }
-        [XmlAttribute("itemname")]
-        public string ItemName { get; set; }
-        public HarakiriDBHistoryModel()
-        {
-            this.EarthTime = string.Empty;
-            this.VanaTime = string.Empty;
-            this.FishName = string.Empty;
-            this.ItemName = string.Empty;
-        }
-        public HarakiriDBHistoryModel(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
-        {
-            this.EarthTime = iEarthDate;
-            this.VanaTime = iVanaDate;
-            this.FishName = iFishName;
-            this.ItemName = iItemName;
         }
     }
 }

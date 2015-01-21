@@ -218,7 +218,8 @@ namespace MiscTools
                     if (MiscTool.IsRegexString(cl.Text, REGEX_PLUGIN))
                     {
                         List<string> reg = MiscTool.GetRegexString(cl.Text, REGEX_PLUGIN);
-                        ret.Add(reg[0]);
+                        string[] work = reg[0].Split(',');
+                        ret.Add(work[work.Count() - 1]);
                     }
                     else if (MiscTool.IsRegexString(cl.Text, REGEX_PLUGIN_END))
                     {
@@ -352,10 +353,10 @@ namespace MiscTools
             if (!IsInventoryFree(InventoryType.Inventory)) return false;
             //Itemizer実行
             string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), fface.Player.Name);
-            string cmd = string.Format("input /gets \"{0}\" {1}", iItemName, iInventoryType.ToString());
-            return ExecScript(cmd, scriptName);
-            //string cmd = string.Format("windower.send_command(\"input //get {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
-            //return ExecLua(cmd, scriptName);
+            //string cmd = string.Format("input /gets \"{0}\" {1}", iItemName, iInventoryType.ToString());
+            //return ExecScript(cmd, scriptName);
+            string cmd = string.Format("windower.send_command(\"input //get {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
+            return ExecLua(cmd, scriptName);
         }
         /// <summary>
         /// Itemizerで鞄のアイテムを移動する
@@ -371,10 +372,10 @@ namespace MiscTools
             if (!IsInventoryFree(iInventoryType)) return false;
             //Itemizer実行
             string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), fface.Player.Name);
-            string cmd = string.Format("input /puts \"{0}\" {1}", iItemName, iInventoryType.ToString());
-            return ExecScript(cmd, scriptName);
-            //string cmd = string.Format("windower.send_command(\"input //put {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
-            //return ExecLua(cmd, scriptName);
+            //string cmd = string.Format("input /puts \"{0}\" {1}", iItemName, iInventoryType.ToString());
+            //return ExecScript(cmd, scriptName);
+            string cmd = string.Format("windower.send_command(\"input //put {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
+            return ExecLua(cmd, scriptName);
         }
         /// <summary>
         /// 指定した倉庫タイプにアイテムが存在するか否か

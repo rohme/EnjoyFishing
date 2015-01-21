@@ -39,6 +39,9 @@ namespace EnjoyFishing
         [XmlArray("Fishes")]
         [XmlArrayItem("Fish")]
         public List<FishHistoryDBFishModel> Fishes { get; set; }
+        [XmlArray("Harakiri")]
+        [XmlArrayItem("Fish")]
+        public List<FishHistoryDBHarakiriModel> Harakiri { get; set; }
         public FishHistoryDBModel()
         {
             this.Version = string.Empty;
@@ -46,7 +49,7 @@ namespace EnjoyFishing
             this.EarthDate = DateTime.Today.ToString();
             this.TimeElapsed = 0;
             this.Fishes = new List<FishHistoryDBFishModel>();
-            
+            this.Harakiri = new List<FishHistoryDBHarakiriModel>();
         }
     }
     public class FishHistoryDBFishModel
@@ -196,6 +199,31 @@ namespace EnjoyFishing
                 this.Fishes.Add(fish);
             }
             this.Fishes.Sort(FishHistoryDBSummaryFishModel.SortTypeName);
+        }
+    }
+    public class FishHistoryDBHarakiriModel
+    {
+        [XmlAttribute("earthtime")]
+        public string EarthTime { get; set; }
+        [XmlAttribute("vanatime")]
+        public string VanaTime { get; set; }
+        [XmlAttribute("fishname")]
+        public string FishName { get; set; }
+        [XmlAttribute("itemname")]
+        public string ItemName { get; set; }
+        public FishHistoryDBHarakiriModel()
+        {
+            this.EarthTime = string.Empty;
+            this.VanaTime = string.Empty;
+            this.FishName = string.Empty;
+            this.ItemName = string.Empty;
+        }
+        public FishHistoryDBHarakiriModel(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
+        {
+            this.EarthTime = iEarthDate;
+            this.VanaTime = iVanaDate;
+            this.FishName = iFishName;
+            this.ItemName = iItemName;
         }
     }
     public class FishHistoryDBSummaryFishModel
