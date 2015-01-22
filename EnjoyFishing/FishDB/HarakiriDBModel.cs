@@ -48,6 +48,22 @@ namespace EnjoyFishing
             if (other == null) return false;
             return (this.FishName == other.FishName);
         }
+        public static int SortTypeCount(HarakiriDBFishModel iFish1, HarakiriDBFishModel iFish2)
+        {
+            //1番目のキー：Countでソート
+            if (iFish1.Count > iFish2.Count)
+            {
+                return -1;
+            }
+            else if (iFish1.Count < iFish2.Count)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
     public class HarakiriDBItemModel : IEquatable<HarakiriDBItemModel>
     {
@@ -72,6 +88,22 @@ namespace EnjoyFishing
         {
             if (other == null) return false;
             return (this.ItemName == other.ItemName);
+        }
+        public static int SortTypeCount(HarakiriDBItemModel iItem1, HarakiriDBItemModel iItem2)
+        {
+            //1番目のキー：Countでソート
+            if (iItem1.Count > iItem2.Count)
+            {
+                return -1;
+            }
+            else if (iItem1.Count < iItem2.Count)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

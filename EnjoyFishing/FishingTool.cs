@@ -990,7 +990,7 @@ namespace EnjoyFishing
             while (this.RunningStatus == RunningStatusKind.Running && fface.Player.Status != FFACETools.Status.Fishing)
             {
                 fface.Windower.SendString("/fish");
-                Thread.Sleep(settings.Global.WaitChat);
+                Thread.Sleep(2000);//wait
 
                 FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
                 while (chat.GetNextChatLine(out cl))

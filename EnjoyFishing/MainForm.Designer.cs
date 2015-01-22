@@ -33,6 +33,7 @@
             this.lstFish = new System.Windows.Forms.CheckedListBox();
             this.btnExecFishing = new System.Windows.Forms.Button();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.lblMoonPhase = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblDayType = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblVanaTime = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblEarthTime = new System.Windows.Forms.ToolStripStatusLabel();
@@ -144,6 +145,7 @@
             this.chkFIshListNarrowArea = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnUpdateFishList = new System.Windows.Forms.Button();
             this.tabMain = new System.Windows.Forms.TabControl();
             this.tabMainFishing = new System.Windows.Forms.TabPage();
             this.tabMainHistory = new System.Windows.Forms.TabPage();
@@ -191,8 +193,6 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.btnUpdateFishList = new System.Windows.Forms.Button();
-            this.lblMoonPhase = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -292,6 +292,16 @@
             this.statusStrip.Size = new System.Drawing.Size(569, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
+            // 
+            // lblMoonPhase
+            // 
+            this.lblMoonPhase.AutoSize = false;
+            this.lblMoonPhase.Image = global::EnjoyFishing.Properties.Resources.IMAGE_MOON00;
+            this.lblMoonPhase.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.lblMoonPhase.Name = "lblMoonPhase";
+            this.lblMoonPhase.Size = new System.Drawing.Size(19, 17);
+            this.lblMoonPhase.Text = "月";
+            this.lblMoonPhase.ToolTipText = "てすと";
             // 
             // lblDayType
             // 
@@ -1611,6 +1621,7 @@
             this.gridHistory.RowTemplate.Height = 21;
             this.gridHistory.Size = new System.Drawing.Size(538, 266);
             this.gridHistory.TabIndex = 0;
+            this.gridHistory.Sorted += new System.EventHandler(this.gridHistory_Sorted);
             // 
             // dateHistory
             // 
@@ -1720,6 +1731,18 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "絞込";
             // 
+            // btnUpdateFishList
+            // 
+            this.btnUpdateFishList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUpdateFishList.Font = new System.Drawing.Font("Meiryo UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnUpdateFishList.Image = global::EnjoyFishing.Properties.Resources.IMAGE_REFRESH;
+            this.btnUpdateFishList.Location = new System.Drawing.Point(90, 0);
+            this.btnUpdateFishList.Name = "btnUpdateFishList";
+            this.btnUpdateFishList.Size = new System.Drawing.Size(36, 36);
+            this.btnUpdateFishList.TabIndex = 1;
+            this.btnUpdateFishList.UseVisualStyleBackColor = true;
+            this.btnUpdateFishList.Click += new System.EventHandler(this.btnUpdateFishList_Click);
+            // 
             // tabMain
             // 
             this.tabMain.Controls.Add(this.tabMainFishing);
@@ -1802,7 +1825,7 @@
             this.gridHistorySummary.Location = new System.Drawing.Point(3, 3);
             this.gridHistorySummary.Name = "gridHistorySummary";
             this.gridHistorySummary.RowTemplate.Height = 21;
-            this.gridHistorySummary.Size = new System.Drawing.Size(538, 267);
+            this.gridHistorySummary.Size = new System.Drawing.Size(538, 266);
             this.gridHistorySummary.TabIndex = 0;
             this.gridHistorySummary.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -2273,28 +2296,6 @@
             this.chkStatusBarVisibleRemainTime.Text = "残り時間";
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
-            // 
-            // btnUpdateFishList
-            // 
-            this.btnUpdateFishList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUpdateFishList.Font = new System.Drawing.Font("Meiryo UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnUpdateFishList.Image = global::EnjoyFishing.Properties.Resources.IMAGE_REFRESH;
-            this.btnUpdateFishList.Location = new System.Drawing.Point(90, 0);
-            this.btnUpdateFishList.Name = "btnUpdateFishList";
-            this.btnUpdateFishList.Size = new System.Drawing.Size(36, 36);
-            this.btnUpdateFishList.TabIndex = 1;
-            this.btnUpdateFishList.UseVisualStyleBackColor = true;
-            this.btnUpdateFishList.Click += new System.EventHandler(this.btnUpdateFishList_Click);
-            // 
-            // lblMoonPhase
-            // 
-            this.lblMoonPhase.AutoSize = false;
-            this.lblMoonPhase.Image = global::EnjoyFishing.Properties.Resources.IMAGE_MOON00;
-            this.lblMoonPhase.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.lblMoonPhase.Name = "lblMoonPhase";
-            this.lblMoonPhase.Size = new System.Drawing.Size(19, 17);
-            this.lblMoonPhase.Text = "月";
-            this.lblMoonPhase.ToolTipText = "てすと";
             // 
             // MainForm
             // 

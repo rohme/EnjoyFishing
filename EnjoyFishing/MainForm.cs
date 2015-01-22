@@ -640,6 +640,28 @@ namespace EnjoyFishing
             iDataGridView.Columns.Add(col);
         }
         /// <summary>
+        /// グリッドのソート設定
+        /// </summary>
+        /// <param name="iGrid">グリッド</param>
+        /// <param name="iColName">列名</param>
+        /// <param name="iSortOrder">ソート順</param>
+        private void setGridSort(DataGridView iGrid, string iColName, SortOrder iSortOrder)
+        {
+            if (iColName != string.Empty)
+            {
+                ListSortDirection sortDirection = ListSortDirection.Ascending;
+                if (iSortOrder == SortOrder.Ascending)
+                {
+                    sortDirection = ListSortDirection.Ascending;
+                }
+                else if (iSortOrder == SortOrder.Descending)
+                {
+                    sortDirection = ListSortDirection.Descending;
+                }
+                iGrid.Sort(iGrid.Columns[iColName], sortDirection);
+            }
+        }
+        /// <summary>
         /// ステータスバーの表示・非表示切り替え
         /// </summary>
         private void setStatusBarVisible()
@@ -1252,7 +1274,8 @@ namespace EnjoyFishing
                 tbl.AcceptChanges();
                 //グリッドにデータソースを設定
                 gridHistory.DataSource = tbl.DefaultView;
-
+                //ソート設定
+                setGridSort(gridHistory, settings.History.SortColName, settings.History.SortOrder);
                 //合計タブの設定
                 updateFishingInfo(gridHistorySummary, dateHistory.Value, (FishResultStatusKind)cmbHistoryResult.SelectedValue, (string)cmbHistoryFishName.SelectedValue);
 
@@ -1398,29 +1421,6 @@ namespace EnjoyFishing
                         row["Percent"] = per.ToString("P2");
                         tbl.Rows.Add(row);
                     }
-                    //if (result.Count > 0)
-                    //{
-                    //    row = tbl.NewRow();
-                    //    row["Result"] = result.Result.ToString();
-                    //    row["FishName"] = string.Empty;
-                    //    row["Count"] = result.Count.ToString();
-                    //    row["ResultPer"] = string.Empty;
-                    //    row["AllPer"] = result.TotalPercent.ToString() + "%";
-                    //    tbl.Rows.Add(row);
-                    //    if (result.Result != FishResultStatusKind.NoBite)
-                    //    {
-                    //        foreach (FishHistoryDBSummaryFishModel fish in result.Fishes)
-                    //        {
-                    //            row = tbl.NewRow();
-                    //            row["Result"] = string.Empty;
-                    //            row["FishName"] = fish.FishName;
-                    //            row["Count"] = fish.Count.ToString();
-                    //            row["ResultPer"] = fish.Percent.ToString() + "%";
-                    //            row["AllPer"] = fish.TotalPercent.ToString() + "%";
-                    //            tbl.Rows.Add(row);
-                    //        }
-                    //    }
-                    //}
                 }
                 tbl.AcceptChanges();
                 //グリッドにデータソースを設定
@@ -1571,6 +1571,17 @@ namespace EnjoyFishing
                 settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
                 settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
                 //履歴
+                DataGridViewColumn sortCol = gridHistory.SortedColumn;
+                if (sortCol != null)
+                {
+                    settings.History.SortColName = sortCol.Name;
+                    settings.History.SortOrder = gridHistory.SortOrder;
+                }
+                else
+                {
+                    settings.History.SortColName = string.Empty;
+                    settings.History.SortOrder = SortOrder.None;
+                }
                 settings.History.ColEarthTime.DisplayIndex = gridHistory.Columns[settings.History.ColEarthTime.Name].DisplayIndex;
                 settings.History.ColVanaTime.DisplayIndex = gridHistory.Columns[settings.History.ColVanaTime.Name].DisplayIndex;
                 settings.History.ColVanaWeekDay.DisplayIndex = gridHistory.Columns[settings.History.ColVanaWeekDay.Name].DisplayIndex;
@@ -2366,6 +2377,21 @@ namespace EnjoyFishing
         }
         
         #endregion
+
+        private void gridHistory_Sorted(object sender, EventArgs e)
+        {
+            DataGridViewColumn sortCol = gridHistory.SortedColumn;
+            if (sortCol != null)
+            {
+                settings.History.SortColName = sortCol.Name;
+                settings.History.SortOrder = gridHistory.SortOrder;
+            }
+            else
+            {
+                settings.History.SortColName = string.Empty;
+                settings.History.SortOrder = SortOrder.None;
+            }
+        }
 
     }
 }

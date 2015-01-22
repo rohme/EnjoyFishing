@@ -515,6 +515,8 @@ namespace EnjoyFishing
     }
     public class SettingsPlayerHistoryModel
     {
+        public string SortColName { get; set; }
+        public SortOrder SortOrder { get; set; }
         public SettingsPlayerHistoryColModel ColEarthTime { get; set; }
         public SettingsPlayerHistoryColModel ColVanaTime { get; set; }
         public SettingsPlayerHistoryColModel ColVanaWeekDay { get; set; }
@@ -528,6 +530,8 @@ namespace EnjoyFishing
         public SettingsPlayerHistoryColModel ColResult { get; set; }
         public SettingsPlayerHistoryModel()
         {
+            this.SortColName = string.Empty;
+            this.SortOrder = System.Windows.Forms.SortOrder.None;
             this.ColEarthTime = new SettingsPlayerHistoryColModel("EarthTime", 0, true, 63);
             this.ColVanaTime = new SettingsPlayerHistoryColModel("VanaTime", 1, true, 130);
             this.ColVanaWeekDay = new SettingsPlayerHistoryColModel("VanaWeekDay", 2, true, 20);

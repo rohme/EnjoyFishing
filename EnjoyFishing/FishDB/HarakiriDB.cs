@@ -31,6 +31,12 @@ namespace EnjoyFishing
         public HarakiriDBModel GetSummary()
         {
             HarakiriDBModel ret = getHarakiriDB();
+            //ソート
+            ret.Fishes.Sort(HarakiriDBFishModel.SortTypeCount);
+            for (int i = 0; i < ret.Fishes.Count; i++)
+            {
+                ret.Fishes[i].Items.Sort(HarakiriDBItemModel.SortTypeCount);
+            }
             return ret;
         }
 
@@ -80,6 +86,12 @@ namespace EnjoyFishing
                     fish.Items.Add(item);
                 }
                 harakiriDB.Fishes.Add(fish);
+            }
+            //ソート
+            harakiriDB.Fishes.Sort(HarakiriDBFishModel.SortTypeCount);
+            for (int i = 0; i < harakiriDB.Fishes.Count; i++)
+            {
+                harakiriDB.Fishes[i].Items.Sort(HarakiriDBItemModel.SortTypeCount);
             }
             //履歴DBに保存
             FishHistoryDB historyDB = new FishHistoryDB(iPlayerName, iEarthDate, logger);
