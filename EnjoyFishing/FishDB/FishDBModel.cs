@@ -19,6 +19,13 @@ namespace EnjoyFishing
         UnknownMonster,
         Unknown,
     }
+    public enum FishDBItemTypeKind
+    {
+        Common,
+        Temporary,
+        Key,
+        Unknown,
+    }
 
     #region FishDBModel
     [XmlRoot("Rod")]
@@ -45,7 +52,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string FishName { get; set; }
-        [XmlAttribute("type")]
+        [XmlAttribute("fishtype")]
         public FishDBFishTypeKind FishType { get; set; }
         [XmlArray("Ids")]
         [XmlArrayItem("Id")]
@@ -107,6 +114,8 @@ namespace EnjoyFishing
         public int Count { get; set; }
         [XmlAttribute("critical")]
         public bool Critical { get; set; }
+        [XmlAttribute("itemtype")]
+        public FishDBItemTypeKind ItemType { get; set; }
         public FishDBIdModel()
         {
             this.ID1 = 0;
@@ -115,8 +124,9 @@ namespace EnjoyFishing
             this.ID4 = 0;
             this.Count = 0;
             this.Critical = false;
+            this.ItemType = FishDBItemTypeKind.Unknown;
         }
-        public FishDBIdModel(int iID1, int iID2, int iID3, int iID4, int iCount, bool iCritical)
+        public FishDBIdModel(int iID1, int iID2, int iID3, int iID4, int iCount, bool iCritical, FishDBItemTypeKind iItemType)
         {
             this.ID1 = iID1;
             this.ID2 = iID2;
@@ -124,6 +134,7 @@ namespace EnjoyFishing
             this.ID4 = iID4;
             this.Count = iCount;
             this.Critical = iCritical;
+            this.ItemType = iItemType;
         }
         public FishDBIdModel(int iID1, int iID2, int iID3, int iID4)
         {
@@ -133,6 +144,7 @@ namespace EnjoyFishing
             this.ID4 = iID4;
             this.Count = 0;
             this.Critical = false;
+            this.ItemType = FishDBItemTypeKind.Unknown;
         }
         public override int GetHashCode()
         {
@@ -145,73 +157,85 @@ namespace EnjoyFishing
         }
        public static int SortCountCritical(FishDBIdModel iID1, FishDBIdModel iID2)
         {
-            //1番目のキー：Countでソート
-            if (iID1.Count > iID2.Count)
+            //1番目のキー：ItemTypeでソート
+            if (iID1.ItemType > iID1.ItemType)
             {
                 return 1;
             }
-            else if (iID1.Count < iID2.Count)
+            else if (iID1.ItemType < iID2.ItemType)
             {
                 return -1;
             }
             else
             {
-                //2番目のキー：Criticalでソート
-                if (iID1.Critical && !iID2.Critical)
+                //2番目のキー：Countでソート
+                if (iID1.Count > iID2.Count)
                 {
                     return 1;
                 }
-                else if (!iID1.Critical && iID2.Critical)
+                else if (iID1.Count < iID2.Count)
                 {
                     return -1;
                 }
                 else
                 {
-                    //3番目のキー：ID1でソート
-                    if (iID1.ID1 > iID2.ID1)
+                    //3番目のキー：Criticalでソート
+                    if (iID1.Critical && !iID2.Critical)
                     {
                         return 1;
                     }
-                    else if (iID1.ID1 < iID2.ID1)
+                    else if (!iID1.Critical && iID2.Critical)
                     {
                         return -1;
                     }
                     else
                     {
-                        //4番目のキー：ID2でソート
-                        if (iID1.ID2 > iID2.ID2)
+                        //4番目のキー：ID1でソート
+                        if (iID1.ID1 > iID2.ID1)
                         {
                             return 1;
                         }
-                        else if (iID1.ID2 < iID2.ID2)
+                        else if (iID1.ID1 < iID2.ID1)
                         {
                             return -1;
                         }
                         else
                         {
-                            //5番目のキー：ID3でソート
-                            if (iID1.ID3 > iID2.ID3)
+                            //5番目のキー：ID2でソート
+                            if (iID1.ID2 > iID2.ID2)
                             {
                                 return 1;
                             }
-                            else if (iID1.ID3 < iID2.ID3)
+                            else if (iID1.ID2 < iID2.ID2)
                             {
                                 return -1;
                             }
                             else
                             {
-                                //6番目のキー：ID4でソート
-                                if (iID1.ID4 > iID2.ID4)
+                                //6番目のキー：ID3でソート
+                                if (iID1.ID3 > iID2.ID3)
                                 {
                                     return 1;
                                 }
-                                else if (iID1.ID4 < iID2.ID4)
+                                else if (iID1.ID3 < iID2.ID3)
                                 {
                                     return -1;
                                 }
                                 else
                                 {
-                                    return 0;
+                                    //7番目のキー：ID4でソート
+                                    if (iID1.ID4 > iID2.ID4)
+                                    {
+                                        return 1;
+                                    }
+                                    else if (iID1.ID4 < iID2.ID4)
+                                    {
+                                        return -1;
+                                    }
+                                    else
+                                    {
+                                        return 0;
+                                    }
                                 }
                             }
                         }

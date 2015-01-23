@@ -74,7 +74,9 @@ namespace EnjoyFishing
         public int ID4 { get; set; }
         [XmlAttribute("critical")]
         public bool Critical { get; set; }
-        [XmlAttribute("type")]
+        [XmlAttribute("itemtype")]
+        public FishDBItemTypeKind ItemType { get; set; }
+        [XmlAttribute("fishtype")]
         public FishDBFishTypeKind FishType { get; set; }
         [XmlAttribute("result")]
         public FishResultStatusKind Result { get; set; }

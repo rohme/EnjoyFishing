@@ -198,6 +198,14 @@ namespace EnjoyFishing
                 fish1_0_5.ID4 = fish1_0_0.ID4;
                 fish1_0_5.Critical = fish1_0_0.Critical;
                 fish1_0_5.FishCount = fish1_0_0.FishCount;
+                if (fish1_0_0.ID1 == 0 && fish1_0_0.ID2 == 0 && fish1_0_0.ID3 == 0 && fish1_0_0.ID4 == 0)
+                {
+                    fish1_0_5.ItemType = FishDBItemTypeKind.Unknown;
+                }
+                else
+                {
+                    fish1_0_5.ItemType = FishDBItemTypeKind.Common;
+                }
                 fish1_0_5.FishType = fish1_0_0.FishType;
                 fish1_0_5.Result = fish1_0_0.Result;
                 fish1_0_5.EarthTime = fish1_0_0.EarthTime.ToString();

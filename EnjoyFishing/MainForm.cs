@@ -1124,7 +1124,7 @@ namespace EnjoyFishing
                     {
                         foreach (FishDBIdModel id in fish.IDs)
                         {
-                            string fishName = FishingTool.GetViewFishName(fish.FishName, fish.FishType, id.Count, id.Critical);
+                            string fishName = FishingTool.GetViewFishName(fish.FishName, fish.FishType, id.Count, id.Critical, id.ItemType);
                             fishListKey.Add(fishName, new SettingsPlayerFishListWantedModel(fish.FishName, id.ID1, id.ID2, id.ID3, id.ID4));
                             lstFish.Items.Add(fishName, settings.FishList.IsWanted(fish.FishName, id.ID1, id.ID2, id.ID3, id.ID4));
                         }
@@ -1275,7 +1275,7 @@ namespace EnjoyFishing
                     row = tbl.NewRow();
                     if (fish.FishName != string.Empty)
                     {
-                        row["FishName"] = FishingTool.GetViewFishName(fish.FishName, fish.FishType, fish.FishCount, fish.Critical);
+                        row["FishName"] = FishingTool.GetViewFishName(fish.FishName, fish.FishType, fish.FishCount, fish.Critical, fish.ItemType);
                         row["ID"] = string.Format("{0:000}-{1:000}-{2:000}-{3:000}", fish.ID1, fish.ID2, fish.ID3, fish.ID4);
                         row["FishCount"] = fish.FishCount;
                     }

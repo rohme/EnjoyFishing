@@ -335,6 +335,7 @@ namespace EnjoyFishing
                     id1_0_5.ID4 = id1_0_0.ID4;
                     id1_0_5.Count = id1_0_0.Count;
                     id1_0_5.Critical = id1_0_0.Critical;
+                    id1_0_5.ItemType = FishDBItemTypeKind.Common;
                     fish1_0_5.IDs.Add(id1_0_5);
                 }
                 //エリア 初期化する
