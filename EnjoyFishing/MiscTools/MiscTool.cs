@@ -34,17 +34,6 @@ namespace MiscTools
         public const UInt32 FLASHW_TIMER = 4;       // FLASHW_STOPが指定されるまでずっと点滅させる
         public const UInt32 FLASHW_TIMERNOFG = 12;  // ウィンドウが最前面に来るまでずっと点滅させる
 
-        public static void FlashWindow(IntPtr iHandle, UInt32 iFlashMode = FLASHW_ALL)
-        {
-            FLASHWINFO fInfo = new FLASHWINFO();
-            fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
-            fInfo.hwnd = iHandle;
-            fInfo.dwFlags = iFlashMode;
-            fInfo.uCount = 5; // 点滅する回数
-            fInfo.dwTimeout = 0;
-            FlashWindowEx(ref fInfo);
-        }
-
         public static void DebugMessage(string iMsg)
         {
             DateTime dtNow = DateTime.Now;
@@ -210,6 +199,23 @@ namespace MiscTools
             }
             Random rnd = new Random();
             return rnd.Next(from, to);
+        }
+
+        /// <summary>
+        /// 指定されたウィンドウを点滅する
+        /// </summary>
+        /// <param name="iHandle">ウィンドウハンドル</param>
+        /// <param name="iFlashMode">点滅モード</param>
+        /// <param name="iFlashCount">点滅回数</param>
+        public static void FlashWindow(IntPtr iHandle, UInt32 iFlashMode = FLASHW_ALL, uint iFlashCount = 5)
+        {
+            FLASHWINFO fInfo = new FLASHWINFO();
+            fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
+            fInfo.hwnd = iHandle;
+            fInfo.dwFlags = iFlashMode;
+            fInfo.uCount = iFlashCount; // 点滅する回数
+            fInfo.dwTimeout = 0;
+            FlashWindowEx(ref fInfo);
         }
 
     }

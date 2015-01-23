@@ -317,6 +317,7 @@ namespace EnjoyFishing
                 if (settings.Form.Width > 0) this.Width = settings.Form.Width;
                 if (settings.Form.Height > 0) this.Height = settings.Form.Height;
                 if (settings.Form.SplitterDistance > 0) splitMain.SplitterDistance = settings.Form.SplitterDistance;
+                this.TopMost = settings.Etc.WindowTopMost;
                 //魚リスト
                 if (settings.FishList.Mode == Settings.FishListModeKind.ID) rdoFishListModeID.Checked = true;
                 else if (settings.FishList.Mode == Settings.FishListModeKind.Name) rdoFishListModeName.Checked = true;
@@ -373,6 +374,10 @@ namespace EnjoyFishing
                 txtNoBaitNoRodCmdLine.Text = settings.Fishing.NoBaitNoRodCmdLine;
                 //釣り・情報
                 updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
+                //設定・一般
+                chkWindowTopMost.Checked = settings.Etc.WindowTopMost;
+                chkWindowFlash.Checked = settings.Etc.WindowFlash;
+                chkWindowActivate.Checked = settings.Etc.WindowActivate;
                 //設定・ステータスバー表示
                 chkStatusBarVisibleMoonPhase.Checked = settings.Etc.VisibleMoonPhase;
                 chkStatusBarVisibleVanaTime.Checked = settings.Etc.VisibleVanaTime;
@@ -941,6 +946,25 @@ namespace EnjoyFishing
                     dgv.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.FromArgb(0x80, 0xFF, 0x80);
                     dgv.Rows[e.RowIndex].DefaultCellStyle.SelectionBackColor = Color.FromArgb(0x80, 0xFF, 0x80);
                 }
+            }
+        }
+        /// <summary>
+        /// 履歴グリッド Sortedイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridHistory_Sorted(object sender, EventArgs e)
+        {
+            DataGridViewColumn sortCol = gridHistory.SortedColumn;
+            if (sortCol != null)
+            {
+                settings.History.SortColName = sortCol.Name;
+                settings.History.SortOrder = gridHistory.SortOrder;
+            }
+            else
+            {
+                settings.History.SortColName = string.Empty;
+                settings.History.SortOrder = SortOrder.None;
             }
         }
         /// <summary>
@@ -1626,6 +1650,10 @@ namespace EnjoyFishing
                 }
                 settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
                 settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
+                //設定・一般
+                settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
+                settings.Etc.WindowFlash = chkWindowFlash.Checked;
+                settings.Etc.WindowActivate = chkWindowActivate.Checked;
                 //保存開始
                 if (fishing != null) settings.Save(fishing.PlayerName);
 
@@ -1674,6 +1702,27 @@ namespace EnjoyFishing
         {
             fishDB.Converter();
             fishHistoryDB.Converter();
+        }
+        /// <summary>
+        /// 画面フラッシュ及び画面アクティブ処理
+        /// </summary>
+        private void flashWindow()
+        {
+            //フォーム点滅
+            if (settings.Etc.WindowFlash)
+            {
+                //フォームが非アクティブの時だけ点滅する
+                if (Form.ActiveForm != this)
+                {
+                    MiscTool.FlashWindow(this.Handle);
+                }
+            }
+            //フォームアクティブ
+            if (settings.Etc.WindowActivate)
+            {
+                this.WindowState = FormWindowState.Normal;
+                this.Activate();
+            }
         }
         #endregion
 
@@ -2168,7 +2217,7 @@ namespace EnjoyFishing
             initGridHistory();
         }
         #endregion
-        #region 設定・設定の保存
+        #region 設定・一般
         private void rdoSaveModeShared_CheckedChanged(object sender, EventArgs e)
         {
             if (startupFlg) return;
@@ -2178,6 +2227,22 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Global.SaveMode = Settings.SaveModeKind.ByPlayer;
+        }
+        private void chkTopMost_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
+            this.TopMost = chkWindowTopMost.Checked;
+        }
+        private void chkFlashAtFinished_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.WindowFlash = chkWindowFlash.Checked;
+        }
+        private void chkActivateAtFinished_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.WindowActivate = chkWindowActivate.Checked;
         }
         #endregion
         #endregion
@@ -2210,15 +2275,19 @@ namespace EnjoyFishing
                 //画面ロック解除
                 lockControl(false);
                 loginFlg = true;
+                flashWindow();//画面フラッシュ
             }
             else if (e.PolStatus == PolTool.PolStatusKind.CharacterLoginScreen)
             {
                 loginFlg = false;
                 lockControl(true);//コントロールロック
                 unload();
+                flashWindow();//画面フラッシュ
             }
             else if (e.PolStatus == PolTool.PolStatusKind.Unknown)
             {
+
+                flashWindow();//画面フラッシュ
                 MessageBox.Show("FF11が終了しました。EnjoyFishingは終了します。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 unload();
                 System.Environment.Exit(0);//プログラム終了
@@ -2282,9 +2351,11 @@ namespace EnjoyFishing
                         break;
                     case FishingTool.FishingStatusKind.Wait:
                         statusStrip.BackColor = Color.FromArgb(0xFF, 0xFF, 0x80);
+                        flashWindow();//画面フラッシュ
                         break;
                     case FishingTool.FishingStatusKind.Error:
                         statusStrip.BackColor = Color.FromArgb(0xFF, 0x80, 0x80);
+                        flashWindow();//画面フラッシュ
                         break;
                     default:
                         statusStrip.BackColor = SystemColors.Control;
@@ -2297,6 +2368,7 @@ namespace EnjoyFishing
                         break;
                     case FishingTool.RunningStatusKind.Stop:
                         this.Cursor = Cursors.Default;
+                        flashWindow();//画面フラッシュ
                         break;
                 }
             }
@@ -2356,9 +2428,11 @@ namespace EnjoyFishing
                         break;
                     case HarakiriTool.HarakiriStatusKind.Wait:
                         statusStrip.BackColor = Color.FromArgb(0xFF, 0xFF, 0x80);
+                        flashWindow();//画面フラッシュ
                         break;
                     case HarakiriTool.HarakiriStatusKind.Error:
                         statusStrip.BackColor = Color.FromArgb(0xFF, 0x80, 0x80);
+                        flashWindow();//画面フラッシュ
                         break;
                     default:
                         statusStrip.BackColor = SystemColors.Control;
@@ -2371,27 +2445,13 @@ namespace EnjoyFishing
                         break;
                     case HarakiriTool.RunningStatusKind.Stop:
                         this.Cursor = Cursors.Default;
+                        flashWindow();//画面フラッシュ
                         break;
                 }
             }
         }
         
         #endregion
-
-        private void gridHistory_Sorted(object sender, EventArgs e)
-        {
-            DataGridViewColumn sortCol = gridHistory.SortedColumn;
-            if (sortCol != null)
-            {
-                settings.History.SortColName = sortCol.Name;
-                settings.History.SortOrder = gridHistory.SortOrder;
-            }
-            else
-            {
-                settings.History.SortColName = string.Empty;
-                settings.History.SortOrder = SortOrder.None;
-            }
-        }
 
     }
 }

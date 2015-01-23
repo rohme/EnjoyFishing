@@ -489,6 +489,9 @@ namespace EnjoyFishing
     }
     public class SettingsPlayerEtcModel
     {
+        public bool WindowTopMost { get; set; }
+        public bool WindowFlash { get; set; }
+        public bool WindowActivate { get; set; }
         public bool VisibleMoonPhase { get; set; }
         public bool VisibleVanaTime { get; set; }
         public bool VisibleEarthTime { get; set; }
@@ -501,6 +504,9 @@ namespace EnjoyFishing
         public bool VisibleRemainTime { get; set; }
         public SettingsPlayerEtcModel()
         {
+            this.WindowTopMost = false;
+            this.WindowFlash = true;
+            this.WindowActivate = true;
             this.VisibleMoonPhase = true;
             this.VisibleVanaTime = true;
             this.VisibleEarthTime = false;

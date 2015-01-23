@@ -165,6 +165,9 @@
             this.btnExecHarakiri = new System.Windows.Forms.Button();
             this.tabMainSetting = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.chkWindowActivate = new System.Windows.Forms.CheckBox();
+            this.chkWindowFlash = new System.Windows.Forms.CheckBox();
+            this.chkWindowTopMost = new System.Windows.Forms.CheckBox();
             this.btnAddonUpdate = new System.Windows.Forms.Button();
             this.rdoSaveModeByPlayer = new System.Windows.Forms.RadioButton();
             this.lblAddonCancel = new System.Windows.Forms.Label();
@@ -1953,6 +1956,9 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.chkWindowActivate);
+            this.groupBox2.Controls.Add(this.chkWindowFlash);
+            this.groupBox2.Controls.Add(this.chkWindowTopMost);
             this.groupBox2.Controls.Add(this.btnAddonUpdate);
             this.groupBox2.Controls.Add(this.rdoSaveModeByPlayer);
             this.groupBox2.Controls.Add(this.lblAddonCancel);
@@ -1964,10 +1970,46 @@
             this.groupBox2.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(552, 49);
+            this.groupBox2.Size = new System.Drawing.Size(552, 69);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "一般";
+            // 
+            // chkWindowActivate
+            // 
+            this.chkWindowActivate.AutoSize = true;
+            this.chkWindowActivate.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkWindowActivate.Location = new System.Drawing.Point(167, 44);
+            this.chkWindowActivate.Name = "chkWindowActivate";
+            this.chkWindowActivate.Size = new System.Drawing.Size(86, 18);
+            this.chkWindowActivate.TabIndex = 7;
+            this.chkWindowActivate.Text = "画面アクティブ";
+            this.chkWindowActivate.UseVisualStyleBackColor = true;
+            this.chkWindowActivate.CheckedChanged += new System.EventHandler(this.chkActivateAtFinished_CheckedChanged);
+            // 
+            // chkWindowFlash
+            // 
+            this.chkWindowFlash.AutoSize = true;
+            this.chkWindowFlash.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkWindowFlash.Location = new System.Drawing.Point(91, 44);
+            this.chkWindowFlash.Name = "chkWindowFlash";
+            this.chkWindowFlash.Size = new System.Drawing.Size(70, 18);
+            this.chkWindowFlash.TabIndex = 7;
+            this.chkWindowFlash.Text = "画面点滅";
+            this.chkWindowFlash.UseVisualStyleBackColor = true;
+            this.chkWindowFlash.CheckedChanged += new System.EventHandler(this.chkFlashAtFinished_CheckedChanged);
+            // 
+            // chkWindowTopMost
+            // 
+            this.chkWindowTopMost.AutoSize = true;
+            this.chkWindowTopMost.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkWindowTopMost.Location = new System.Drawing.Point(6, 44);
+            this.chkWindowTopMost.Name = "chkWindowTopMost";
+            this.chkWindowTopMost.Size = new System.Drawing.Size(79, 18);
+            this.chkWindowTopMost.TabIndex = 7;
+            this.chkWindowTopMost.Text = "常に最前面";
+            this.chkWindowTopMost.UseVisualStyleBackColor = true;
+            this.chkWindowTopMost.CheckedChanged += new System.EventHandler(this.chkTopMost_CheckedChanged);
             // 
             // btnAddonUpdate
             // 
@@ -2059,7 +2101,7 @@
             this.groupBox6.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupBox6.Controls.Add(this.flowLayoutPanel2);
             this.groupBox6.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupBox6.Location = new System.Drawing.Point(0, 123);
+            this.groupBox6.Location = new System.Drawing.Point(0, 140);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(552, 67);
             this.groupBox6.TabIndex = 2;
@@ -2224,7 +2266,7 @@
             // 
             this.groupBox7.Controls.Add(this.flowLayoutPanel1);
             this.groupBox7.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupBox7.Location = new System.Drawing.Point(0, 53);
+            this.groupBox7.Location = new System.Drawing.Point(0, 70);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(552, 67);
             this.groupBox7.TabIndex = 1;
@@ -2541,5 +2583,8 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label lblFishingInfoTimeElapsed;
         private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.CheckBox chkWindowActivate;
+        private System.Windows.Forms.CheckBox chkWindowFlash;
+        private System.Windows.Forms.CheckBox chkWindowTopMost;
     }
 }
