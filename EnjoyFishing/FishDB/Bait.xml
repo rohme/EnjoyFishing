@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Baits>
+<Baits version="1.0.0">
   <Bait name="リトルワーム" />
   <Bait name="フナ切り身" />
   <Bait name="虫ダンゴ" />

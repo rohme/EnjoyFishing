@@ -145,8 +145,8 @@ namespace MiscTools
                     fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
                 {
                     updateChatLine();
-                    Thread.Sleep(CHAT_INTERVAL);
                 }
+                Thread.Sleep(CHAT_INTERVAL);
             }
         }
         /// <summary>

@@ -11,24 +11,54 @@ using MiscTools;
 
 namespace EnjoyFishing
 {
+
+    /// <summary>
+    /// 釣り結果ステータス
+    /// </summary>
+    public enum FishResultStatusKind
+    {
+        Catch,
+        NoBite,
+        NoCatch,
+        Release,
+        LineBreak,
+        RodBreak,
+        Unknown,
+    }
+    /// <summary>
+    /// だいじなもの有無
+    /// </summary>
+    public enum HasKeyItemKind
+    {
+        Yes,
+        No,
+        Unknown,
+    }
+
     [XmlRoot("History")]
     public class FishHistoryDBModel
     {
+        [XmlAttribute("version")]
+        public string Version { get; set; }
         [XmlAttribute("player")]
         public string PlayerName { get; set; }
         [XmlAttribute("date")]
-        public DateTime EarthDate { get; set; }
-        public int CatchCount { get; set; }
+        public string EarthDate { get; set; }
+        public int TimeElapsed { get; set; }
         [XmlArray("Fishes")]
         [XmlArrayItem("Fish")]
         public List<FishHistoryDBFishModel> Fishes { get; set; }
+        [XmlArray("Harakiri")]
+        [XmlArrayItem("Fish")]
+        public List<FishHistoryDBHarakiriModel> Harakiri { get; set; }
         public FishHistoryDBModel()
         {
+            this.Version = string.Empty;
             this.PlayerName = string.Empty;
-            this.EarthDate = DateTime.Today;
-            this.CatchCount = 0;
+            this.EarthDate = DateTime.Today.ToString();
+            this.TimeElapsed = 0;
             this.Fishes = new List<FishHistoryDBFishModel>();
-            
+            this.Harakiri = new List<FishHistoryDBHarakiriModel>();
         }
     }
     public class FishHistoryDBFishModel
@@ -53,12 +83,14 @@ namespace EnjoyFishing
         public int ID4 { get; set; }
         [XmlAttribute("critical")]
         public bool Critical { get; set; }
-        [XmlAttribute("type")]
+        [XmlAttribute("itemtype")]
+        public FishDBItemTypeKind ItemType { get; set; }
+        [XmlAttribute("fishtype")]
         public FishDBFishTypeKind FishType { get; set; }
         [XmlAttribute("result")]
         public FishResultStatusKind Result { get; set; }
         [XmlAttribute("earthtime")]
-        public DateTime EarthTime { get; set; }
+        public string EarthTime { get; set; }
         [XmlAttribute("vanatime")]
         public string VanaTime { get; set; }
         [XmlAttribute("weekday")]
@@ -73,6 +105,16 @@ namespace EnjoyFishing
         public float Z { get; set; }
         [XmlAttribute("h")]
         public float H { get; set; }
+        [XmlAttribute("skill")]
+        public int Skill { get; set; }
+        [XmlAttribute("serpentrumors")]
+        public HasKeyItemKind SerpentRumors { get; set; }
+        [XmlAttribute("anglersalmanac")]
+        public HasKeyItemKind AnglersAlmanac { get; set; }
+        [XmlAttribute("frogfishing")]
+        public HasKeyItemKind FrogFishing { get; set; }
+        [XmlAttribute("mooching")]
+        public HasKeyItemKind Mooching { get; set; }
         public FishHistoryDBFishModel()
         {
             this.FishName = string.Empty;
@@ -87,7 +129,7 @@ namespace EnjoyFishing
             this.FishCount = 0;
             this.FishType = FishDBFishTypeKind.Unknown;
             this.Result = FishResultStatusKind.NoBite;
-            this.EarthTime = DateTime.Today;
+            this.EarthTime = DateTime.Today.ToString();
             this.VanaTime = string.Empty;
             this.VanaWeekDay = Weekday.Unknown;
             this.MoonPhase = FFACETools.MoonPhase.Unknown;
@@ -95,8 +137,14 @@ namespace EnjoyFishing
             this.Y = 0.0f;
             this.Z = 0.0f;
             this.H = 0.0f;
+            this.Skill = -1;
+            this.SerpentRumors = HasKeyItemKind.Unknown;
+            this.AnglersAlmanac = HasKeyItemKind.Unknown;
+            this.FrogFishing = HasKeyItemKind.Unknown;
+            this.Mooching = HasKeyItemKind.Unknown;
         }
     }
+
     public class FishHistoryDBSummaryModel
     {
         public int Count { get; set; }
@@ -177,6 +225,31 @@ namespace EnjoyFishing
                 this.Fishes.Add(fish);
             }
             this.Fishes.Sort(FishHistoryDBSummaryFishModel.SortTypeName);
+        }
+    }
+    public class FishHistoryDBHarakiriModel
+    {
+        [XmlAttribute("earthtime")]
+        public string EarthTime { get; set; }
+        [XmlAttribute("vanatime")]
+        public string VanaTime { get; set; }
+        [XmlAttribute("fishname")]
+        public string FishName { get; set; }
+        [XmlAttribute("itemname")]
+        public string ItemName { get; set; }
+        public FishHistoryDBHarakiriModel()
+        {
+            this.EarthTime = string.Empty;
+            this.VanaTime = string.Empty;
+            this.FishName = string.Empty;
+            this.ItemName = string.Empty;
+        }
+        public FishHistoryDBHarakiriModel(string iEarthDate, string iVanaDate, string iFishName, string iItemName)
+        {
+            this.EarthTime = iEarthDate;
+            this.VanaTime = iVanaDate;
+            this.FishName = iFishName;
+            this.ItemName = iItemName;
         }
     }
     public class FishHistoryDBSummaryFishModel

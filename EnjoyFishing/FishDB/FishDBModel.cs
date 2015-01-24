@@ -12,10 +12,18 @@ namespace EnjoyFishing
         SmallFish,
         LargeFish,
         Item,
+        Monster,
         UnknownSmallFish,
         UnknownLargeFish,
         UnknownItem,
-        Monster,
+        UnknownMonster,
+        Unknown,
+    }
+    public enum FishDBItemTypeKind
+    {
+        Common,
+        Temporary,
+        Key,
         Unknown,
     }
 
@@ -23,24 +31,28 @@ namespace EnjoyFishing
     [XmlRoot("Rod")]
     public class FishDBModel
     {
+        [XmlAttribute("version")]
+        public string Version { get; set; }
         [XmlAttribute("name")]
         public string RodName { get; set; }
-        [XmlElement("Fish")]
+        [XmlArray("Fishes")]
+        [XmlArrayItem("Fish")]
         public List<FishDBFishModel> Fishes { get; set; }
         public FishDBModel() : this(string.Empty)
         {
         }
         public FishDBModel(string iRodName)
         {
-            RodName = iRodName;
-            Fishes = new List<FishDBFishModel>();
+            this.Version = string.Empty;
+            this.RodName = iRodName;
+            this.Fishes = new List<FishDBFishModel>();
         }
     }
     public class FishDBFishModel
     {
         [XmlAttribute("name")]
         public string FishName { get; set; }
-        [XmlAttribute("type")]
+        [XmlAttribute("fishtype")]
         public FishDBFishTypeKind FishType { get; set; }
         [XmlArray("Ids")]
         [XmlArrayItem("Id")]
@@ -53,11 +65,11 @@ namespace EnjoyFishing
         public List<string> BaitNames { get; set; }
         public FishDBFishModel()
         {
-            FishName = string.Empty;
-            FishType = FishDBFishTypeKind.Unknown;
-            IDs = new List<FishDBIdModel>();
-            ZoneNames = new List<string>();
-            BaitNames = new List<string>();
+            this.FishName = string.Empty;
+            this.FishType = FishDBFishTypeKind.Unknown;
+            this.IDs = new List<FishDBIdModel>();
+            this.ZoneNames = new List<string>();
+            this.BaitNames = new List<string>();
         }
        public FishDBIdModel GetId(int iID1, int iID2, int iID3, int iID4)
         {
@@ -88,7 +100,7 @@ namespace EnjoyFishing
             }
         }
     }
-    public class FishDBIdModel
+    public class FishDBIdModel : IEquatable<FishDBIdModel>
     {
         [XmlAttribute("id1")]
         public int ID1 { get; set; }
@@ -102,6 +114,8 @@ namespace EnjoyFishing
         public int Count { get; set; }
         [XmlAttribute("critical")]
         public bool Critical { get; set; }
+        [XmlAttribute("itemtype")]
+        public FishDBItemTypeKind ItemType { get; set; }
         public FishDBIdModel()
         {
             this.ID1 = 0;
@@ -110,76 +124,118 @@ namespace EnjoyFishing
             this.ID4 = 0;
             this.Count = 0;
             this.Critical = false;
+            this.ItemType = FishDBItemTypeKind.Unknown;
         }
-       public static int SortCountID(FishDBIdModel iID1, FishDBIdModel iID2)
+        public FishDBIdModel(int iID1, int iID2, int iID3, int iID4, int iCount, bool iCritical, FishDBItemTypeKind iItemType)
         {
-            //1番目のキー：Countでソート
-            if (iID1.Count > iID2.Count)
+            this.ID1 = iID1;
+            this.ID2 = iID2;
+            this.ID3 = iID3;
+            this.ID4 = iID4;
+            this.Count = iCount;
+            this.Critical = iCritical;
+            this.ItemType = iItemType;
+        }
+        public FishDBIdModel(int iID1, int iID2, int iID3, int iID4)
+        {
+            this.ID1 = iID1;
+            this.ID2 = iID2;
+            this.ID3 = iID3;
+            this.ID4 = iID4;
+            this.Count = 0;
+            this.Critical = false;
+            this.ItemType = FishDBItemTypeKind.Unknown;
+        }
+        public override int GetHashCode()
+        {
+            return this.ID1.GetHashCode() ^ this.ID2.GetHashCode() ^ this.ID3.GetHashCode() ^ this.ID4.GetHashCode();
+        }
+        bool IEquatable<FishDBIdModel>.Equals(FishDBIdModel other)
+        {
+            if (other == null) return false;
+            return (this.ID1 == other.ID1 && this.ID2 == other.ID2 && this.ID3 == other.ID3 && this.ID4 == other.ID4);
+        }
+       public static int SortCountCritical(FishDBIdModel iID1, FishDBIdModel iID2)
+        {
+            //1番目のキー：ItemTypeでソート
+            if (iID1.ItemType > iID1.ItemType)
             {
                 return 1;
             }
-            else if (iID1.Count < iID2.Count)
+            else if (iID1.ItemType < iID2.ItemType)
             {
                 return -1;
             }
             else
             {
-                //2番目のキー：Criticalでソート
-                if (iID1.Critical && !iID2.Critical)
+                //2番目のキー：Countでソート
+                if (iID1.Count > iID2.Count)
                 {
                     return 1;
                 }
-                else if (!iID1.Critical && iID2.Critical)
+                else if (iID1.Count < iID2.Count)
                 {
                     return -1;
                 }
                 else
                 {
-                    //3番目のキー：ID1でソート
-                    if (iID1.ID1 > iID2.ID1)
+                    //3番目のキー：Criticalでソート
+                    if (iID1.Critical && !iID2.Critical)
                     {
                         return 1;
                     }
-                    else if (iID1.ID1 < iID2.ID1)
+                    else if (!iID1.Critical && iID2.Critical)
                     {
                         return -1;
                     }
                     else
                     {
-                        //4番目のキー：ID2でソート
-                        if (iID1.ID2 > iID2.ID2)
+                        //4番目のキー：ID1でソート
+                        if (iID1.ID1 > iID2.ID1)
                         {
                             return 1;
                         }
-                        else if (iID1.ID2 < iID2.ID2)
+                        else if (iID1.ID1 < iID2.ID1)
                         {
                             return -1;
                         }
                         else
                         {
-                            //5番目のキー：ID3でソート
-                            if (iID1.ID3 > iID2.ID3)
+                            //5番目のキー：ID2でソート
+                            if (iID1.ID2 > iID2.ID2)
                             {
                                 return 1;
                             }
-                            else if (iID1.ID3 < iID2.ID3)
+                            else if (iID1.ID2 < iID2.ID2)
                             {
                                 return -1;
                             }
                             else
                             {
-                                //6番目のキー：ID4でソート
-                                if (iID1.ID4 > iID2.ID4)
+                                //6番目のキー：ID3でソート
+                                if (iID1.ID3 > iID2.ID3)
                                 {
                                     return 1;
                                 }
-                                else if (iID1.ID4 < iID2.ID4)
+                                else if (iID1.ID3 < iID2.ID3)
                                 {
                                     return -1;
                                 }
                                 else
                                 {
-                                    return 0;
+                                    //7番目のキー：ID4でソート
+                                    if (iID1.ID4 > iID2.ID4)
+                                    {
+                                        return 1;
+                                    }
+                                    else if (iID1.ID4 < iID2.ID4)
+                                    {
+                                        return -1;
+                                    }
+                                    else
+                                    {
+                                        return 0;
+                                    }
                                 }
                             }
                         }
@@ -198,7 +254,7 @@ namespace EnjoyFishing
         public List<RodDBRodModel> Rod { get; set; }
         public RodDBModel()
         {
-            Rod = new List<RodDBRodModel>();
+            this.Rod = new List<RodDBRodModel>();
         }
     }
     public class RodDBRodModel
@@ -216,7 +272,7 @@ namespace EnjoyFishing
         public List<BaitDBBaitModel> Bait { get; set; }
         public BaitDBModel()
         {
-            Bait = new List<BaitDBBaitModel>();
+            this.Bait = new List<BaitDBBaitModel>();
         }
     }
     public class BaitDBBaitModel
@@ -234,33 +290,13 @@ namespace EnjoyFishing
         public List<GearDBGearModel> Gear { get; set; }
         public GearDBModel()
         {
-            Gear = new List<GearDBGearModel>();
+            this.Gear = new List<GearDBGearModel>();
         }
     }
     public class GearDBGearModel
     {
         [XmlAttribute("name")]
         public string GearName { get; set; }
-    }
-    #endregion
-
-    #region RenameFishModel
-    [XmlRoot("RenameFish")]
-    public class RenameFishDBModel
-    {
-        [XmlElement("Fish")]
-        public List<RenameFishDBFishModel> Fishes { get; set; }
-        public RenameFishDBModel()
-        {
-            Fishes =new List<RenameFishDBFishModel>();
-        }
-    }
-    public class RenameFishDBFishModel
-    {
-        [XmlAttribute("name")]
-        public string FishName { get; set; }
-        [XmlAttribute("rename")]
-        public string FishRename { get; set; }
     }
     #endregion
 }

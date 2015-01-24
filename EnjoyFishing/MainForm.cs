@@ -109,6 +109,15 @@ namespace EnjoyFishing
             new GridColModel(typeof(DataGridViewTextBoxColumn), "AllPer",     "全体%",      4, true,  50, DataGridViewContentAlignment.MiddleRight,  string.Empty ,DataGridViewTriState.False),
         };
         #endregion
+        #region lstGridHarakiri
+        private static List<GridColModel> lstGridHarakiri = new List<GridColModel>()
+        {
+            new GridColModel(typeof(DataGridViewTextBoxColumn), "FishName",   "魚",         0, true, 160, DataGridViewContentAlignment.MiddleLeft,   string.Empty ,DataGridViewTriState.True),
+            new GridColModel(typeof(DataGridViewTextBoxColumn), "ItemName",   "アイテム",   1, true, 160, DataGridViewContentAlignment.MiddleLeft,   string.Empty ,DataGridViewTriState.True),
+            new GridColModel(typeof(DataGridViewTextBoxColumn), "Count",      "回",         2, true,  50, DataGridViewContentAlignment.MiddleRight,  string.Empty ,DataGridViewTriState.False),
+            new GridColModel(typeof(DataGridViewTextBoxColumn), "Percent",    "%",          3, true,  60, DataGridViewContentAlignment.MiddleRight,  string.Empty ,DataGridViewTriState.False),
+        };
+        #endregion
         #endregion
 
         private PolTool pol;
@@ -117,15 +126,19 @@ namespace EnjoyFishing
         private Settings settings;
         private ChatTool chat;
         private FishingTool fishing;
+        private HarakiriTool harakiri;
         private FFACEControl control;
         private FishDB fishDB;
         private FishHistoryDB fishHistoryDB;
+        private HarakiriDB harakiriDB;
 
         private Thread thFishing;
+        private Thread thHarakiri;
         private Thread thMonitor;
         private bool loginFlg = true;//キャラクターログイン中のフラグ
         private bool startupFlg = false;//初期化中のフラグ
         private bool fishingFlg = false;//釣り中のフラグ
+        private bool harakiriFlg = false;//ハラキリ中のフラグ
         private SettingsArgsModel args = new SettingsArgsModel();
         private Dictionary<string, SettingsPlayerFishListWantedModel> fishListKey = new Dictionary<string, SettingsPlayerFishListWantedModel>();
 
@@ -134,15 +147,21 @@ namespace EnjoyFishing
         delegate void InitFormDelegate();
         delegate void StartFishingDelegate();
         delegate void StopFishingDelegate(bool iShowStopMessage);
+        delegate void StartHarakiriDelegate();
+        delegate void StopHarakiriDelegate(bool iShowStopMessage);
         delegate void SetStatusStripBackColorDelegate();
         delegate void UpdateFishListDelegate();
         delegate void UpdateHistoryDelegate();
         delegate void UpdateFishingInfoDelegate(DataGridView iGrid, DateTime iYmd, FishResultStatusKind iResult, string iFishName);
         delegate void UpdateFishingInfoRealTimeDelegate();
+        delegate void UpdateHarakiriHistoryDelegate();
         delegate void FishingTool_ChangeStatusDelegate(object sender, FishingTool.ChangeStatusEventArgs e);
         delegate void FishingTool_ChangeMessageDelegate(object sender, FishingTool.ChangeMessageEventArgs e);
-        delegate void saveSettingsDelegate();
-        delegate void lockControlDelegate(bool iLock);
+        delegate void HarakiriTool_ChangeStatusDelegate(object sender, HarakiriTool.ChangeStatusEventArgs e);
+        delegate void HarakiriTool_ChangeMessageDelegate(object sender, HarakiriTool.ChangeMessageEventArgs e);
+        delegate void SaveSettingsDelegate();
+        delegate void LockControlDelegate(bool iLock);
+        delegate void ThreadHarakiriDelegate();
         #endregion
 
         #region Models
@@ -222,12 +241,18 @@ namespace EnjoyFishing
             //ChatTool初期設定
             chat = new ChatTool(iPol.FFACE);
             logger.Output(LogLevelKind.DEBUG, "ChatTool起動");
-            //Fishing初期設定
+            //FishingTool初期設定
             fishing = new FishingTool(iPol, chat, settings, logger);
             fishing.Fished += new FishingTool.FishedEventHandler(this.FishingTool_Fished);
             fishing.ChangeMessage += new FishingTool.ChangeMessageEventHandler(this.FishingTool_ChangeMessage);
             fishing.ChangeStatus += new FishingTool.ChangeStatusEventHandler(this.FishingTool_ChangeStatus);
             logger.Output(LogLevelKind.DEBUG, "FishingTool起動");
+            //HarakiriTool初期設定
+            harakiri = new HarakiriTool(iPol, chat, settings, logger);
+            harakiri.HarakiriOnce += new HarakiriTool.HarakiriOnceEventHandler(this.HarakiriTool_HarakiriOnce);
+            harakiri.ChangeMessage += new HarakiriTool.ChangeMessageEventHandler(this.HarakiriTool_ChangeMessage);
+            harakiri.ChangeStatus += new HarakiriTool.ChangeStatusEventHandler(this.HarakiriTool_ChangeStatus);
+            logger.Output(LogLevelKind.DEBUG, "HarakiriTool起動");
             //FFACEControl初期設定
             control = new FFACEControl(pol, chat, logger);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
@@ -241,7 +266,10 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "監視スレッド起動");
             //DB
             fishDB = new FishDB(logger);
-            fishHistoryDB = new FishHistoryDB(logger);
+            fishHistoryDB = new FishHistoryDB(fishing.PlayerName, fishing.EarthDateTime, logger);
+            harakiriDB = new HarakiriDB(logger);
+            //古いデータをコンバート
+            converter();
         }
         #endregion
 
@@ -253,7 +281,6 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            tabMain.TabPages.Remove(tabMainHarakiri);
             tabFishingMain.TabPages.Remove(tabFishingMainEquip);
 
             //アドオン・プラグインの更新
@@ -264,6 +291,8 @@ namespace EnjoyFishing
             initGridHistory();
             //履歴合計グリッド初期化
             initGridFishingInfo(gridHistorySummary);
+            //ハラキリグリッド初期化
+            initGridHarakiri(gridHarakiri);
             //フォーム初期化
             initForm();
 
@@ -288,6 +317,7 @@ namespace EnjoyFishing
                 if (settings.Form.Width > 0) this.Width = settings.Form.Width;
                 if (settings.Form.Height > 0) this.Height = settings.Form.Height;
                 if (settings.Form.SplitterDistance > 0) splitMain.SplitterDistance = settings.Form.SplitterDistance;
+                this.TopMost = settings.Etc.WindowTopMost;
                 //魚リスト
                 if (settings.FishList.Mode == Settings.FishListModeKind.ID) rdoFishListModeID.Checked = true;
                 else if (settings.FishList.Mode == Settings.FishListModeKind.Name) rdoFishListModeName.Checked = true;
@@ -328,6 +358,7 @@ namespace EnjoyFishing
                 chkChatParty.Checked = settings.Fishing.ChatParty;
                 chkChatLs.Checked = settings.Fishing.ChatLs;
                 chkChatShout.Checked = settings.Fishing.ChatShout;
+                chkChatEmote.Checked = settings.Fishing.ChatEmote;
                 chkChatRestart.Checked = settings.Fishing.ChatRestart;
                 txtChatRestartMinute.Value = settings.Fishing.ChatRestartMinute;
                 chkEntryPort.Checked = settings.Fishing.EntryPort;
@@ -343,6 +374,10 @@ namespace EnjoyFishing
                 txtNoBaitNoRodCmdLine.Text = settings.Fishing.NoBaitNoRodCmdLine;
                 //釣り・情報
                 updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
+                //設定・一般
+                chkWindowTopMost.Checked = settings.Etc.WindowTopMost;
+                chkWindowFlash.Checked = settings.Etc.WindowFlash;
+                chkWindowActivate.Checked = settings.Etc.WindowActivate;
                 //設定・ステータスバー表示
                 chkStatusBarVisibleMoonPhase.Checked = settings.Etc.VisibleMoonPhase;
                 chkStatusBarVisibleVanaTime.Checked = settings.Etc.VisibleVanaTime;
@@ -379,6 +414,23 @@ namespace EnjoyFishing
                 dateHistory.Value = DateTime.Now;
                 updateHistory();
                 updateFishingInfo(gridHistorySummary, dateHistory.Value, (FishResultStatusKind)cmbHistoryResult.SelectedValue, (string)cmbHistoryFishName.SelectedValue);
+                //ハラキリ
+                updateHarakiriFishList();
+                cmbHarakiriFishname.SelectedIndex = cmbHarakiriFishname.Items.IndexOf(settings.Harakiri.FishNameSelect);
+                txtHarakiriFishname.Text = settings.Harakiri.FishNameInput;
+                if (settings.Harakiri.InputType == Settings.HarakiriInputTypeKind.Select)
+                {
+                    rdoHarakiriInputTypeSelect.Checked = true;
+                    EventArgs e = new EventArgs();
+                    rdoHarakiriInputTypeSelect_CheckedChanged(rdoHarakiriInputTypeSelect,e);
+                }
+                else if (settings.Harakiri.InputType == Settings.HarakiriInputTypeKind.Input)
+                {
+                    rdoHarakiriInputTypeInput.Checked = true;
+                    EventArgs e = new EventArgs();
+                    rdoHarakiriInputTypeInput_CheckedChanged(rdoHarakiriInputTypeInput, e);
+                }
+                updateHarakiriHistory();
                 //ステータスバー
                 statusStrip.BackColor = SystemColors.Control;
                 lblMoonPhase.Text = string.Empty;
@@ -494,7 +546,48 @@ namespace EnjoyFishing
             {
                 iGrid.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
             }
-        }        
+        }
+        /// <summary>
+        /// ハラキリグリッドを初期化する
+        /// </summary>
+        private void initGridHarakiri(DataGridView iGrid)
+        {
+            //表示専用にする
+            iGrid.ReadOnly = true;
+            //ユーザーが新しい行を追加できないようにする
+            iGrid.AllowUserToAddRows = false;
+            //行をユーザーが削除できないようにする
+            iGrid.AllowUserToDeleteRows = false;
+            //行の高さをユーザーが変更できないようにする
+            iGrid.AllowUserToResizeRows = false;
+            //セルを選択すると行全体が選択されるようにする
+            iGrid.MultiSelect = false;
+            iGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            //列が自動的に作成されないようにする
+            iGrid.AutoGenerateColumns = false;
+            //行ヘッダを非表示にする
+            iGrid.RowHeadersVisible = false;
+            //列の位置をユーザーが変更できるようにする
+            iGrid.AllowUserToOrderColumns = true;
+            //列を設定する
+            iGrid.Columns.Clear();
+            foreach (GridColModel col in lstGridHarakiri)
+            {
+                if (col.Type == typeof(DataGridViewTextBoxColumn))
+                {
+                    addGridTextColumns(iGrid, col);
+                }
+                else if (col.Type == typeof(DataGridViewImageColumn))
+                {
+                    addGridImageColumns(iGrid, col);
+                }
+            }
+            //ソート無効
+            for (int i = 0; i < iGrid.Columns.Count; i++)
+            {
+                iGrid.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+        }
         /// <summary>
         /// グリッドにテキストボックス列を追加する
         /// </summary>
@@ -552,6 +645,28 @@ namespace EnjoyFishing
             iDataGridView.Columns.Add(col);
         }
         /// <summary>
+        /// グリッドのソート設定
+        /// </summary>
+        /// <param name="iGrid">グリッド</param>
+        /// <param name="iColName">列名</param>
+        /// <param name="iSortOrder">ソート順</param>
+        private void setGridSort(DataGridView iGrid, string iColName, SortOrder iSortOrder)
+        {
+            if (iColName != string.Empty)
+            {
+                ListSortDirection sortDirection = ListSortDirection.Ascending;
+                if (iSortOrder == SortOrder.Ascending)
+                {
+                    sortDirection = ListSortDirection.Ascending;
+                }
+                else if (iSortOrder == SortOrder.Descending)
+                {
+                    sortDirection = ListSortDirection.Descending;
+                }
+                iGrid.Sort(iGrid.Columns[iColName], sortDirection);
+            }
+        }
+        /// <summary>
         /// ステータスバーの表示・非表示切り替え
         /// </summary>
         private void setStatusBarVisible()
@@ -584,6 +699,9 @@ namespace EnjoyFishing
             
             System.Environment.Exit(0);//プログラム終了
         }
+        /// <summary>
+        /// アンロード処理
+        /// </summary>
         private void unload()
         {
             //設定保存
@@ -599,6 +717,10 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "監視スレッド停止");
             //FFACEControl停止
             control = null;
+            //HarakiriTool停止
+            if (harakiri != null) harakiri.SystemAbort();
+            harakiri = null;
+            logger.Output(LogLevelKind.DEBUG, "HarakiriTool停止");
             //FishingTool停止
             if (fishing != null) fishing.SystemAbort();
             fishing = null;
@@ -651,6 +773,9 @@ namespace EnjoyFishing
 
                 thFishing = new Thread(threadFishing);
                 thFishing.Start();
+
+                //ハラキリボタン無効化
+                btnExecHarakiri.Enabled = false;
             }
         }
         /// <summary>
@@ -669,6 +794,9 @@ namespace EnjoyFishing
                 btnExecFishing.Text = "開　始";
                 bool ret = fishing.FishingAbort();
                 if(iShowStopMessage) lblMessage.Text = "停止しました";
+
+                //ハラキリボタン有効化
+                btnExecHarakiri.Enabled = true;
             }
         }
         /// <summary>
@@ -821,6 +949,43 @@ namespace EnjoyFishing
             }
         }
         /// <summary>
+        /// 履歴グリッド Sortedイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridHistory_Sorted(object sender, EventArgs e)
+        {
+            DataGridViewColumn sortCol = gridHistory.SortedColumn;
+            if (sortCol != null)
+            {
+                settings.History.SortColName = sortCol.Name;
+                settings.History.SortOrder = gridHistory.SortOrder;
+            }
+            else
+            {
+                settings.History.SortColName = string.Empty;
+                settings.History.SortOrder = SortOrder.None;
+            }
+        }
+        /// <summary>
+        /// グリッド CellFormattingイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridHarakiri_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            DataGridView dgv = (DataGridView)sender;
+            if (dgv.Columns[e.ColumnIndex].Name == "FishName" && e.Value is string)
+            {
+                string val = (string)e.Value;
+                if (val != string.Empty)
+                {
+                    dgv.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.FromArgb(0x80, 0xFF, 0x80);
+                    dgv.Rows[e.RowIndex].DefaultCellStyle.SelectionBackColor = Color.FromArgb(0x80, 0xFF, 0x80);
+                }
+            }
+        }
+        /// <summary>
         /// アドオン・プラグインの更新 Clickイベント
         /// </summary>
         /// <param name="sender"></param>
@@ -830,6 +995,104 @@ namespace EnjoyFishing
             btnAddonUpdate.Enabled = false;
             updateAddonPlugin();
             btnAddonUpdate.Enabled = true;
+        }
+        /// <summary>
+        /// ハラキリ実行 Clickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnExecHarakiri_Click(object sender, EventArgs e)
+        {
+            if (!harakiriFlg)
+            {
+                //釣り開始
+                startHarakiri();
+            }
+            else
+            {
+                //釣り停止
+                stopHarakiri(true);
+            }
+        }
+        /// <summary>
+        /// ハラキリ開始
+        /// </summary>
+        private void startHarakiri()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new StartHarakiriDelegate(startHarakiri), null);
+            }
+            else
+            {
+                logger.Output(LogLevelKind.INFO, "ハラキリ開始");
+                harakiriFlg = true;
+                btnExecHarakiri.Text = "停　止";
+
+                if (rdoHarakiriInputTypeSelect.Checked)
+                {
+                    harakiri.HarakiriFishName = cmbHarakiriFishname.Text;
+                }
+                else if (rdoHarakiriInputTypeInput.Checked)
+                {
+                    harakiri.HarakiriFishName = txtHarakiriFishname.Text;
+                }
+
+                thHarakiri = new Thread(threadHarakiri);
+                thHarakiri.Start();
+
+                //釣りボタン無効化
+                btnExecFishing.Enabled = false;
+            }
+        }
+        /// <summary>
+        /// ハラキリ停止
+        /// </summary>
+        private void stopHarakiri(bool iShowStopMessage)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new StopHarakiriDelegate(stopHarakiri), iShowStopMessage);
+            }
+            else
+            {
+                logger.Output(LogLevelKind.INFO, "ハラキリ停止");
+                harakiriFlg = false;
+                btnExecHarakiri.Text = "開　始";
+                bool ret = harakiri.HarakiriAbort();
+                if(iShowStopMessage) lblMessage.Text = "停止しました";
+                
+                //釣りボタン有効化
+                btnExecFishing.Enabled = true;
+            }
+        }
+        /// <summary>
+        /// 釣りメインスレッド
+        /// </summary>
+        private void threadHarakiri()
+        {
+
+            HarakiriTool.HarakiriStatusKind ret = harakiri.HarakiriStart();
+            stopHarakiri(false);
+            if (ret != HarakiriTool.HarakiriStatusKind.Error)
+            {
+                //正常終了
+                SystemSounds.Asterisk.Play();
+            }
+            else
+            {
+                //エラー
+                SystemSounds.Hand.Play();
+            }
+        }
+        /// <summary>
+        /// ハラキリ魚更新ボタン Clickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnHarakiriUpdate_Click(object sender, EventArgs e)
+        {
+            updateHarakiriFishList();
         }
         #endregion
 
@@ -861,7 +1124,7 @@ namespace EnjoyFishing
                     {
                         foreach (FishDBIdModel id in fish.IDs)
                         {
-                            string fishName = FishingTool.GetViewFishName(fish.FishName, fish.FishType, id.Count, id.Critical);
+                            string fishName = FishingTool.GetViewFishName(fish.FishName, fish.FishType, id.Count, id.Critical, id.ItemType);
                             fishListKey.Add(fishName, new SettingsPlayerFishListWantedModel(fish.FishName, id.ID1, id.ID2, id.ID3, id.ID4));
                             lstFish.Items.Add(fishName, settings.FishList.IsWanted(fish.FishName, id.ID1, id.ID2, id.ID3, id.ID4));
                         }
@@ -876,6 +1139,28 @@ namespace EnjoyFishing
                 //setWantedToSettings();
                 lstFish.EndUpdate();
                 this.Cursor = Cursors.Default;
+            }
+        }
+        /// <summary>
+        /// ハラキリリストの更新
+        /// </summary>
+        private void updateHarakiriFishList()
+        {
+            string lastFishname = cmbHarakiriFishname.Text;
+            //釣ったことのある魚で、手持ちの魚をリストに追加
+            cmbHarakiriFishname.Items.Clear();
+            List<string> fishes = fishDB.SelectAllFishName();
+            foreach (string fish in fishes)
+            {
+                if (harakiri.GetHarakiriRemain(fish) > 0)
+                {
+                    cmbHarakiriFishname.Items.Add(fish);
+                }
+            }
+            //SelectIndex設定
+            if (cmbHarakiriFishname.Items.Count > 0)
+            {
+                cmbHarakiriFishname.SelectedIndex = cmbHarakiriFishname.Items.IndexOf(lastFishname);
             }
         }
         /// <summary>
@@ -982,7 +1267,7 @@ namespace EnjoyFishing
                 tbl.Columns.Add("FishCount", typeof(string));
                 tbl.Columns.Add("Result", typeof(FishResultStatusKind));
                 tbl.Columns.Add("EarthTime", typeof(DateTime));
-                tbl.Columns.Add("VanaTime", typeof(DateTime));
+                tbl.Columns.Add("VanaTime", typeof(string));
                 tbl.Columns.Add("VanaWeekDay", typeof(Image));
                 tbl.Columns.Add("MoonPhase", typeof(Image));
                 foreach (FishHistoryDBFishModel fish in history.Fishes)
@@ -990,7 +1275,7 @@ namespace EnjoyFishing
                     row = tbl.NewRow();
                     if (fish.FishName != string.Empty)
                     {
-                        row["FishName"] = FishingTool.GetViewFishName(fish.FishName, fish.FishType, fish.FishCount, fish.Critical);
+                        row["FishName"] = FishingTool.GetViewFishName(fish.FishName, fish.FishType, fish.FishCount, fish.Critical, fish.ItemType);
                         row["ID"] = string.Format("{0:000}-{1:000}-{2:000}-{3:000}", fish.ID1, fish.ID2, fish.ID3, fish.ID4);
                         row["FishCount"] = fish.FishCount;
                     }
@@ -1013,7 +1298,8 @@ namespace EnjoyFishing
                 tbl.AcceptChanges();
                 //グリッドにデータソースを設定
                 gridHistory.DataSource = tbl.DefaultView;
-
+                //ソート設定
+                setGridSort(gridHistory, settings.History.SortColName, settings.History.SortOrder);
                 //合計タブの設定
                 updateFishingInfo(gridHistorySummary, dateHistory.Value, (FishResultStatusKind)cmbHistoryResult.SelectedValue, (string)cmbHistoryFishName.SelectedValue);
 
@@ -1092,15 +1378,79 @@ namespace EnjoyFishing
             }
             else
             {
+                //エリア名
                 lblFishingInfoZoneName.Text = fishing.ZoneName;
+                //竿名
                 lblFishingInfoRodName.Text = fishing.RodNameWithRemain;
+                //エサ名
                 lblFishingInfoBaitName.Text = fishing.BaitNameWithRemain;
+                //釣果数
+                float catchCountPerHour = 0;
+                if (fishing.TimeElapsed > 0)
+                {
+                    catchCountPerHour = ((float)fishing.CatchCount / (float)fishing.TimeElapsed) * 60f * 60f;
+                }
+                lblFishingInfoCatchCount.Text = string.Format("{0}({1:0.0})", fishing.CatchCount, catchCountPerHour);
+                //経過時間
+                DateTime timeElapsed = new DateTime(2000, 12, 31, 0, 0, 0).AddSeconds(fishing.TimeElapsed);
+                lblFishingInfoTimeElapsed.Text = timeElapsed.ToString("HH:mm:ss");
+                //連続釣果なし
                 lblFishingInfoNoCatchCount.Text = fishing.NoCatchCount.ToString();
+                //釣りスキル
                 lblFishingInfoSkill.Text = fishing.FishingSkill.ToString();
+                //鞄
                 lblFishingInfoInventory.Text = string.Format("{0:00}/{1:00}", fishing.InventoryCount, fishing.InventoryMax);
+                //サッチェル
                 lblFishingInfoSatchel.Text = string.Format("{0:00}/{1:00}", fishing.SatchelCount, fishing.SatchelMax);
+                //サック
                 lblFishingInfoSack.Text = string.Format("{0:00}/{1:00}", fishing.SackCount, fishing.SackMax);
+                //ケース
                 lblFishingInfoCase.Text = string.Format("{0:00}/{1:00}", fishing.CaseCount, fishing.CaseMax);
+            }
+        }
+        /// <summary>
+        /// ハラキリ情報の更新()
+        /// </summary>             
+        private void updateHarakiriHistory()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new UpdateHarakiriHistoryDelegate(updateHarakiriHistory), null);
+            }
+            else
+            {
+                this.Cursor = Cursors.WaitCursor;
+                logger.Output(LogLevelKind.DEBUG, "ハラキリ情報の更新");
+                HarakiriDBModel sum = harakiriDB.GetSummary();
+                DataTable tbl = new DataTable();
+                tbl.Columns.Add("FishName", typeof(string));
+                tbl.Columns.Add("ItemName", typeof(string));
+                tbl.Columns.Add("Count", typeof(string));
+                tbl.Columns.Add("Percent", typeof(string));
+                foreach (HarakiriDBFishModel fish in sum.Fishes)
+                {
+                    DataRow row = tbl.NewRow();
+                    row["FishName"] = fish.FishName;
+                    row["ItemName"] = string.Empty;
+                    row["Count"] = fish.Count.ToString();
+                    row["Percent"] = string.Empty;
+                    tbl.Rows.Add(row);
+                    foreach (HarakiriDBItemModel item in fish.Items)
+                    {
+                        row = tbl.NewRow();
+                        row["FishName"] = string.Empty;
+                        row["ItemName"] = item.ItemName;
+                        row["Count"] = item.Count.ToString();
+                        float per = (float)item.Count / (float)fish.Count;
+                        row["Percent"] = per.ToString("P2");
+                        tbl.Rows.Add(row);
+                    }
+                }
+                tbl.AcceptChanges();
+                //グリッドにデータソースを設定
+                gridHarakiri.DataSource = tbl.DefaultView;
+
+                this.Cursor = Cursors.Default;
             }
         }
         /// <summary>
@@ -1108,17 +1458,19 @@ namespace EnjoyFishing
         /// </summary>
         private void updateAddonPlugin()
         {
-            List<string> plugins = control.GetPlugin();
-            settings.UseItemizer = plugins.Contains("itemizer");
+            //PlugIn
+            //List<string> plugins = control.GetPlugin();
+            //settings.UseItemizer = plugins.Contains("itemizer");
+            //logger.Output(LogLevelKind.DEBUG, "使用中のプラグイン");
+            //foreach (string plugin in plugins) logger.Output(LogLevelKind.DEBUG, plugin);
+            //AddOn
             List<string> addons = control.GetAddon();
-            //settings.UseItemizer = addons.Contains("Itemizer");
+            settings.UseItemizer = addons.Contains("Itemizer");
             settings.UseEnternity = addons.Contains("enternity");
             settings.UseCancel = addons.Contains("Cancel");
-
-            logger.Output(LogLevelKind.DEBUG, "使用中のプラグイン");
-            foreach (string plugin in plugins) logger.Output(LogLevelKind.DEBUG, plugin);
             logger.Output(LogLevelKind.DEBUG, "使用中のアドオン");
             foreach (string addon in addons) logger.Output(LogLevelKind.DEBUG, addon);
+
 
             if (settings.UseItemizer)
             {
@@ -1126,9 +1478,13 @@ namespace EnjoyFishing
                 chkInventoryFullSack.Enabled = true;
                 chkInventoryFullSatchel.Enabled = true;
                 chkInventoryFullCase.Enabled = true;
+                txtInventoryFullCmdLine.Enabled = true;
+                chkInventoryFullCmd.Enabled = true;
                 chkNoBaitNoRodSack.Enabled = true;
                 chkNoBaitNoRodSatchel.Enabled = true;
                 chkNoBaitNoRodCase.Enabled = true;
+                txtNoBaitNoRodCmdLine.Enabled = true;
+                chkNoBaitNoRodCmd.Enabled = true;
             }
             else
             {
@@ -1136,9 +1492,13 @@ namespace EnjoyFishing
                 chkInventoryFullSack.Enabled = false;
                 chkInventoryFullSatchel.Enabled = false;
                 chkInventoryFullCase.Enabled = false;
+                txtInventoryFullCmdLine.Enabled = false;
+                chkInventoryFullCmd.Enabled = false;
                 chkNoBaitNoRodSack.Enabled = false;
                 chkNoBaitNoRodSatchel.Enabled = false;
                 chkNoBaitNoRodCase.Enabled = false;
+                txtNoBaitNoRodCmdLine.Enabled = false;
+                chkNoBaitNoRodCmd.Enabled = false;
             }
             if (settings.UseEnternity)
             {
@@ -1169,7 +1529,7 @@ namespace EnjoyFishing
         {
             if (InvokeRequired)
             {
-                Invoke(new saveSettingsDelegate(saveSettings), null);
+                Invoke(new SaveSettingsDelegate(saveSettings), null);
             }
             else
             {
@@ -1219,6 +1579,7 @@ namespace EnjoyFishing
                 settings.Fishing.ChatParty = chkChatParty.Checked;
                 settings.Fishing.ChatLs = chkChatLs.Checked;
                 settings.Fishing.ChatShout = chkChatShout.Checked;
+                settings.Fishing.ChatEmote = chkChatEmote.Checked;
                 settings.Fishing.ChatRestart = chkChatRestart.Checked;
                 settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
                 settings.Fishing.EntryPort = chkEntryPort.Checked;
@@ -1234,6 +1595,17 @@ namespace EnjoyFishing
                 settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
                 settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
                 //履歴
+                DataGridViewColumn sortCol = gridHistory.SortedColumn;
+                if (sortCol != null)
+                {
+                    settings.History.SortColName = sortCol.Name;
+                    settings.History.SortOrder = gridHistory.SortOrder;
+                }
+                else
+                {
+                    settings.History.SortColName = string.Empty;
+                    settings.History.SortOrder = SortOrder.None;
+                }
                 settings.History.ColEarthTime.DisplayIndex = gridHistory.Columns[settings.History.ColEarthTime.Name].DisplayIndex;
                 settings.History.ColVanaTime.DisplayIndex = gridHistory.Columns[settings.History.ColVanaTime.Name].DisplayIndex;
                 settings.History.ColVanaWeekDay.DisplayIndex = gridHistory.Columns[settings.History.ColVanaWeekDay.Name].DisplayIndex;
@@ -1267,7 +1639,21 @@ namespace EnjoyFishing
                 settings.History.ColFishName.Visible = chkHistoryVisibleFishName.Checked;
                 settings.History.ColFishCount.Visible = chkHistoryVisibleFishCount.Checked;
                 settings.History.ColResult.Visible = chkHistoryVisibleResult.Checked;
-
+                //ハラキリ
+                if (rdoHarakiriInputTypeSelect.Checked)
+                {
+                    settings.Harakiri.InputType = Settings.HarakiriInputTypeKind.Select;
+                }
+                else if (rdoHarakiriInputTypeInput.Checked)
+                {
+                    settings.Harakiri.InputType = Settings.HarakiriInputTypeKind.Input;
+                }
+                settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
+                settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
+                //設定・一般
+                settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
+                settings.Etc.WindowFlash = chkWindowFlash.Checked;
+                settings.Etc.WindowActivate = chkWindowActivate.Checked;
                 //保存開始
                 if (fishing != null) settings.Save(fishing.PlayerName);
 
@@ -1283,7 +1669,7 @@ namespace EnjoyFishing
         {
             if (InvokeRequired)
             {
-                Invoke(new lockControlDelegate(lockControl), iLock);
+                Invoke(new LockControlDelegate(lockControl), iLock);
             }
             else
             {
@@ -1302,8 +1688,42 @@ namespace EnjoyFishing
                 btnHistoryUpdate.Enabled = enabled;
                 cmbHistoryResult.Enabled = enabled;
                 cmbHistoryFishName.Enabled = enabled;
+                //ハラキリ
+                btnExecHarakiri.Enabled = enabled;
+                btnHarakiriUpdate.Enabled = enabled;
                 //設定
                 btnAddonUpdate.Enabled = enabled;
+            }
+        }
+        /// <summary>
+        /// 古い形式のデータがある場合コンバートする
+        /// </summary>
+        private void converter()
+        {
+            fishDB.Converter();
+            fishHistoryDB.Converter();
+        }
+        /// <summary>
+        /// 画面フラッシュ及び画面アクティブ処理
+        /// </summary>
+        private void flashWindow()
+        {
+            //フォーム点滅
+            if (settings.Etc.WindowFlash)
+            {
+                //フォームが非アクティブの時だけ点滅する
+                if (Form.ActiveForm != this)
+                {
+                    MiscTool.FlashWindow(this.Handle);
+                }
+            }
+            //フォームアクティブ
+            if (settings.Etc.WindowActivate)
+            {
+                this.WindowState = FormWindowState.Normal;
+                this.Activate();
+                this.TopMost = true;
+                if (!settings.Etc.WindowTopMost) this.TopMost = false;
             }
         }
         #endregion
@@ -1351,7 +1771,7 @@ namespace EnjoyFishing
                 }
                 //ヴァナ時間
                 lblVanaTime.Text = string.Format("{0:00}:{1:00}", iFishing.VanaDateTime.Hour, iFishing.VanaDateTime.Minute);
-                lblVanaTime.ToolTipText = "ヴァナ時間 " + iFishing.VanaDateTimeYmdhm;
+                lblVanaTime.ToolTipText = "ヴァナ時間 " + iFishing.VanaDateTimeYmdhms;
                 //地球時間
                 lblEarthTime.Text = iFishing.EarthDateTime.ToString("HH:mm");
                 lblEarthTime.ToolTipText = "地球時間 " + iFishing.EarthDateTime.ToString("yyyy/MM/dd HH:mm");
@@ -1376,23 +1796,27 @@ namespace EnjoyFishing
         #region 魚リスト
         private void rdoFishListModeID_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.Mode = Settings.FishListModeKind.ID;
-            if (!startupFlg) settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
+            settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
             updateFishList();
         }
         private void rdoFishListName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.Mode = Settings.FishListModeKind.Name;
-            if (!startupFlg) settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
+            settings.FishList.Wanted = new List<SettingsPlayerFishListWantedModel>();
             updateFishList();
         }
         private void chkFIshListViewArea_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.NarrowArea = chkFIshListNarrowArea.Checked;
             updateFishList();
         }
         private void chkFIshListViewBait_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.FishList.NarrowBait = chkFIshListNarrowBait.Checked;
             updateFishList();
         }
@@ -1401,241 +1825,328 @@ namespace EnjoyFishing
         #region 釣り設定・動作
         private void chkLearning_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.Learning = chkLearning.Checked;
         }
         private void chkSneakFishing_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.SneakFishing = chkSneakFishing.Checked;
         }
         private void txtSneakFishingRemain_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.SneakFishingRemain = (float)txtSneakFishingRemain.Value;
         }
         private void chkHP0_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.HP0 = chkHP0.Checked;
         }
         private void txtHP0Min_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.HP0Min = (int)txtHP0Min.Value;
         }
         private void txtHP0Max_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.HP0Max = (int)txtHP0Max.Value;
         }
         private void chkReactionTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ReactionTime = chkReactionTime.Checked;
         }
         private void txtReactionTimeMin_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ReactionTimeMin = (float)txtReactionTimeMin.Value;
         }
         private void txtReactionTimeMax_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ReactionTimeMax = (float)txtReactionTimeMax.Value;
         }
         private void chkVanaTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.VanaTime = chkVanaTime.Checked;
         }
         private void txtVanaTimeFrom_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.VanaTimeFrom = (int)txtVanaTimeFrom.Value;
         }
         private void txtVanaTimeTo_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.VanaTimeTo = (int)txtVanaTimeTo.Value;
         }
         private void chkRecastTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.RecastTime = chkRecastTime.Checked;
         }
         private void txtRecastTimeMin_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.RecastTimeMin = (float)txtRecastTimeMin.Value;
         }
         private void txtRecastTimeMax_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.RecastTimeMax = (float)txtRecastTimeMax.Value;
         }
         private void chkEarthTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EarthTime = chkEarthTime.Checked;
         }
         private void txtEarthTimeFrom_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EarthTimeFrom = (int)txtEarthTimeFrom.Value;
         }
         private void txtEarthTimeTo_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
         }
         private void chkIgnoreSmallFish_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
         }
         private void chkIgnoreLargeFish_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
         }
         private void chkIgnoreMonster_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
         }
         private void chkIgnoreItem_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.IgnoreItem = chkIgnoreItem.Checked;
         }
         private void chkInventoryFullSack_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
         }
         private void chkInventoryFullSatchel_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
         }
         private void chkInventoryFullCase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
         }
         private void chkInventoryFullCmd_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
         }
         private void txtInventoryFullCmdLine_TextChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
         }
         private void chkNoBaitNoRodSack_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
         }
         private void chkNoBaitNoRodSatchel_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
         }
         private void chkNoBaitNoRodCase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
         }
         private void chkNoBaitNoRodCmd_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
         }
         private void txtNoBaitNoRodCmdLine_TextChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
         }
         #endregion
         #region 釣り設定・停止条件
         private void chkMaxCatch_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxCatch = chkMaxCatch.Checked;
         }
         private void txtMaxCatchCount_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxCatchCount = (int)txtMaxCatchCount.Value;
         }
         private void chkMaxNoCatch_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxNoCatch = chkMaxNoCatch.Checked;
         }
         private void txtMaxNoCatchCount_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxNoCatchCount = (int)txtMaxNoCatchCount.Value;
         }
         private void chkMaxSkill_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxSkill = chkMaxSkill.Checked;
         }
         private void txtMaxSkillValue_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.MaxSkillValue = (int)txtMaxSkillValue.Value;
         }
         private void chkChatTell_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatTell = chkChatTell.Checked;
         }
         private void chkChatSay_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatSay = chkChatSay.Checked;
         }
         private void chkChatParty_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatParty = chkChatParty.Checked;
         }
         private void chkChatLs_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatLs = chkChatLs.Checked;
         }
         private void chkChatShout_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatShout = chkChatShout.Checked;
+        }
+        private void chkChatEmote_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.ChatEmote = chkChatEmote.Checked;
         }
         private void chkChatRestart_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatRestart = chkChatRestart.Checked;
         }
         private void txtChatRestartCount_ValueChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
         }
         private void chkEntryPort_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Fishing.EntryPort = chkEntryPort.Checked;
         }
         #endregion
+        #endregion
+        #region ハラキリ
+        private void rdoHarakiriInputTypeSelect_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Harakiri.InputType = Settings.HarakiriInputTypeKind.Select;
+            cmbHarakiriFishname.Enabled = true;
+            txtHarakiriFishname.Enabled = false;
+        }
+        private void rdoHarakiriInputTypeInput_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Harakiri.InputType = Settings.HarakiriInputTypeKind.Input;
+            cmbHarakiriFishname.Enabled = false;
+            txtHarakiriFishname.Enabled = true;
+        }
+        private void cmbHarakiriFishname_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
+        }
+        private void txtHarakiriFishname_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
+        }
         #endregion
         #region 設定
         #region 設定・ステータスバー表示
         private void chkVisibleMoonPhase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleVanatime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleEarthTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleEarthTime = chkStatusBarVisibleEarthTime.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleDayType_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleDayType = chkStatusBarVisibleDayType.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleLoginStatus_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleLoginStatus = chkStatusBarVisibleLoginStatus.Checked;
             setStatusBarVisible();
         }
         private void chkVisiblePlayerStatus_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisiblePlayerStatus = chkStatusBarVisiblePlayerStatus.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleHpBar_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleHpBar = chkStatusBarVisibleHpBar.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleHP_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleHP = chkStatusBarVisibleHP.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleRemainTimeBar_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
             setStatusBarVisible();
         }
         private void chkVisibleRemainTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
             setStatusBarVisible();
         }
@@ -1643,74 +2154,103 @@ namespace EnjoyFishing
         #region 設定・履歴列表示
         private void chkHistoryVisibleEarthTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColEarthTime.Visible = chkHistoryVisibleEarthTime.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleVanaTime_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColVanaTime.Visible = chkHistoryVisibleVanaTime.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleVanaWeekDay_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColVanaWeekDay.Visible = chkHistoryVisibleVanaWeekDay.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleMoonPhase_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColMoonPhase.Visible = chkHistoryVisibleMoonPhase.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleZoneName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColZoneName.Visible = chkHistoryVisibleZoneName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleRodName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColRodName.Visible = chkHistoryVisibleRodName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleBaitName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColBaitName.Visible = chkHistoryVisibleBaitName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleID_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColID.Visible = chkHistoryVisibleID.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleFishName_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColFishName.Visible = chkHistoryVisibleFishName.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleFishCount_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColFishCount.Visible = chkHistoryVisibleFishCount.Checked;
             initGridHistory();
         }
         private void chkHistoryVisibleResult_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.History.ColResult.Visible = chkHistoryVisibleResult.Checked;
             initGridHistory();
         }
         #endregion
-        #region 設定・設定の保存
+        #region 設定・一般
         private void rdoSaveModeShared_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Global.SaveMode = Settings.SaveModeKind.Shared;
         }
         private void rdoSaveModeByPlayer_CheckedChanged(object sender, EventArgs e)
         {
+            if (startupFlg) return;
             settings.Global.SaveMode = Settings.SaveModeKind.ByPlayer;
+        }
+        private void chkTopMost_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
+            this.TopMost = chkWindowTopMost.Checked;
+        }
+        private void chkFlashAtFinished_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.WindowFlash = chkWindowFlash.Checked;
+        }
+        private void chkActivateAtFinished_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.WindowActivate = chkWindowActivate.Checked;
         }
         #endregion
         #endregion
         #endregion
 
-        #region PolTool/FishingToolイベント
+        #region PolTool/FishingTool/HarakiriToolイベント
         /// <summary>
         /// PolTool ChangeStatusイベント
         /// </summary>
@@ -1737,15 +2277,19 @@ namespace EnjoyFishing
                 //画面ロック解除
                 lockControl(false);
                 loginFlg = true;
+                flashWindow();//画面フラッシュ
             }
             else if (e.PolStatus == PolTool.PolStatusKind.CharacterLoginScreen)
             {
                 loginFlg = false;
                 lockControl(true);//コントロールロック
                 unload();
+                flashWindow();//画面フラッシュ
             }
             else if (e.PolStatus == PolTool.PolStatusKind.Unknown)
             {
+
+                flashWindow();//画面フラッシュ
                 MessageBox.Show("FF11が終了しました。EnjoyFishingは終了します。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 unload();
                 System.Environment.Exit(0);//プログラム終了
@@ -1809,9 +2353,11 @@ namespace EnjoyFishing
                         break;
                     case FishingTool.FishingStatusKind.Wait:
                         statusStrip.BackColor = Color.FromArgb(0xFF, 0xFF, 0x80);
+                        flashWindow();//画面フラッシュ
                         break;
                     case FishingTool.FishingStatusKind.Error:
                         statusStrip.BackColor = Color.FromArgb(0xFF, 0x80, 0x80);
+                        flashWindow();//画面フラッシュ
                         break;
                     default:
                         statusStrip.BackColor = SystemColors.Control;
@@ -1824,12 +2370,90 @@ namespace EnjoyFishing
                         break;
                     case FishingTool.RunningStatusKind.Stop:
                         this.Cursor = Cursors.Default;
+                        flashWindow();//画面フラッシュ
                         break;
                 }
             }
         }
-        #endregion
+        /// <summary>
+        /// HarakiriTool HarakiriOnceイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HarakiriTool_HarakiriOnce(object sender, HarakiriTool.HarakiriOnceEventArgs e)
+        {
+            updateHarakiriHistory();
+        }
+        /// <summary>
+        /// FishingTool ChangeMessageイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HarakiriTool_ChangeMessage(object sender, HarakiriTool.ChangeMessageEventArgs e)
+        {
+            if (InvokeRequired)
+            {
 
+                Invoke(new HarakiriTool_ChangeMessageDelegate(HarakiriTool_ChangeMessage), sender, e);
+            }
+            else
+            {
+                //メッセージの更新
+                lblMessage.Text = e.Message;
+            }
+        }
+        /// <summary>
+        /// FishingTool ChangeStatusイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HarakiriTool_ChangeStatus(object sender, HarakiriTool.ChangeStatusEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new HarakiriTool_ChangeStatusDelegate(HarakiriTool_ChangeStatus), sender, e);
+            }
+            else
+            {
+                //ステータスバーの背景色を設定
+                switch (e.FishingStatus)
+                {
+                    case HarakiriTool.HarakiriStatusKind.Normal:
+                        if (e.RunningStatus == HarakiriTool.RunningStatusKind.Running)
+                        {
+                            statusStrip.BackColor = Color.FromArgb(0x80, 0xFF, 0xFF);
+                        }
+                        else
+                        {
+                            statusStrip.BackColor = SystemColors.Control;
+                        }
+                        break;
+                    case HarakiriTool.HarakiriStatusKind.Wait:
+                        statusStrip.BackColor = Color.FromArgb(0xFF, 0xFF, 0x80);
+                        flashWindow();//画面フラッシュ
+                        break;
+                    case HarakiriTool.HarakiriStatusKind.Error:
+                        statusStrip.BackColor = Color.FromArgb(0xFF, 0x80, 0x80);
+                        flashWindow();//画面フラッシュ
+                        break;
+                    default:
+                        statusStrip.BackColor = SystemColors.Control;
+                        break;
+                }
+                switch (e.RunningStatus)
+                {
+                    case HarakiriTool.RunningStatusKind.UnderStop:
+                        this.Cursor = Cursors.WaitCursor;
+                        break;
+                    case HarakiriTool.RunningStatusKind.Stop:
+                        this.Cursor = Cursors.Default;
+                        flashWindow();//画面フラッシュ
+                        break;
+                }
+            }
+        }
+        
+        #endregion
 
     }
 }
