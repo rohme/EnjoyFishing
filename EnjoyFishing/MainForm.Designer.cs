@@ -1320,7 +1320,7 @@
             // lblFishingInfoSkill
             // 
             this.lblFishingInfoSkill.AutoSize = true;
-            this.lblFishingInfoSkill.Location = new System.Drawing.Point(349, 17);
+            this.lblFishingInfoSkill.Location = new System.Drawing.Point(370, 17);
             this.lblFishingInfoSkill.Name = "lblFishingInfoSkill";
             this.lblFishingInfoSkill.Size = new System.Drawing.Size(28, 14);
             this.lblFishingInfoSkill.TabIndex = 7;
@@ -1330,7 +1330,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label7.Location = new System.Drawing.Point(313, 17);
+            this.label7.Location = new System.Drawing.Point(334, 17);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(45, 14);
             this.label7.TabIndex = 6;
@@ -1339,7 +1339,7 @@
             // lblFishingInfoNoCatchCount
             // 
             this.lblFishingInfoNoCatchCount.AutoSize = true;
-            this.lblFishingInfoNoCatchCount.Location = new System.Drawing.Point(294, 17);
+            this.lblFishingInfoNoCatchCount.Location = new System.Drawing.Point(315, 17);
             this.lblFishingInfoNoCatchCount.Name = "lblFishingInfoNoCatchCount";
             this.lblFishingInfoNoCatchCount.Size = new System.Drawing.Size(21, 14);
             this.lblFishingInfoNoCatchCount.TabIndex = 7;
@@ -1361,9 +1361,9 @@
             this.label14.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label14.Location = new System.Drawing.Point(241, 17);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(59, 14);
+            this.label14.Size = new System.Drawing.Size(81, 14);
             this.label14.TabIndex = 6;
-            this.label14.Text = "釣果無し：";
+            this.label14.Text = "連続釣果無し：";
             // 
             // lblFishingInfoBaitName
             // 

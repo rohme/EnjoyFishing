@@ -1722,6 +1722,8 @@ namespace EnjoyFishing
             {
                 this.WindowState = FormWindowState.Normal;
                 this.Activate();
+                this.TopMost = true;
+                if (!settings.Etc.WindowTopMost) this.TopMost = false;
             }
         }
         #endregion
