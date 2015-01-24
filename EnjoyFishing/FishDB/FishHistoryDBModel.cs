@@ -25,6 +25,15 @@ namespace EnjoyFishing
         RodBreak,
         Unknown,
     }
+    /// <summary>
+    /// だいじなもの有無
+    /// </summary>
+    public enum HasKeyItemKind
+    {
+        Yes,
+        No,
+        Unknown,
+    }
 
     [XmlRoot("History")]
     public class FishHistoryDBModel
@@ -96,6 +105,16 @@ namespace EnjoyFishing
         public float Z { get; set; }
         [XmlAttribute("h")]
         public float H { get; set; }
+        [XmlAttribute("skill")]
+        public int Skill { get; set; }
+        [XmlAttribute("serpentrumors")]
+        public HasKeyItemKind SerpentRumors { get; set; }
+        [XmlAttribute("anglersalmanac")]
+        public HasKeyItemKind AnglersAlmanac { get; set; }
+        [XmlAttribute("frogfishing")]
+        public HasKeyItemKind FrogFishing { get; set; }
+        [XmlAttribute("mooching")]
+        public HasKeyItemKind Mooching { get; set; }
         public FishHistoryDBFishModel()
         {
             this.FishName = string.Empty;
@@ -118,6 +137,11 @@ namespace EnjoyFishing
             this.Y = 0.0f;
             this.Z = 0.0f;
             this.H = 0.0f;
+            this.Skill = -1;
+            this.SerpentRumors = HasKeyItemKind.Unknown;
+            this.AnglersAlmanac = HasKeyItemKind.Unknown;
+            this.FrogFishing = HasKeyItemKind.Unknown;
+            this.Mooching = HasKeyItemKind.Unknown;
         }
     }
 

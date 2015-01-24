@@ -513,6 +513,74 @@ namespace EnjoyFishing
                 return fishHistoryDB.CatchCount;
             }
         }
+        /// <summary>
+        /// だいじなもの：サーペントの伝説を持っているか
+        /// </summary>
+        public HasKeyItemKind HasSerpentRumors
+        {
+            get
+            {
+                if (fface.Player.HasKeyitem(KeyItem.Serpent_Rumors))
+                {
+                    return HasKeyItemKind.Yes;
+                }
+                else
+                {
+                    return HasKeyItemKind.No;
+                }
+            }
+        }
+        /// <summary>
+        /// だいじなもの：伝説の巨大魚紀聞を持っているか
+        /// </summary>
+        public HasKeyItemKind HasAnglersAlmanac
+        {
+            get
+            {
+                if (fface.Player.HasKeyitem(KeyItem.Anglers_Almanac))
+                {
+                    return HasKeyItemKind.Yes;
+                }
+                else
+                {
+                    return HasKeyItemKind.No;
+                }
+            }
+        }
+        /// <summary>
+        /// だいじなもの：フロッグフィッシングを持っているか
+        /// </summary>
+        public HasKeyItemKind HasFrogFishing
+        {
+            get
+            {
+                if (fface.Player.HasKeyitem(KeyItem.Frog_Fishing))
+                {
+                    return HasKeyItemKind.Yes;
+                }
+                else
+                {
+                    return HasKeyItemKind.No;
+                }
+            }
+        }
+        /// <summary>
+        /// だいじなもの：泳がせ釣りを持っているか
+        /// </summary>
+        public HasKeyItemKind HasMooching
+        {
+            get
+            {
+                if (fface.Player.HasKeyitem(KeyItem.Mooching))
+                {
+                    return HasKeyItemKind.Yes;
+                }
+                else
+                {
+                    return HasKeyItemKind.No;
+                }
+            }
+        }
         #endregion
 
         #region イベント
@@ -981,6 +1049,11 @@ namespace EnjoyFishing
             oFish.Y = (float)Math.Round(this.Position.Y, 1, MidpointRounding.AwayFromZero);
             oFish.Z = (float)Math.Round(this.Position.Z, 1, MidpointRounding.AwayFromZero);
             oFish.H = (float)Math.Round(this.Position.H, 1, MidpointRounding.AwayFromZero);
+            oFish.Skill = this.FishingSkill;
+            oFish.SerpentRumors = this.HasSerpentRumors;
+            oFish.AnglersAlmanac = this.HasAnglersAlmanac;
+            oFish.Mooching = this.HasMooching;
+            oFish.FrogFishing = this.HasFrogFishing;
 
             bool fishedFlg = false;
             oChatReceive = false;
@@ -1126,7 +1199,7 @@ namespace EnjoyFishing
                                 {
                                     logger.Output(LogLevelKind.INFO,"制限時間を過ぎたので、魚のHPを強制的にゼロにします");
                                     fface.Fish.SetHP(0);
-                                    Thread.Sleep(settings.Global.WaitBase);
+                                    Thread.Sleep(1000);
                                 }
                             }
                             //格闘
