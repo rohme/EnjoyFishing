@@ -36,19 +36,32 @@ namespace EnjoyFishing
         {
             Dictionary<string, string> dicStatus = new Dictionary<string, string>();
             dicStatus.Add("ProcessID", pol.ProcessID.ToString());
+            //Player
             dicStatus.Add("Player.Name", fface.Player.Name);
             dicStatus.Add("Player.GetLoginStatus", fface.Player.GetLoginStatus.ToString());
             dicStatus.Add("Player.Status", fface.Player.Status.ToString());
             dicStatus.Add("Player.Zone", string.Format("{0}({1})", fface.Player.Zone.ToString("D"), FFACE.ParseResources.GetAreaName(fface.Player.Zone)));
+            string statusEffectsStr = string.Empty;
+            foreach(StatusEffect statusEffect in fface.Player.StatusEffects)
+            {
+                if (statusEffect != StatusEffect.Unknown)
+                {
+                    statusEffectsStr += string.Format("{0}({1}),", statusEffect.ToString("D"), statusEffect);
+                }
+            }
+            dicStatus.Add("Player.StatusEffects", statusEffectsStr);
             dicStatus.Add("Player.GetCraftDetails(Craft.Fishing).Level", fface.Player.GetCraftDetails(Craft.Fishing).Level.ToString());
             dicStatus.Add("Player.PosX", fface.Player.PosX.ToString());
             dicStatus.Add("Player.PosY", fface.Player.PosY.ToString());
             dicStatus.Add("Player.PosZ", fface.Player.PosZ.ToString());
             dicStatus.Add("Player.PosH", fface.Player.PosH.ToString());
+            //Timer
             dicStatus.Add("Timer.GetVanaTime()", fface.Timer.GetVanaTime().ToString());
+            //Fish
             dicStatus.Add("Fish.HPMax", fface.Fish.HPMax.ToString());
             dicStatus.Add("Fish.HPCurrent", fface.Fish.HPCurrent.ToString());
             dicStatus.Add("Fish.Timeout", fface.Fish.Timeout.ToString());
+            //Item
             dicStatus.Add("Item.InventoryMax", fface.Item.InventoryMax.ToString());
             dicStatus.Add("Item.InventoryCount", fface.Item.InventoryCount.ToString());
             //dicStatus.Add("Item.SafeMax", fface.Item.SafeMax.ToString());
@@ -67,17 +80,22 @@ namespace EnjoyFishing
             dicStatus.Add("Item.CaseCount", fface.Item.CaseCount.ToString());
             //dicStatus.Add("Item.WardrobeMax", fface.Item.WardrobeMax.ToString());
             //dicStatus.Add("Item.WardrobeCount", fface.Item.WardrobeCount.ToString());
-
             dicStatus.Add("Item.GetEquippedItemID(EquipSlot.Range)", fface.Item.GetEquippedItemID(EquipSlot.Range).ToString());
             dicStatus.Add("Item.GetItemCount(RangeItemID, InventoryType.Inventory)", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Inventory).ToString());
             dicStatus.Add("ParseResources.GetItemName(RangeItemID)", FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range)));
-
             dicStatus.Add("Item.GetEquippedItemID(EquipSlot.Ammo)", fface.Item.GetEquippedItemID(EquipSlot.Ammo).ToString());
             dicStatus.Add("Item.GetItemCount(AmmoItemID, InventoryType.Inventory)", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Inventory).ToString());
             dicStatus.Add("ParseResources.GetItemName(AmmoItemID)", FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Ammo)));
+            //Windower
+            //dicStatus.Add("Windower.ArgumentCount", fface.Windower.ArgumentCount().ToString());
+            //string argumentStr = string.Empty;
+            //for (short i = 0; i < fface.Windower.ArgumentCount(); i++)
+            //{
+            ////    argumentStr += fface.Windower.GetArgument(i) + " ";
+            //}
+            //dicStatus.Add("Windower.GetArgument", argumentStr);
+            //dicStatus.Add("Windower.IsNewCommand", fface.Windower.IsNewCommand().ToString());
 
-
-            
             refreshStatus(dicStatus);
         }
 

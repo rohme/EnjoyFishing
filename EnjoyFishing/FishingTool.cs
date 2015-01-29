@@ -7,6 +7,7 @@ using FFACETools;
 using MiscTools;
 using System.Threading;
 using System.IO;
+using System.Windows.Forms;
 
 namespace EnjoyFishing
 {
@@ -50,6 +51,8 @@ namespace EnjoyFishing
             {ChatKbnKind.ShipWarning7, "Eunirange : そろそろ中桟橋かな？"},//バージ 主水路(北桟橋→中桟橋)
             {ChatKbnKind.ShipWarning8, "Ineuteniace : そろそろ南桟橋じゃな。"},//バージ 井守ヶ淵(中桟橋→南桟橋)
             {ChatKbnKind.ShipWarning9, "Eunirange : そろそろ中桟橋かな。"},//バージ エメフィ支水路(南桟橋→中桟橋)
+            {ChatKbnKind.SkillUp, "{0}の釣りスキルが、(.*)アップ！"},
+            {ChatKbnKind.SkillLvUp, "{0}の釣りスキルは、(.*)になった。"},
         };
         #endregion
 
@@ -94,6 +97,8 @@ namespace EnjoyFishing
             ShipWarning7,
             ShipWarning8,
             ShipWarning9,
+            SkillUp,
+            SkillLvUp,
         }
         public enum RunningStatusKind
         {
@@ -125,6 +130,7 @@ namespace EnjoyFishing
         private string lastZoneName = string.Empty;
         private DateTime lastCastDate = new DateTime(2000, 1, 1);
         private int noCatchCount = 0;
+        private int chatFishingSkill = 0;//チャットから取得した釣りスキル
 
         #region メンバ
         /// <summary>
@@ -388,7 +394,17 @@ namespace EnjoyFishing
         /// </summary>
         public int FishingSkill
         {
-            get { return fface.Player.GetCraftDetails(Craft.Fishing).Level; }
+            get
+            {
+                if (fface.Player.GetCraftDetails(Craft.Fishing).Level > chatFishingSkill)
+                {
+                    return fface.Player.GetCraftDetails(Craft.Fishing).Level;
+                }
+                else
+                {
+                    return chatFishingSkill;
+                }
+            }
         }
         /// <summary>
         /// エリア名称
@@ -1578,21 +1594,40 @@ namespace EnjoyFishing
                     v.Key == ChatKbnKind.CatchMonster ||
                     v.Key == ChatKbnKind.EnemyAttack1 || 
                     v.Key == ChatKbnKind.EnemyAttack2 ||
-                    v.Key == ChatKbnKind.SneakWarning2)
+                    v.Key == ChatKbnKind.SneakWarning2 ||
+                    v.Key == ChatKbnKind.SkillUp ||
+                    v.Key == ChatKbnKind.SkillLvUp)
+                {
                     searchStr = string.Format(v.Value, this.PlayerName);
-                else 
+                }
+                else
+                {
                     searchStr = v.Value;
+                }
 
                 if (MiscTool.IsRegexString(iCl.Text, searchStr))
                 {
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
-                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2) rEnemyAttack = true;
-                    if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/) rSneakWarning = true;
+                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2)
+                    {
+                        rEnemyAttack = true;
+                    }
+                    if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/)
+                    {
+                        rSneakWarning = true;
+                    }
                     if (v.Key == ChatKbnKind.ShipWarning1 || v.Key == ChatKbnKind.ShipWarning2 ||
                         v.Key == ChatKbnKind.ShipWarning3 || v.Key == ChatKbnKind.ShipWarning4 ||
                         v.Key == ChatKbnKind.ShipWarning5 || v.Key == ChatKbnKind.ShipWarning6 ||
-                        v.Key == ChatKbnKind.ShipWarning7 || v.Key == ChatKbnKind.ShipWarning8 || 
-                        v.Key == ChatKbnKind.ShipWarning9) rShipWarning = true;
+                        v.Key == ChatKbnKind.ShipWarning7 || v.Key == ChatKbnKind.ShipWarning8 ||
+                        v.Key == ChatKbnKind.ShipWarning9)
+                    {
+                        rShipWarning = true;
+                    }
+                    if (v.Key == ChatKbnKind.SkillLvUp)
+                    {
+                        chatFishingSkill = int.Parse(oArgs[0]);
+                    }
                     return v.Key;
                 }
             }
