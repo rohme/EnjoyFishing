@@ -156,6 +156,7 @@
             this.cmbHistoryFishName = new System.Windows.Forms.ComboBox();
             this.cmbHistoryResult = new System.Windows.Forms.ComboBox();
             this.tabMainHarakiri = new System.Windows.Forms.TabPage();
+            this.chkHarakiriStopFound = new System.Windows.Forms.CheckBox();
             this.btnHarakiriUpdate = new System.Windows.Forms.Button();
             this.txtHarakiriFishname = new System.Windows.Forms.TextBox();
             this.rdoHarakiriInputTypeInput = new System.Windows.Forms.RadioButton();
@@ -196,7 +197,8 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.chkHarakiriStopFound = new System.Windows.Forms.CheckBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.lblFishingInfoWardrobe = new System.Windows.Forms.Label();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -1287,6 +1289,7 @@
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoBaitName);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoRodName);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoCatchCount);
+            this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoWardrobe);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoCase);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoSack);
             this.tabFishingMainInfo.Controls.Add(this.lblFishingInfoSatchel);
@@ -1294,6 +1297,7 @@
             this.tabFishingMainInfo.Controls.Add(this.label16);
             this.tabFishingMainInfo.Controls.Add(this.label6);
             this.tabFishingMainInfo.Controls.Add(this.label5);
+            this.tabFishingMainInfo.Controls.Add(this.label15);
             this.tabFishingMainInfo.Controls.Add(this.label11);
             this.tabFishingMainInfo.Controls.Add(this.label10);
             this.tabFishingMainInfo.Controls.Add(this.label9);
@@ -1398,7 +1402,7 @@
             // lblFishingInfoCase
             // 
             this.lblFishingInfoCase.AutoSize = true;
-            this.lblFishingInfoCase.Location = new System.Drawing.Point(299, 29);
+            this.lblFishingInfoCase.Location = new System.Drawing.Point(288, 29);
             this.lblFishingInfoCase.Name = "lblFishingInfoCase";
             this.lblFishingInfoCase.Size = new System.Drawing.Size(40, 14);
             this.lblFishingInfoCase.TabIndex = 0;
@@ -1407,7 +1411,7 @@
             // lblFishingInfoSack
             // 
             this.lblFishingInfoSack.AutoSize = true;
-            this.lblFishingInfoSack.Location = new System.Drawing.Point(212, 29);
+            this.lblFishingInfoSack.Location = new System.Drawing.Point(202, 29);
             this.lblFishingInfoSack.Name = "lblFishingInfoSack";
             this.lblFishingInfoSack.Size = new System.Drawing.Size(40, 14);
             this.lblFishingInfoSack.TabIndex = 0;
@@ -1416,7 +1420,7 @@
             // lblFishingInfoSatchel
             // 
             this.lblFishingInfoSatchel.AutoSize = true;
-            this.lblFishingInfoSatchel.Location = new System.Drawing.Point(130, 29);
+            this.lblFishingInfoSatchel.Location = new System.Drawing.Point(123, 29);
             this.lblFishingInfoSatchel.Name = "lblFishingInfoSatchel";
             this.lblFishingInfoSatchel.Size = new System.Drawing.Size(40, 14);
             this.lblFishingInfoSatchel.TabIndex = 0;
@@ -1469,7 +1473,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label11.Location = new System.Drawing.Point(260, 29);
+            this.label11.Location = new System.Drawing.Point(249, 29);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(46, 14);
             this.label11.TabIndex = 0;
@@ -1479,7 +1483,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label10.Location = new System.Drawing.Point(176, 29);
+            this.label10.Location = new System.Drawing.Point(166, 29);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(43, 14);
             this.label10.TabIndex = 0;
@@ -1489,7 +1493,7 @@
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label9.Location = new System.Drawing.Point(77, 29);
+            this.label9.Location = new System.Drawing.Point(70, 29);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(60, 14);
             this.label9.TabIndex = 0;
@@ -1869,6 +1873,17 @@
             this.tabMainHarakiri.TabIndex = 3;
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
+            // 
+            // chkHarakiriStopFound
+            // 
+            this.chkHarakiriStopFound.AutoSize = true;
+            this.chkHarakiriStopFound.Location = new System.Drawing.Point(440, 10);
+            this.chkHarakiriStopFound.Name = "chkHarakiriStopFound";
+            this.chkHarakiriStopFound.Size = new System.Drawing.Size(95, 18);
+            this.chkHarakiriStopFound.TabIndex = 7;
+            this.chkHarakiriStopFound.Text = "発見したら停止";
+            this.chkHarakiriStopFound.UseVisualStyleBackColor = true;
+            this.chkHarakiriStopFound.CheckedChanged += new System.EventHandler(this.chkHarakiriStopFound_CheckedChanged);
             // 
             // btnHarakiriUpdate
             // 
@@ -2341,16 +2356,24 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // chkHarakiriStopFound
+            // label15
             // 
-            this.chkHarakiriStopFound.AutoSize = true;
-            this.chkHarakiriStopFound.Location = new System.Drawing.Point(440, 10);
-            this.chkHarakiriStopFound.Name = "chkHarakiriStopFound";
-            this.chkHarakiriStopFound.Size = new System.Drawing.Size(95, 18);
-            this.chkHarakiriStopFound.TabIndex = 7;
-            this.chkHarakiriStopFound.Text = "発見したら停止";
-            this.chkHarakiriStopFound.UseVisualStyleBackColor = true;
-            this.chkHarakiriStopFound.CheckedChanged += new System.EventHandler(this.chkHarakiriStopFound_CheckedChanged);
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label15.Location = new System.Drawing.Point(333, 29);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(45, 14);
+            this.label15.TabIndex = 0;
+            this.label15.Text = "ワード：";
+            // 
+            // lblFishingInfoWardrobe
+            // 
+            this.lblFishingInfoWardrobe.AutoSize = true;
+            this.lblFishingInfoWardrobe.Location = new System.Drawing.Point(372, 29);
+            this.lblFishingInfoWardrobe.Name = "lblFishingInfoWardrobe";
+            this.lblFishingInfoWardrobe.Size = new System.Drawing.Size(40, 14);
+            this.lblFishingInfoWardrobe.TabIndex = 0;
+            this.lblFishingInfoWardrobe.Text = "99/99";
             // 
             // MainForm
             // 
@@ -2600,5 +2623,7 @@
         private System.Windows.Forms.CheckBox chkWindowFlash;
         private System.Windows.Forms.CheckBox chkWindowTopMost;
         private System.Windows.Forms.CheckBox chkHarakiriStopFound;
+        private System.Windows.Forms.Label lblFishingInfoWardrobe;
+        private System.Windows.Forms.Label label15;
     }
 }

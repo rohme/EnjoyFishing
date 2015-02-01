@@ -393,6 +393,20 @@ namespace EnjoyFishing
             get { return control.GetInventoryMaxByType(InventoryType.Case); }
         }
         /// <summary>
+        /// ワードローブ所持数
+        /// </summary>
+        public int WardrobeCount
+        {
+            get { return control.GetInventoryCountByType(InventoryType.Wardrobe); }
+        }
+        /// <summary>
+        /// ワードローブ最大所持数
+        /// </summary>
+        public int WardrobeMax
+        {
+            get { return control.GetInventoryMaxByType(InventoryType.Wardrobe); }
+        }
+        /// <summary>
         /// 釣りスキル
         /// </summary>
         public int FishingSkill
@@ -445,7 +459,8 @@ namespace EnjoyFishing
                 if (!isRod(this.RodName)) return string.Empty;
                 //鞄にアイテムが存在するかチェック
                 int rodId = FFACE.ParseResources.GetItemId(this.RodName);
-                uint remain = fface.Item.GetItemCount(rodId, InventoryType.Inventory);
+                uint remain = fface.Item.GetItemCount(rodId, InventoryType.Inventory) +
+                                fface.Item.GetItemCount(rodId, InventoryType.Wardrobe);
                 if (settings.UseItemizer)
                 {
                     if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(rodId, InventoryType.Satchel);
@@ -491,7 +506,8 @@ namespace EnjoyFishing
                 if (!isBait(this.BaitName)) return string.Empty;
                 //鞄にアイテムが存在するかチェック
                 int baitId = FFACE.ParseResources.GetItemId(this.BaitName);
-                uint remain = fface.Item.GetItemCount(baitId, InventoryType.Inventory);
+                uint remain = fface.Item.GetItemCount(baitId, InventoryType.Inventory) +
+                                fface.Item.GetItemCount(baitId, InventoryType.Wardrobe);
                 if (settings.UseItemizer)
                 {
                     if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(baitId, InventoryType.Satchel);
@@ -930,7 +946,8 @@ namespace EnjoyFishing
                 if (this.RodName == string.Empty)
                 {
                     if (!string.IsNullOrEmpty(lastRodName) &&
-                        !control.IsExistItem(lastRodName, InventoryType.Inventory))
+                        !control.IsExistItem(lastRodName, InventoryType.Inventory) &&
+                        !control.IsExistItem(lastRodName, InventoryType.Wardrobe))
                     {
                         getItem(lastRodName);
                     }
@@ -951,8 +968,9 @@ namespace EnjoyFishing
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (this.BaitName == string.Empty)
                 {
-                    if (!string.IsNullOrEmpty(lastBaitName) && 
-                        !control.IsExistItem(lastBaitName, InventoryType.Inventory))
+                    if (!string.IsNullOrEmpty(lastBaitName) &&
+                        !control.IsExistItem(lastBaitName, InventoryType.Inventory) &&
+                        !control.IsExistItem(lastBaitName, InventoryType.Wardrobe))
                     {
                         getItem(lastBaitName);
                     }
@@ -1890,7 +1908,8 @@ namespace EnjoyFishing
             setMessage(string.Format("{0}を装備", iRodName));
             //鞄にアイテムが存在するかチェック
             int rodId = FFACE.ParseResources.GetItemId(iRodName);
-            uint rodCnt = fface.Item.GetItemCount(rodId, InventoryType.Inventory);
+            uint rodCnt = fface.Item.GetItemCount(rodId, InventoryType.Inventory) +
+                            fface.Item.GetItemCount(rodId, InventoryType.Wardrobe);
             //アイテムの装備
             if (rodCnt > 0)
             {
@@ -1918,7 +1937,8 @@ namespace EnjoyFishing
             setMessage(string.Format("{0}を装備", iBaitName));
             //鞄にアイテムが存在するかチェック
             int baitId = FFACE.ParseResources.GetItemId(iBaitName);
-            uint baitCnt = fface.Item.GetItemCount(baitId, InventoryType.Inventory);
+            uint baitCnt = fface.Item.GetItemCount(baitId, InventoryType.Inventory) +
+                            fface.Item.GetItemCount(baitId, InventoryType.Wardrobe);
             //アイテムの装備
             if (baitCnt > 0)
             {

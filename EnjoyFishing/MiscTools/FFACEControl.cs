@@ -237,7 +237,7 @@ namespace MiscTools
         /// <returns>アドオン名</returns>
         public List<string> GetAddon()
         {
-            string key = "EnjoyFishing CheckAddon " + DateTime.Now.ToString("yyyyMMddhhmmss");
+            string key = "EnjoyFishing CheckAddon " + DateTime.Now.ToString("yyyyMMddHHmmss");
             List<string> addon = new List<string>();
             bool consoleLog = true;
             if (!getAddonFromKey(key, out addon))
