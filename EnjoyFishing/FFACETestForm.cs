@@ -27,6 +27,11 @@ namespace EnjoyFishing
 
         private void FFACETestForm_Load(object sender, EventArgs e)
         {
+            lblProcID.Text = pol.ProcessID.ToString();
+            lblPlayerName.Text = fface.Player.Name;
+            chkTopMost.Checked = false;
+            trcOpacity.Value = 100;
+
             timRefresh.Enabled = true;
             gridStatus.RowsDefaultCellStyle.BackColor = Color.White;
             gridStatus.AlternatingRowsDefaultCellStyle.BackColor = Color.WhiteSmoke;
@@ -35,12 +40,11 @@ namespace EnjoyFishing
         private void timRefresh_Tick(object sender, EventArgs e)
         {
             Dictionary<string, string> dicStatus = new Dictionary<string, string>();
-            dicStatus.Add("ProcessID", pol.ProcessID.ToString());
             //Player
-            dicStatus.Add("Player.Name", fface.Player.Name);
-            dicStatus.Add("Player.GetLoginStatus", fface.Player.GetLoginStatus.ToString());
-            dicStatus.Add("Player.Status", fface.Player.Status.ToString());
-            dicStatus.Add("Player.Zone", string.Format("{0}({1})", fface.Player.Zone.ToString("D"), FFACE.ParseResources.GetAreaName(fface.Player.Zone)));
+            dicStatus.Add("ログインステータス", fface.Player.GetLoginStatus.ToString());
+            dicStatus.Add("プレイヤーステータス", fface.Player.Status.ToString());
+            dicStatus.Add("エリア", string.Format("{0}({1})", fface.Player.Zone.ToString("D"), FFACE.ParseResources.GetAreaName(fface.Player.Zone)));
+            //dicStatus.Add("天気", string.Format("{0}({1})", fface.Player.Weather.ToString("D"), FFACE.ParseResources.GetWeatherName(fface.Player.Weather)));
             string statusEffectsStr = string.Empty;
             foreach(StatusEffect statusEffect in fface.Player.StatusEffects)
             {
@@ -49,43 +53,42 @@ namespace EnjoyFishing
                     statusEffectsStr += string.Format("{0}({1}),", statusEffect.ToString("D"), statusEffect);
                 }
             }
-            dicStatus.Add("Player.StatusEffects", statusEffectsStr);
-            dicStatus.Add("Player.GetCraftDetails(Craft.Fishing).Level", fface.Player.GetCraftDetails(Craft.Fishing).Level.ToString());
-            dicStatus.Add("Player.PosX", fface.Player.PosX.ToString());
-            dicStatus.Add("Player.PosY", fface.Player.PosY.ToString());
-            dicStatus.Add("Player.PosZ", fface.Player.PosZ.ToString());
-            dicStatus.Add("Player.PosH", fface.Player.PosH.ToString());
+            dicStatus.Add("強化", statusEffectsStr);
+            dicStatus.Add("釣りスキル", fface.Player.GetCraftDetails(Craft.Fishing).Level.ToString());
+            dicStatus.Add("位置X", fface.Player.PosX.ToString());
+            dicStatus.Add("位置Y", fface.Player.PosY.ToString());
+            dicStatus.Add("位置Z", fface.Player.PosZ.ToString());
+            dicStatus.Add("方向", fface.Player.PosH.ToString());
+            dicStatus.Add("MP残", fface.Player.MPCurrent.ToString());
+            dicStatus.Add("スニーク覚えてる？", fface.Player.KnowsSpell(SpellList.Sneak).ToString());
+            dicStatus.Add("残り詠唱時間", fface.Player.CastPercentEx.ToString());
+            dicStatus.Add("詠唱時間", fface.Player.CastMax.ToString());
             //Timer
-            dicStatus.Add("Timer.GetVanaTime()", fface.Timer.GetVanaTime().ToString());
+            dicStatus.Add("スニークリキャスト時間", fface.Timer.GetSpellRecast(SpellList.Sneak).ToString());
+            dicStatus.Add("ヴァナ時間", fface.Timer.GetVanaTime().ToString());
             //Fish
-            dicStatus.Add("Fish.HPMax", fface.Fish.HPMax.ToString());
-            dicStatus.Add("Fish.HPCurrent", fface.Fish.HPCurrent.ToString());
-            dicStatus.Add("Fish.Timeout", fface.Fish.Timeout.ToString());
+            dicStatus.Add("魚-最大HP", fface.Fish.HPMax.ToString());
+            dicStatus.Add("魚-現在HP", fface.Fish.HPCurrent.ToString());
+            dicStatus.Add("魚-残り時間", fface.Fish.Timeout.ToString());
             //Item
-            dicStatus.Add("Item.InventoryMax", fface.Item.InventoryMax.ToString());
-            dicStatus.Add("Item.InventoryCount", fface.Item.InventoryCount.ToString());
-            //dicStatus.Add("Item.SafeMax", fface.Item.SafeMax.ToString());
-            //dicStatus.Add("Item.SafeCount", fface.Item.SafeCount.ToString());
-            //dicStatus.Add("Item.StorageMax", fface.Item.StorageMax.ToString());
-            //dicStatus.Add("Item.StorageCount", fface.Item.StorageCount.ToString());
-            //dicStatus.Add("Item.LockerMax", fface.Item.LockerMax.ToString());
-            //dicStatus.Add("Item.LockerCount", fface.Item.LockerCount.ToString());
-            dicStatus.Add("Item.SatchelMax", fface.Item.SatchelMax.ToString());
-            dicStatus.Add("Item.SatchelCount", fface.Item.SatchelCount.ToString());
-            dicStatus.Add("Item.SackMax", fface.Item.SackMax.ToString());
-            dicStatus.Add("Item.SackCount", fface.Item.SackCount.ToString());
-            //dicStatus.Add("Item.TemporaryMax", fface.Item.TemporaryMax.ToString());
-            //dicStatus.Add("Item.TemporaryCount", fface.Item.TemporaryCount.ToString());
-            dicStatus.Add("Item.CaseMax", fface.Item.CaseMax.ToString());
-            dicStatus.Add("Item.CaseCount", fface.Item.CaseCount.ToString());
-            //dicStatus.Add("Item.WardrobeMax", fface.Item.WardrobeMax.ToString());
-            //dicStatus.Add("Item.WardrobeCount", fface.Item.WardrobeCount.ToString());
-            dicStatus.Add("Item.GetEquippedItemID(EquipSlot.Range)", fface.Item.GetEquippedItemID(EquipSlot.Range).ToString());
-            dicStatus.Add("Item.GetItemCount(RangeItemID, InventoryType.Inventory)", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Inventory).ToString());
-            dicStatus.Add("ParseResources.GetItemName(RangeItemID)", FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range)));
-            dicStatus.Add("Item.GetEquippedItemID(EquipSlot.Ammo)", fface.Item.GetEquippedItemID(EquipSlot.Ammo).ToString());
-            dicStatus.Add("Item.GetItemCount(AmmoItemID, InventoryType.Inventory)", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Inventory).ToString());
-            dicStatus.Add("ParseResources.GetItemName(AmmoItemID)", FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Ammo)));
+            dicStatus.Add("鞄", string.Format("{0}/{1}", fface.Item.InventoryCount, fface.Item.InventoryMax));
+            //dicStatus.Add("金庫", string.Format("{0}/{1}", fface.Item.SafeCount, fface.Item.SafeMax));
+            //dicStatus.Add("家具", string.Format("{0}/{1}", fface.Item.StorageCount, fface.Item.StorageMax));
+            dicStatus.Add("ロッカー", string.Format("{0}/{1}", fface.Item.LockerCount, fface.Item.LockerMax));
+            dicStatus.Add("サッチェル", string.Format("{0}/{1}", fface.Item.SatchelCount, fface.Item.SatchelMax));
+            dicStatus.Add("サック", string.Format("{0}/{1}", fface.Item.SackCount, fface.Item.SackMax));
+            //dicStatus.Add("テンポラリ", string.Format("{0}/{1}", fface.Item.TemporaryCount, fface.Item.TemporaryMax));
+            dicStatus.Add("ケース", string.Format("{0}/{1}", fface.Item.CaseCount, fface.Item.CaseMax));
+            dicStatus.Add("ワードローブ", string.Format("{0}/{1}", fface.Item.WardrobeCount, fface.Item.WardrobeMax));
+            dicStatus.Add("竿-装備", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Range), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range))));
+            dicStatus.Add("竿-装備-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Inventory).ToString());
+            dicStatus.Add("竿-装備-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Wardrobe).ToString());
+            dicStatus.Add("エサ-装備", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Ammo), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Ammo))));
+            dicStatus.Add("エサ-装備-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Inventory).ToString());
+            dicStatus.Add("エサ-装備-サッチェル残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Satchel).ToString());
+            dicStatus.Add("エサ-装備-サック残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Sack).ToString());
+            dicStatus.Add("エサ-装備-ケース残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Case).ToString());
+            dicStatus.Add("エサ-装備-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Wardrobe).ToString());
             //Windower
             //dicStatus.Add("Windower.ArgumentCount", fface.Windower.ArgumentCount().ToString());
             //string argumentStr = string.Empty;
@@ -135,6 +138,15 @@ namespace EnjoyFishing
                     cl = fface.Chat.GetNextLine();
                 }
             }
+        }
+
+        private void chkTopMost_CheckedChanged(object sender, EventArgs e)
+        {
+            this.TopMost = chkTopMost.Checked;
+        }
+        private void trcOpacity_Scroll(object sender, EventArgs e)
+        {
+            this.Opacity = trcOpacity.Value / 100f;
         }
 
     }

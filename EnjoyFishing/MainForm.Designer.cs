@@ -196,6 +196,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
+            this.chkHarakiriStopFound = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -1854,6 +1855,7 @@
             // 
             // tabMainHarakiri
             // 
+            this.tabMainHarakiri.Controls.Add(this.chkHarakiriStopFound);
             this.tabMainHarakiri.Controls.Add(this.btnHarakiriUpdate);
             this.tabMainHarakiri.Controls.Add(this.txtHarakiriFishname);
             this.tabMainHarakiri.Controls.Add(this.rdoHarakiriInputTypeInput);
@@ -2339,6 +2341,17 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
+            // chkHarakiriStopFound
+            // 
+            this.chkHarakiriStopFound.AutoSize = true;
+            this.chkHarakiriStopFound.Location = new System.Drawing.Point(440, 10);
+            this.chkHarakiriStopFound.Name = "chkHarakiriStopFound";
+            this.chkHarakiriStopFound.Size = new System.Drawing.Size(95, 18);
+            this.chkHarakiriStopFound.TabIndex = 7;
+            this.chkHarakiriStopFound.Text = "発見したら停止";
+            this.chkHarakiriStopFound.UseVisualStyleBackColor = true;
+            this.chkHarakiriStopFound.CheckedChanged += new System.EventHandler(this.chkHarakiriStopFound_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -2586,5 +2599,6 @@
         private System.Windows.Forms.CheckBox chkWindowActivate;
         private System.Windows.Forms.CheckBox chkWindowFlash;
         private System.Windows.Forms.CheckBox chkWindowTopMost;
+        private System.Windows.Forms.CheckBox chkHarakiriStopFound;
     }
 }

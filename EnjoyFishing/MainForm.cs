@@ -430,6 +430,7 @@ namespace EnjoyFishing
                     EventArgs e = new EventArgs();
                     rdoHarakiriInputTypeInput_CheckedChanged(rdoHarakiriInputTypeInput, e);
                 }
+                chkHarakiriStopFound.Checked = settings.Harakiri.StopFound;
                 updateHarakiriHistory();
                 //ステータスバー
                 statusStrip.BackColor = SystemColors.Control;
@@ -1650,6 +1651,7 @@ namespace EnjoyFishing
                 }
                 settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
                 settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
+                settings.Harakiri.StopFound = chkHarakiriStopFound.Checked;
                 //設定・一般
                 settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
                 settings.Etc.WindowFlash = chkWindowFlash.Checked;
@@ -2087,6 +2089,11 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
         }
+        private void chkHarakiriStopFound_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Harakiri.StopFound = chkHarakiriStopFound.Checked;
+        }
         #endregion
         #region 設定
         #region 設定・ステータスバー表示
@@ -2452,8 +2459,6 @@ namespace EnjoyFishing
                 }
             }
         }
-        
         #endregion
-
     }
 }

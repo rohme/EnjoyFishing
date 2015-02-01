@@ -218,6 +218,9 @@ namespace EnjoyFishing
         /// プレイヤーステータス
         /// </summary>
         public FFACETools.Status PlayerStatus { get { return fface.Player.Status; } }
+        /// <summary>
+        /// プレイヤー名
+        /// </summary>
         public string PlayerName { get { return fface.Player.Name; } }
         /// <summary>
         /// ログインステータス
@@ -1839,7 +1842,7 @@ namespace EnjoyFishing
             //MPチェック
             if (fface.Player.MPCurrent < 12) return;
             //魔法詠唱可能かチェック
-            //if (!fface.Player.KnowsSpell(SpellList.Sneak)) return;
+            if (!fface.Player.KnowsSpell(SpellList.Sneak)) return;
             //リキャストタイムまで待つ
             for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Timer.GetSpellRecast(SpellList.Sneak) > 0; i++) Thread.Sleep(100);
             //スニーク詠唱
