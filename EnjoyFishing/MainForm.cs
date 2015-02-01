@@ -324,7 +324,7 @@ namespace EnjoyFishing
                 chkFIshListNarrowArea.Checked = settings.FishList.NarrowArea;
                 chkFIshListNarrowBait.Checked = settings.FishList.NarrowBait;
                 updateFishList();
-                //釣り・設定
+                //釣り設定・動作
                 chkLearning.Checked = settings.Fishing.Learning;
                 chkSneakFishing.Checked = settings.Fishing.SneakFishing;
                 txtSneakFishingRemain.Value = (decimal)settings.Fishing.SneakFishingRemain;
@@ -362,11 +362,13 @@ namespace EnjoyFishing
                 chkChatRestart.Checked = settings.Fishing.ChatRestart;
                 txtChatRestartMinute.Value = settings.Fishing.ChatRestartMinute;
                 chkEntryPort.Checked = settings.Fishing.EntryPort;
+                //釣り設定・鞄いっぱい
                 chkInventoryFullSack.Checked = settings.Fishing.InventoryFullSack;
                 chkInventoryFullSatchel.Checked = settings.Fishing.InventoryFullSatchel;
                 chkInventoryFullCase.Checked = settings.Fishing.InventoryFullCase;
                 chkInventoryFullCmd.Checked = settings.Fishing.InventoryFullCmd;
                 txtInventoryFullCmdLine.Text = settings.Fishing.InventoryFullCmdLine;
+                //釣り設定・竿エサ無し
                 chkNoBaitNoRodSack.Checked = settings.Fishing.NoBaitNoRodSack;
                 chkNoBaitNoRodSatchel.Checked = settings.Fishing.NoBaitNoRodSatchel;
                 chkNoBaitNoRodCase.Checked = settings.Fishing.NoBaitNoRodCase;
@@ -430,6 +432,7 @@ namespace EnjoyFishing
                     EventArgs e = new EventArgs();
                     rdoHarakiriInputTypeInput_CheckedChanged(rdoHarakiriInputTypeInput, e);
                 }
+                chkHarakiriStopFound.Checked = settings.Harakiri.StopFound;
                 updateHarakiriHistory();
                 //ステータスバー
                 statusStrip.BackColor = SystemColors.Control;
@@ -1406,6 +1409,8 @@ namespace EnjoyFishing
                 lblFishingInfoSack.Text = string.Format("{0:00}/{1:00}", fishing.SackCount, fishing.SackMax);
                 //ケース
                 lblFishingInfoCase.Text = string.Format("{0:00}/{1:00}", fishing.CaseCount, fishing.CaseMax);
+                //ワードローブ
+                lblFishingInfoWardrobe.Text = string.Format("{0:00}/{1:00}", fishing.WardrobeCount, fishing.WardrobeMax);
             }
         }
         /// <summary>
@@ -1545,7 +1550,7 @@ namespace EnjoyFishing
                 else if (rdoFishListModeName.Checked) settings.FishList.Mode = Settings.FishListModeKind.Name;
                 settings.FishList.NarrowArea = chkFIshListNarrowArea.Checked;
                 settings.FishList.NarrowBait = chkFIshListNarrowBait.Checked;
-                //釣り設定
+                //釣り設定・動作
                 settings.Fishing.Learning = chkLearning.Checked;
                 settings.Fishing.SneakFishing = chkSneakFishing.Checked;
                 settings.Fishing.SneakFishingRemain = (float)txtSneakFishingRemain.Value;
@@ -1583,6 +1588,18 @@ namespace EnjoyFishing
                 settings.Fishing.ChatRestart = chkChatRestart.Checked;
                 settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
                 settings.Fishing.EntryPort = chkEntryPort.Checked;
+                //釣り設定・鞄いっぱい
+                settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
+                settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
+                settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
+                settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
+                settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
+                //釣り設定・竿エサ無し
+                settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
+                settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
+                settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
+                settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
+                settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
                 //設定・ステータスバー表示
                 settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
                 settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
@@ -1650,6 +1667,7 @@ namespace EnjoyFishing
                 }
                 settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
                 settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
+                settings.Harakiri.StopFound = chkHarakiriStopFound.Checked;
                 //設定・一般
                 settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
                 settings.Etc.WindowFlash = chkWindowFlash.Checked;
@@ -1740,8 +1758,6 @@ namespace EnjoyFishing
                 updateFishingInfoRealTime();
                 //ステータスバー情報更新
                 updateStatusBar(fishing);
-                
-
                 Thread.Sleep(settings.Global.WaitBase);   
             }
         }
@@ -2086,6 +2102,11 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
+        }
+        private void chkHarakiriStopFound_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Harakiri.StopFound = chkHarakiriStopFound.Checked;
         }
         #endregion
         #region 設定
@@ -2452,8 +2473,6 @@ namespace EnjoyFishing
                 }
             }
         }
-        
         #endregion
-
     }
 }

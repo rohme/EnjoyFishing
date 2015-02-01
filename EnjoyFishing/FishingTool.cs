@@ -7,6 +7,7 @@ using FFACETools;
 using MiscTools;
 using System.Threading;
 using System.IO;
+using System.Windows.Forms;
 
 namespace EnjoyFishing
 {
@@ -50,6 +51,8 @@ namespace EnjoyFishing
             {ChatKbnKind.ShipWarning7, "Eunirange : そろそろ中桟橋かな？"},//バージ 主水路(北桟橋→中桟橋)
             {ChatKbnKind.ShipWarning8, "Ineuteniace : そろそろ南桟橋じゃな。"},//バージ 井守ヶ淵(中桟橋→南桟橋)
             {ChatKbnKind.ShipWarning9, "Eunirange : そろそろ中桟橋かな。"},//バージ エメフィ支水路(南桟橋→中桟橋)
+            {ChatKbnKind.SkillUp, "{0}の釣りスキルが、(.*)アップ！"},
+            {ChatKbnKind.SkillLvUp, "{0}の釣りスキルは、(.*)になった。"},
         };
         #endregion
 
@@ -94,6 +97,8 @@ namespace EnjoyFishing
             ShipWarning7,
             ShipWarning8,
             ShipWarning9,
+            SkillUp,
+            SkillLvUp,
         }
         public enum RunningStatusKind
         {
@@ -125,6 +130,7 @@ namespace EnjoyFishing
         private string lastZoneName = string.Empty;
         private DateTime lastCastDate = new DateTime(2000, 1, 1);
         private int noCatchCount = 0;
+        private int chatFishingSkill = 0;//チャットから取得した釣りスキル
 
         #region メンバ
         /// <summary>
@@ -212,6 +218,9 @@ namespace EnjoyFishing
         /// プレイヤーステータス
         /// </summary>
         public FFACETools.Status PlayerStatus { get { return fface.Player.Status; } }
+        /// <summary>
+        /// プレイヤー名
+        /// </summary>
         public string PlayerName { get { return fface.Player.Name; } }
         /// <summary>
         /// ログインステータス
@@ -384,11 +393,35 @@ namespace EnjoyFishing
             get { return control.GetInventoryMaxByType(InventoryType.Case); }
         }
         /// <summary>
+        /// ワードローブ所持数
+        /// </summary>
+        public int WardrobeCount
+        {
+            get { return control.GetInventoryCountByType(InventoryType.Wardrobe); }
+        }
+        /// <summary>
+        /// ワードローブ最大所持数
+        /// </summary>
+        public int WardrobeMax
+        {
+            get { return control.GetInventoryMaxByType(InventoryType.Wardrobe); }
+        }
+        /// <summary>
         /// 釣りスキル
         /// </summary>
         public int FishingSkill
         {
-            get { return fface.Player.GetCraftDetails(Craft.Fishing).Level; }
+            get
+            {
+                if (fface.Player.GetCraftDetails(Craft.Fishing).Level > chatFishingSkill)
+                {
+                    return fface.Player.GetCraftDetails(Craft.Fishing).Level;
+                }
+                else
+                {
+                    return chatFishingSkill;
+                }
+            }
         }
         /// <summary>
         /// エリア名称
@@ -426,7 +459,8 @@ namespace EnjoyFishing
                 if (!isRod(this.RodName)) return string.Empty;
                 //鞄にアイテムが存在するかチェック
                 int rodId = FFACE.ParseResources.GetItemId(this.RodName);
-                uint remain = fface.Item.GetItemCount(rodId, InventoryType.Inventory);
+                uint remain = fface.Item.GetItemCount(rodId, InventoryType.Inventory) +
+                                fface.Item.GetItemCount(rodId, InventoryType.Wardrobe);
                 if (settings.UseItemizer)
                 {
                     if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(rodId, InventoryType.Satchel);
@@ -472,7 +506,8 @@ namespace EnjoyFishing
                 if (!isBait(this.BaitName)) return string.Empty;
                 //鞄にアイテムが存在するかチェック
                 int baitId = FFACE.ParseResources.GetItemId(this.BaitName);
-                uint remain = fface.Item.GetItemCount(baitId, InventoryType.Inventory);
+                uint remain = fface.Item.GetItemCount(baitId, InventoryType.Inventory) +
+                                fface.Item.GetItemCount(baitId, InventoryType.Wardrobe);
                 if (settings.UseItemizer)
                 {
                     if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(baitId, InventoryType.Satchel);
@@ -911,7 +946,8 @@ namespace EnjoyFishing
                 if (this.RodName == string.Empty)
                 {
                     if (!string.IsNullOrEmpty(lastRodName) &&
-                        !control.IsExistItem(lastRodName, InventoryType.Inventory))
+                        !control.IsExistItem(lastRodName, InventoryType.Inventory) &&
+                        !control.IsExistItem(lastRodName, InventoryType.Wardrobe))
                     {
                         getItem(lastRodName);
                     }
@@ -932,8 +968,9 @@ namespace EnjoyFishing
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (this.BaitName == string.Empty)
                 {
-                    if (!string.IsNullOrEmpty(lastBaitName) && 
-                        !control.IsExistItem(lastBaitName, InventoryType.Inventory))
+                    if (!string.IsNullOrEmpty(lastBaitName) &&
+                        !control.IsExistItem(lastBaitName, InventoryType.Inventory) &&
+                        !control.IsExistItem(lastBaitName, InventoryType.Wardrobe))
                     {
                         getItem(lastBaitName);
                     }
@@ -1209,15 +1246,15 @@ namespace EnjoyFishing
                         //HP0になった瞬間に釣り上げるとFFの画面上ではHPが残ったままになるのでウェイト
                         Thread.Sleep(500);
                         //チャット処理
-                        while(chat.GetNextChatLine(out cl))
-                        {
-                            ChatKbnKind fightingChatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
-                            logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, fightingChatKbn));
-                            if (fightingChatKbn == ChatKbnKind.BaitCritical)//クリティカル
-                            {
-                                oFish.Critical = true;
-                            }
-                        }
+                        //while(chat.GetNextChatLine(out cl))
+                        //{
+                        //    ChatKbnKind fightingChatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
+                        //    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, fightingChatKbn));
+                        //    if (fightingChatKbn == ChatKbnKind.BaitCritical)//クリティカル
+                        //    {
+                        //        oFish.Critical = true;
+                        //    }
+                        //}
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
                         while (this.PlayerStatus == FFACETools.Status.FishBite)
@@ -1578,21 +1615,40 @@ namespace EnjoyFishing
                     v.Key == ChatKbnKind.CatchMonster ||
                     v.Key == ChatKbnKind.EnemyAttack1 || 
                     v.Key == ChatKbnKind.EnemyAttack2 ||
-                    v.Key == ChatKbnKind.SneakWarning2)
+                    v.Key == ChatKbnKind.SneakWarning2 ||
+                    v.Key == ChatKbnKind.SkillUp ||
+                    v.Key == ChatKbnKind.SkillLvUp)
+                {
                     searchStr = string.Format(v.Value, this.PlayerName);
-                else 
+                }
+                else
+                {
                     searchStr = v.Value;
+                }
 
                 if (MiscTool.IsRegexString(iCl.Text, searchStr))
                 {
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
-                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2) rEnemyAttack = true;
-                    if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/) rSneakWarning = true;
+                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2)
+                    {
+                        rEnemyAttack = true;
+                    }
+                    if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/)
+                    {
+                        rSneakWarning = true;
+                    }
                     if (v.Key == ChatKbnKind.ShipWarning1 || v.Key == ChatKbnKind.ShipWarning2 ||
                         v.Key == ChatKbnKind.ShipWarning3 || v.Key == ChatKbnKind.ShipWarning4 ||
                         v.Key == ChatKbnKind.ShipWarning5 || v.Key == ChatKbnKind.ShipWarning6 ||
-                        v.Key == ChatKbnKind.ShipWarning7 || v.Key == ChatKbnKind.ShipWarning8 || 
-                        v.Key == ChatKbnKind.ShipWarning9) rShipWarning = true;
+                        v.Key == ChatKbnKind.ShipWarning7 || v.Key == ChatKbnKind.ShipWarning8 ||
+                        v.Key == ChatKbnKind.ShipWarning9)
+                    {
+                        rShipWarning = true;
+                    }
+                    if (v.Key == ChatKbnKind.SkillLvUp)
+                    {
+                        chatFishingSkill = int.Parse(oArgs[0]);
+                    }
                     return v.Key;
                 }
             }
@@ -1804,7 +1860,7 @@ namespace EnjoyFishing
             //MPチェック
             if (fface.Player.MPCurrent < 12) return;
             //魔法詠唱可能かチェック
-            //if (!fface.Player.KnowsSpell(SpellList.Sneak)) return;
+            if (!fface.Player.KnowsSpell(SpellList.Sneak)) return;
             //リキャストタイムまで待つ
             for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Timer.GetSpellRecast(SpellList.Sneak) > 0; i++) Thread.Sleep(100);
             //スニーク詠唱
@@ -1852,7 +1908,8 @@ namespace EnjoyFishing
             setMessage(string.Format("{0}を装備", iRodName));
             //鞄にアイテムが存在するかチェック
             int rodId = FFACE.ParseResources.GetItemId(iRodName);
-            uint rodCnt = fface.Item.GetItemCount(rodId, InventoryType.Inventory);
+            uint rodCnt = fface.Item.GetItemCount(rodId, InventoryType.Inventory) +
+                            fface.Item.GetItemCount(rodId, InventoryType.Wardrobe);
             //アイテムの装備
             if (rodCnt > 0)
             {
@@ -1880,7 +1937,8 @@ namespace EnjoyFishing
             setMessage(string.Format("{0}を装備", iBaitName));
             //鞄にアイテムが存在するかチェック
             int baitId = FFACE.ParseResources.GetItemId(iBaitName);
-            uint baitCnt = fface.Item.GetItemCount(baitId, InventoryType.Inventory);
+            uint baitCnt = fface.Item.GetItemCount(baitId, InventoryType.Inventory) +
+                            fface.Item.GetItemCount(baitId, InventoryType.Wardrobe);
             //アイテムの装備
             if (baitCnt > 0)
             {

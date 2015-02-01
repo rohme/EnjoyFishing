@@ -581,11 +581,13 @@ namespace EnjoyFishing
         public Settings.HarakiriInputTypeKind InputType { get; set; }
         public string FishNameSelect { get; set; }
         public string FishNameInput { get; set; }
+        public bool StopFound { get; set; }
         public SettingsPlayerHarakiriModel()
         {
             this.InputType = Settings.HarakiriInputTypeKind.Select;
             this.FishNameSelect = string.Empty;
             this.FishNameInput = string.Empty;
+            this.StopFound = false;
         }
     }
     public class SettingsArgsModel

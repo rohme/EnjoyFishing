@@ -15,11 +15,10 @@ namespace EnjoyFishing
         private static Dictionary<ChatKbnKind, string> dictionaryChat = new Dictionary<ChatKbnKind, string>()
         {
             {ChatKbnKind.Zaldon1, "Zaldon : おお、持ってきたのか。"},
-            {ChatKbnKind.Zaldon2, "Zaldon : んー、残念だったな。"},
-            {ChatKbnKind.Zaldon3, "腹の中から(.*)が出てきたぜ！"},
-            {ChatKbnKind.Zaldon4, "まあ、あきらめずにまた持ってきてくれや。"},
-            {ChatKbnKind.Zaldon5, "まあ、魚をまた持ってきてくれや。"},
-            //{ChatKbnKind.GetItem, "(.*)を手にいれた！"},
+            {ChatKbnKind.Found1, "腹の中から(.*)が出てきたぜ！"},
+            {ChatKbnKind.Found2, "まあ、魚をまた持ってきてくれや。"},
+            {ChatKbnKind.NotFound1, "Zaldon : んー、残念だったな。"},
+            {ChatKbnKind.NotFound2, "まあ、あきらめずにまた持ってきてくれや。"},
         };
         #endregion
 
@@ -27,11 +26,10 @@ namespace EnjoyFishing
         private enum ChatKbnKind
         {
             Zaldon1,
-            Zaldon2,
-            Zaldon3,
-            Zaldon4,
-            Zaldon5,
-            //GetItem,
+            Found1,
+            Found2,
+            NotFound1,
+            NotFound2,
             Unknown,
         }
         public enum RunningStatusKind
@@ -379,7 +377,7 @@ namespace EnjoyFishing
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         }
                     }
-                    else if (chatKbn == ChatKbnKind.Zaldon2)
+                    else if (chatKbn == ChatKbnKind.NotFound1)
                     {
                         noResponseCount = 0;
                         if (!putDatabase(itemName))
@@ -396,7 +394,7 @@ namespace EnjoyFishing
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         }
                     }
-                    else if (chatKbn == ChatKbnKind.Zaldon3)
+                    else if (chatKbn == ChatKbnKind.Found1)
                     {
                         noResponseCount = 0;
                         itemName = chatKbnArgs[0];
@@ -412,10 +410,17 @@ namespace EnjoyFishing
                         fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         Thread.Sleep(settings.Global.WaitChat);
                     }
-                    else if (chatKbn == ChatKbnKind.Zaldon4 || chatKbn == ChatKbnKind.Zaldon5)
+                    else if (chatKbn == ChatKbnKind.NotFound2 || chatKbn == ChatKbnKind.Found2)
                     {
                         noResponseCount = 0;
                         Thread.Sleep(2000);
+                        //発見したら停止
+                        if (chatKbn == ChatKbnKind.Found2 && settings.Harakiri.StopFound)
+                        {
+                            setRunningStatus(RunningStatusKind.Stop);
+                            setHarakiriStatus(HarakiriStatusKind.Normal);
+                            setMessage("アイテムを発見したので停止します");
+                        }
                         break;
                     }
                     Thread.Sleep(settings.Global.WaitBase);//wait
