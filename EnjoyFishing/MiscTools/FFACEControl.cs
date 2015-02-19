@@ -20,8 +20,8 @@ namespace MiscTools
         private const string REGEX_PLUGIN = "(.*) \\(author: (.*)";
         //private const string REGEX_PLUGIN_END = "=== Done Listing Currently Loaded Plugins ===";
         private const string REGEX_PLUGIN_END = "=== Done Listing (.*)";
-        private const string REGEX_ADDON = "([0-9]*):([0-9]*):([0-9]*) >   (.*)";
-        private const string REGEX_ADDON_KEY = "([0-9]*):([0-9]*):([0-9]*) > {0}";
+        private const string REGEX_ADDON = "  (.*)";
+        private const string REGEX_ADDON_END = "EnjoyFishing Addon Check End";
 
         private PolTool pol = null;
         private FFACE fface = null;
@@ -225,7 +225,6 @@ namespace MiscTools
                     {
                         break;
                     }
-
                 }
                 Thread.Sleep(this.BaseWait);
             }
@@ -237,64 +236,30 @@ namespace MiscTools
         /// <returns>アドオン名</returns>
         public List<string> GetAddon()
         {
-            string key = "EnjoyFishing CheckAddon " + DateTime.Now.ToString("yyyyMMddHHmmss");
-            List<string> addon = new List<string>();
-            bool consoleLog = true;
-            if (!getAddonFromKey(key, out addon))
-            {
-                consoleLog = false;
-                fface.Windower.SendString("//console_log 1");
-                getAddonFromKey(key, out addon);
-            }
-            if (!consoleLog)
-            {
-                fface.Windower.SendString("//console_log 0");
-            }
-            return addon;
-        }
-        /// <summary>
-        /// 指定したキーが含まれる行以降のアドオン名を返す
-        /// </summary>
-        /// <param name="iKey"></param>
-        /// <param name="oAddonList"></param>
-        /// <returns>取得に成功した場合Trueを返す</returns>
-        private bool getAddonFromKey(string iKey, out List<string> oAddonList)
-        {
-            string KeyStart = string.Format("{0} START", iKey);
-            string KeyEnd = string.Format("{0} END", iKey);
-            oAddonList = new List<string>();
-            string fileNameOrg = GetWindowerPath() + "console.log";
-            string fileName = GetWindowerPath() + "EnjoyFishing.log";
-            if (!File.Exists(fileNameOrg)) return false;
-            fface.Windower.SendString("//echo " + KeyStart);
-            Thread.Sleep(this.BaseWait);
+            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn) return new List<string>();
+            chat.Reset();
             fface.Windower.SendString("//lua list");
             Thread.Sleep(this.BaseWait);
-            fface.Windower.SendString("//echo " + KeyEnd);
-            Thread.Sleep(300);
-            File.Copy(fileNameOrg, fileName, true);
-
-            bool foundFlg = false;
-            using (StreamReader sr = new StreamReader(fileName))
+            fface.Windower.SendString("/echo " + REGEX_ADDON_END);
+            List<string> ret = new List<string>();
+            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            for (int i = 0; i < this.MaxLoopCount && !MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END); i++)
             {
-                string line = string.Empty;
-                while ((line = sr.ReadLine()) != null)
+                while (chat.GetNextChatLine(out cl))
                 {
-                    if (MiscTool.IsRegexString(line, string.Format(REGEX_ADDON_KEY, KeyStart))) foundFlg = true;
-                    else if (MiscTool.IsRegexString(line, string.Format(REGEX_ADDON_KEY, KeyEnd))) foundFlg = false;
-                    if (foundFlg)
+                    if (MiscTool.IsRegexString(cl.Text, REGEX_ADDON))
                     {
-                        if (MiscTool.IsRegexString(line, REGEX_ADDON))
-                        {
-                            List<string> reg = MiscTool.GetRegexString(line, REGEX_ADDON);
-                            oAddonList.Add(reg[3]);
-                        }
+                        List<string> reg = MiscTool.GetRegexString(cl.Text, REGEX_ADDON);
+                        ret.Add(reg[0]);
+                    }
+                    else if (MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END))
+                    {
+                        break;
                     }
                 }
-                sr.Close();
+                Thread.Sleep(this.BaseWait);
             }
-            File.Delete(fileName);
-            return foundFlg;
+            return ret;
         }
         #endregion
 
