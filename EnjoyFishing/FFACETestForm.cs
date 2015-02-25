@@ -67,6 +67,7 @@ namespace EnjoyFishing
             dicStatus.Add("スニークリキャスト時間", fface.Timer.GetSpellRecast(SpellList.Sneak).ToString());
             dicStatus.Add("ヴァナ時間", fface.Timer.GetVanaTime().ToString());
             //Fish
+            dicStatus.Add("魚-ID", string.Format("{0}-{1}-{2}-{3}",fface.Fish.ID.ID1, fface.Fish.ID.ID2, fface.Fish.ID.ID3, fface.Fish.ID.ID4));
             dicStatus.Add("魚-最大HP", fface.Fish.HPMax.ToString());
             dicStatus.Add("魚-現在HP", fface.Fish.HPCurrent.ToString());
             dicStatus.Add("魚-残り時間", fface.Fish.Timeout.ToString());
@@ -134,8 +135,10 @@ namespace EnjoyFishing
                     gridChat.Rows[gridChat.Rows.Count - 1].Cells[0].Value = cl.Index;
                     gridChat.Rows[gridChat.Rows.Count - 1].Cells[1].Value = cl.NowDate.ToString("hh:mm:ss");
                     gridChat.Rows[gridChat.Rows.Count - 1].Cells[2].Value = cl.Type;
-                    gridChat.Rows[gridChat.Rows.Count - 1].Cells[3].Value = cl.Text;
+                    gridChat.Rows[gridChat.Rows.Count - 1].Cells[3].Value = cl.RawString[20];
+                    gridChat.Rows[gridChat.Rows.Count - 1].Cells[4].Value = cl.Text;
                     cl = fface.Chat.GetNextLine();
+                    gridChat.FirstDisplayedScrollingRowIndex = gridChat.RowCount-1;
                 }
             }
         }
