@@ -67,6 +67,7 @@ namespace EnjoyFishing
             dicStatus.Add("スニークリキャスト時間", fface.Timer.GetSpellRecast(SpellList.Sneak).ToString());
             dicStatus.Add("ヴァナ時間", fface.Timer.GetVanaTime().ToString());
             //Fish
+            dicStatus.Add("魚-ID", string.Format("{0}-{1}-{2}-{3}",fface.Fish.ID.ID1, fface.Fish.ID.ID2, fface.Fish.ID.ID3, fface.Fish.ID.ID4));
             dicStatus.Add("魚-最大HP", fface.Fish.HPMax.ToString());
             dicStatus.Add("魚-現在HP", fface.Fish.HPCurrent.ToString());
             dicStatus.Add("魚-残り時間", fface.Fish.Timeout.ToString());
