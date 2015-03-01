@@ -206,7 +206,7 @@ http://delvl.ffevo.net/RZN/FFACE4-Public/tree/master
 * [.NET Framework 4.0](http://www.microsoft.com/ja-jp/net/)
 * [Windower4](http://windower.net/)
 * [FFACE](http://www.ffevo.net/)
-* [FFACETools](https://github.com/h1pp0/FFACETools_ffevo.net/)
+* [FFACETools](https://github.com/h1pp0/FFACETools_ffevo.net/)を修正した[FFACEToolsJP](https://github.com/rohme/FFACEToolsJP)
 
 ## ソース
 EnjoyFishingは以下のサイトで、GPLv2ライセンスにて公開しています。  
@@ -218,6 +218,8 @@ https://github.com/rohme/EnjoyFishing
 このソフトウェアを使用したことによって生じたすべての障害・損害・不具合等に関しては、作者は一切の責任を負いません。各自の責任においてご使用ください。  
 
 ## 修正履歴
+* **2015-03-01 Ver1.0.8**
+    - ハラキリが動作しなかったのを修正
 * **2015-02-25 Ver1.0.7**
     - `//lua list`の出力先変更に伴う修正
 * **2015-02-01 Ver1.0.6**

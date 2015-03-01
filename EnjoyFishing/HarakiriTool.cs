@@ -14,22 +14,18 @@ namespace EnjoyFishing
         #region Dictionary
         private static Dictionary<ChatKbnKind, string> dictionaryChat = new Dictionary<ChatKbnKind, string>()
         {
-            {ChatKbnKind.Zaldon1, "Zaldon : おお、持ってきたのか。"},
-            {ChatKbnKind.Found1, "腹の中から(.*)が出てきたぜ！"},
-            {ChatKbnKind.Found2, "まあ、魚をまた持ってきてくれや。"},
-            {ChatKbnKind.NotFound1, "Zaldon : んー、残念だったな。"},
-            {ChatKbnKind.NotFound2, "まあ、あきらめずにまた持ってきてくれや。"},
+            {ChatKbnKind.Zaldon, "Zaldon : おお、持ってきたのか。"},
+            {ChatKbnKind.Found, "Zaldon : おおっ！？あった、あった！腹の中から(.*)が出てきたぜ！"},
+            {ChatKbnKind.NotFound, "Zaldon : んー、残念だったな。"},
         };
         #endregion
 
         #region Enum
         private enum ChatKbnKind
         {
-            Zaldon1,
-            Found1,
-            Found2,
-            NotFound1,
-            NotFound2,
+            Zaldon,
+            Found,
+            NotFound,
             Unknown,
         }
         public enum RunningStatusKind
@@ -369,7 +365,7 @@ namespace EnjoyFishing
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
                     logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
-                    if (chatKbn == ChatKbnKind.Zaldon1)
+                    if (chatKbn == ChatKbnKind.Zaldon)
                     {
                         noResponseCount = 0;
                         if (!settings.UseEnternity)
@@ -377,7 +373,7 @@ namespace EnjoyFishing
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         }
                     }
-                    else if (chatKbn == ChatKbnKind.NotFound1)
+                    else if (chatKbn == ChatKbnKind.NotFound)
                     {
                         noResponseCount = 0;
                         if (!putDatabase(itemName))
@@ -394,7 +390,7 @@ namespace EnjoyFishing
                             fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         }
                     }
-                    else if (chatKbn == ChatKbnKind.Found1)
+                    else if (chatKbn == ChatKbnKind.Found)
                     {
                         noResponseCount = 0;
                         itemName = chatKbnArgs[0];
@@ -410,12 +406,12 @@ namespace EnjoyFishing
                         fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         Thread.Sleep(settings.Global.WaitChat);
                     }
-                    else if (chatKbn == ChatKbnKind.NotFound2 || chatKbn == ChatKbnKind.Found2)
+                    if (chatKbn == ChatKbnKind.Found || chatKbn == ChatKbnKind.NotFound)
                     {
                         noResponseCount = 0;
                         Thread.Sleep(2000);
                         //発見したら停止
-                        if (chatKbn == ChatKbnKind.Found2 && settings.Harakiri.StopFound)
+                        if (chatKbn == ChatKbnKind.Found && settings.Harakiri.StopFound)
                         {
                             setRunningStatus(RunningStatusKind.Stop);
                             setHarakiriStatus(HarakiriStatusKind.Normal);
