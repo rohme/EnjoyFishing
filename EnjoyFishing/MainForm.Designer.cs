@@ -232,6 +232,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
+            this.chkMessageEcho = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -2397,6 +2398,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.chkMessageEcho);
             this.groupBox2.Controls.Add(this.chkWindowActivate);
             this.groupBox2.Controls.Add(this.chkWindowFlash);
             this.groupBox2.Controls.Add(this.chkWindowTopMost);
@@ -2780,6 +2782,18 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
+            // chkMessageEcho
+            // 
+            this.chkMessageEcho.AutoSize = true;
+            this.chkMessageEcho.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkMessageEcho.Location = new System.Drawing.Point(258, 44);
+            this.chkMessageEcho.Name = "chkMessageEcho";
+            this.chkMessageEcho.Size = new System.Drawing.Size(138, 18);
+            this.chkMessageEcho.TabIndex = 8;
+            this.chkMessageEcho.Text = "メッセージを/Echoで表示";
+            this.chkMessageEcho.UseVisualStyleBackColor = true;
+            this.chkMessageEcho.CheckedChanged += new System.EventHandler(this.chkMessageEcho_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3064,5 +3078,6 @@
         private System.Windows.Forms.CheckBox chkUseRingLeft;
         private System.Windows.Forms.CheckBox chkUseWaist;
         private System.Windows.Forms.CheckBox chkEquipEnable;
+        private System.Windows.Forms.CheckBox chkMessageEcho;
     }
 }

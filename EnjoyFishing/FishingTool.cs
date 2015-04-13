@@ -817,6 +817,8 @@ namespace EnjoyFishing
             FishHistoryDBFishModel fish = new FishHistoryDBFishModel();
 
             logger.Output(LogLevelKind.DEBUG, "釣りスレッド開始");
+            setMessage("開始しました");
+
             //着替え
             setEquipGear();
             //釣りメインループ
@@ -2082,10 +2084,14 @@ namespace EnjoyFishing
                     fface.Windower.SendString(string.Format("/equip back {0}", settings.Fishing.EquipBack));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipEarLeft))
                     fface.Windower.SendString(string.Format("/equip ear1 {0}", settings.Fishing.EquipEarLeft));
+                if (settings.Fishing.EquipEarLeft == settings.Fishing.EquipEarRight) 
+                    Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipEarRight))
                     fface.Windower.SendString(string.Format("/equip ear2 {0}", settings.Fishing.EquipEarRight));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
                     fface.Windower.SendString(string.Format("/equip ring1 {0}", settings.Fishing.EquipRingLeft));
+                if (settings.Fishing.EquipRingLeft == settings.Fishing.EquipRingRight) 
+                    Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
                     fface.Windower.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));
             }

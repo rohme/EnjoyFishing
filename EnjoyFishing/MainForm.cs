@@ -240,6 +240,7 @@ namespace EnjoyFishing
             settings = new Settings(iPol.FFACE.Player.Name);
             //ChatTool初期設定
             chat = new ChatTool(iPol.FFACE);
+            chat.ReceivedCommand += new ChatTool.ReceivedCommandEventHandler(this.ChatTool_ReceivedCommand);
             logger.Output(LogLevelKind.DEBUG, "ChatTool起動");
             //FishingTool初期設定
             fishing = new FishingTool(iPol, chat, settings, logger);
@@ -402,6 +403,7 @@ namespace EnjoyFishing
                 chkWindowTopMost.Checked = settings.Etc.WindowTopMost;
                 chkWindowFlash.Checked = settings.Etc.WindowFlash;
                 chkWindowActivate.Checked = settings.Etc.WindowActivate;
+                chkMessageEcho.Checked = settings.Etc.MessageEcho;
                 //設定・ステータスバー表示
                 chkStatusBarVisibleMoonPhase.Checked = settings.Etc.VisibleMoonPhase;
                 chkStatusBarVisibleVanaTime.Checked = settings.Etc.VisibleVanaTime;
@@ -893,7 +895,7 @@ namespace EnjoyFishing
                 fishingFlg = false;
                 btnExecFishing.Text = "開　始";
                 bool ret = fishing.FishingAbort();
-                if(iShowStopMessage) lblMessage.Text = "停止しました";
+                if(iShowStopMessage) setMessage("停止しました");
 
                 //ハラキリボタン有効化
                 btnExecHarakiri.Enabled = true;
@@ -1160,7 +1162,7 @@ namespace EnjoyFishing
                 harakiriFlg = false;
                 btnExecHarakiri.Text = "開　始";
                 bool ret = harakiri.HarakiriAbort();
-                if(iShowStopMessage) lblMessage.Text = "停止しました";
+                if(iShowStopMessage) setMessage("停止しました");
                 
                 //釣りボタン有効化
                 btnExecFishing.Enabled = true;
@@ -1718,17 +1720,6 @@ namespace EnjoyFishing
                 settings.Fishing.UseWaist = chkUseWaist.Checked;
                 settings.Fishing.UseRingLeft = chkUseRingLeft.Checked;
                 settings.Fishing.UseRingRight = chkUseRingRight.Checked;
-                //設定・ステータスバー表示
-                settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
-                settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
-                settings.Etc.VisibleEarthTime = chkStatusBarVisibleEarthTime.Checked;
-                settings.Etc.VisibleDayType = chkStatusBarVisibleDayType.Checked;
-                settings.Etc.VisibleLoginStatus = chkStatusBarVisibleLoginStatus.Checked;
-                settings.Etc.VisiblePlayerStatus = chkStatusBarVisiblePlayerStatus.Checked;
-                settings.Etc.VisibleHpBar = chkStatusBarVisibleHpBar.Checked;
-                settings.Etc.VisibleHP = chkStatusBarVisibleHP.Checked;
-                settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
-                settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
                 //履歴
                 DataGridViewColumn sortCol = gridHistory.SortedColumn;
                 if (sortCol != null)
@@ -1790,6 +1781,18 @@ namespace EnjoyFishing
                 settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
                 settings.Etc.WindowFlash = chkWindowFlash.Checked;
                 settings.Etc.WindowActivate = chkWindowActivate.Checked;
+                settings.Etc.MessageEcho = chkMessageEcho.Checked;
+                //設定・ステータスバー表示
+                settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
+                settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
+                settings.Etc.VisibleEarthTime = chkStatusBarVisibleEarthTime.Checked;
+                settings.Etc.VisibleDayType = chkStatusBarVisibleDayType.Checked;
+                settings.Etc.VisibleLoginStatus = chkStatusBarVisibleLoginStatus.Checked;
+                settings.Etc.VisiblePlayerStatus = chkStatusBarVisiblePlayerStatus.Checked;
+                settings.Etc.VisibleHpBar = chkStatusBarVisibleHpBar.Checked;
+                settings.Etc.VisibleHP = chkStatusBarVisibleHP.Checked;
+                settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
+                settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
                 //保存開始
                 if (fishing != null) settings.Save(fishing.PlayerName);
 
@@ -1860,6 +1863,17 @@ namespace EnjoyFishing
                 this.Activate();
                 this.TopMost = true;
                 if (!settings.Etc.WindowTopMost) this.TopMost = false;
+            }
+        }
+        /// <summary>
+        /// メッセージを表示する
+        /// </summary>
+        private void setMessage(string iMessage)
+        {
+            lblMessage.Text = iMessage;
+            if (settings.Etc.MessageEcho && iMessage != string.Empty)
+            {
+                fface.Windower.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
             }
         }
         #endregion
@@ -2506,11 +2520,16 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Etc.WindowActivate = chkWindowActivate.Checked;
         }
+        private void chkMessageEcho_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.MessageEcho = chkMessageEcho.Checked;
+        }
         #endregion
         #endregion
         #endregion
 
-        #region PolTool/FishingTool/HarakiriToolイベント
+        #region PolTool/ChatTool/FishingTool/HarakiriToolイベント
         /// <summary>
         /// PolTool ChangeStatusイベント
         /// </summary>
@@ -2555,6 +2574,24 @@ namespace EnjoyFishing
                 System.Environment.Exit(0);//プログラム終了
             }
         }
+        private void ChatTool_ReceivedCommand(object sender, ChatTool.ReceivedCommandEventArgs e)
+        {
+            List<string> cmd = e.Command;
+            if (cmd.Count > 0)
+            {
+                switch (cmd[0])
+                {
+                    case "start":
+                        Console.WriteLine(cmd[0]);
+                        if(!fishingFlg) startFishing();
+                        break;
+                    case "stop":
+                        Console.WriteLine(cmd[0]);
+                        if (fishingFlg) stopFishing(true);
+                        break;
+                }
+            }
+        }
         /// <summary>
         /// FishingTool Fishedイベント
         /// </summary>
@@ -2581,7 +2618,7 @@ namespace EnjoyFishing
             else
             {
                 //メッセージの更新
-                lblMessage.Text = e.Message;
+                setMessage(e.Message);
             }
         }
         /// <summary>
@@ -2659,7 +2696,7 @@ namespace EnjoyFishing
             else
             {
                 //メッセージの更新
-                lblMessage.Text = e.Message;
+                setMessage(e.Message);
             }
         }
         /// <summary>

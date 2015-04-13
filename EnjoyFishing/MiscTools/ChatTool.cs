@@ -18,17 +18,23 @@ namespace MiscTools
         private Thread thChat;
         private FFACE fface;
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="iFFACE"></param>
+        #region コンストラクタ
         public ChatTool(FFACE iFFACE)
         {
             fface = iFFACE;
+
+            //過去のチャットをクリア
+            FFACE.ChatTools.ChatLine cl = fface.Chat.GetNextLine();
+            while (cl != null)
+            {
+                cl = fface.Chat.GetNextLine();
+            }
+
             Start();
         }
+        #endregion
 
-        #region Getter Setter
+        #region メンバ
         /// <summary>
         /// CurrentIndex
         /// </summary>
@@ -46,6 +52,36 @@ namespace MiscTools
         }
         #endregion
 
+        #region イベント
+        #region ReceivedCommand
+        /// <summary>
+        /// ReceivedCommandイベントで返されるデータ
+        /// </summary>
+        public class ReceivedCommandEventArgs : EventArgs
+        {
+            public List<string> Command;
+        }
+        public delegate void ReceivedCommandEventHandler(object sender, ReceivedCommandEventArgs e);
+        public event ReceivedCommandEventHandler ReceivedCommand;
+        protected virtual void OnReceivedCommand(ReceivedCommandEventArgs e)
+        {
+            if (ReceivedCommand != null)
+            {
+                ReceivedCommand(this, e);
+            }
+        }
+        private void EventReceivedCommand(List<string> iCommand)
+        {
+            //返すデータの設定
+            ReceivedCommandEventArgs e = new ReceivedCommandEventArgs();
+            e.Command = iCommand;
+            //イベントの発生
+            OnReceivedCommand(e);
+        }
+        #endregion
+        #endregion
+
+        #region スレッド操作など
         /// <summary>
         /// ChatTool終了処理
         /// </summary>
@@ -57,7 +93,6 @@ namespace MiscTools
                 thChat = null;
             }
         }
-
         /// <summary>
         /// チャット監視の開始
         /// </summary>
@@ -89,6 +124,8 @@ namespace MiscTools
         {
             this.currentIndex = this.maxIndex;
         }
+        #endregion
+
         /// <summary>
         /// 指定したインデックス以降のチャットを取得
         /// </summary>
@@ -157,6 +194,20 @@ namespace MiscTools
                         FFACE.ChatTools.ChatLine cl = fface.Chat.GetNextLine();
                         while (cl != null)
                         {
+                            //コマンド受信イベント処理
+                            if(cl.Type == ChatMode.Echo && cl.Text.Length > 0){
+                                string[] cmd = cl.Text.Split(' ');
+                                if (cmd[0].ToLower() == "enjoyfishing" && cmd.Length > 1)
+                                {
+                                    List<string> retcmd = new List<string>();
+                                    for (int i = 1; i < cmd.Length; i++)
+                                    {
+                                        retcmd.Add(cmd[i].ToLower());
+                                    }
+                                    EventReceivedCommand(retcmd);
+                                }
+                            }
+                            //チャットが複数行に渡ってある場合、一行にまとめる処理
                             if (cl.RawString[20] == "00")//1行目か否か
                             {
                                 chatLines.Add(cl);

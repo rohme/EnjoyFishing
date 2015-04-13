@@ -532,6 +532,7 @@ namespace EnjoyFishing
         public bool WindowTopMost { get; set; }
         public bool WindowFlash { get; set; }
         public bool WindowActivate { get; set; }
+        public bool MessageEcho { get; set; }
         public bool VisibleMoonPhase { get; set; }
         public bool VisibleVanaTime { get; set; }
         public bool VisibleEarthTime { get; set; }
@@ -547,6 +548,7 @@ namespace EnjoyFishing
             this.WindowTopMost = false;
             this.WindowFlash = true;
             this.WindowActivate = true;
+            this.MessageEcho = true;
             this.VisibleMoonPhase = true;
             this.VisibleVanaTime = true;
             this.VisibleEarthTime = false;
