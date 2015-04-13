@@ -1,46 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Gears version="1.0.0">
-  <!-- Body -->
-  <Gear name="アングラーチュニカ" />
-  <Gear name="漁師エプロン" />
-  <Gear name="漁師スモック" />
-  <Gear name="フィッシャチュニカ" />
-  <!-- Hands -->
-  <Gear name="アングラーグローブ" />
-  <Gear name="フィッシャグローブ" />
-  <!-- Legs -->
-  <Gear name="アングラーホーズ" />
-  <Gear name="フィッシャホーズ" />
-  <!-- Feet -->
-  <Gear name="アングラーブーツ" />
-  <Gear name="フィッシャブーツ" />
-  <Gear name="ウエーダー" />
-  <!-- Head -->
-  <Gear name="トレイニーグラス" />
-  <!-- Neck -->
-  <Gear name="フィッシャトルク" />
-  <!-- Waist -->
-  <Gear name="フィッシャロープ" />
-  <Gear name="漁師ベルト" />
-  <!-- Rings -->
-  <Gear name="アルバトロスリング" />
-  <Gear name="ペリカンリング" />
-  <Gear name="ペンギンリング" />
-  <Gear name="ヘロンリング" />
-  <Gear name="ノディリング" />
-  <Gear name="パフィンリング" />
-  <Gear name="シーガルリング" />
-  <!-- Earrings -->
-  <Gear name="ジュノピアス" />
-  <Gear name="アトルガンピアス" />
-  <Gear name="ウィンダスピアス" />
-  <Gear name="カザムピアス" />
-  <Gear name="サンドリアピアス" />
-  <Gear name="マウラピアス" />
-  <Gear name="ナシュモピアス" />
-  <Gear name="ノーグピアス" />
-  <Gear name="ラバオピアス" />
-  <Gear name="バストゥークピアス" />
-  <Gear name="タブナジアピアス" />
-  <Gear name="セルビナピアス" />
+    <Gear name="トレイニーグラス" position="Head" buff="-1" />
+    <Gear name="アングラーチュニカ" position="Body" buff="-1"/>
+    <Gear name="漁師エプロン" position="Body" buff="-1" />
+    <Gear name="漁師スモック" position="Body" buff="-1" />
+    <Gear name="フィッシャチュニカ" position="Body" buff="-1" />
+    <Gear name="アングラーグローブ" position="Hands" buff="-1" />
+    <Gear name="フィッシャグローブ" position="Hands" buff="-1" />
+    <Gear name="アングラーホーズ" position="Legs" buff="-1" />
+    <Gear name="フィッシャホーズ" position="Legs" buff="-1" />
+    <Gear name="アングラーブーツ" position="Feet" buff="-1" />
+    <Gear name="フィッシャブーツ" position="Feet" buff="-1" />
+    <Gear name="ウエーダー" position="Feet" buff="-1" />
+    <Gear name="フィッシャトルク" position="Neck" buff="-1" />
+    <Gear name="フィッシャロープ" position="Waist" buff="-1" />
+    <Gear name="漁師ベルト" position="Waist" buff="235" />
+    <Gear name="アルバトロスリング" position="Rings" buff="-1" />
+    <Gear name="ペリカンリング" position="Rings" buff="-1" />
+    <Gear name="ペンギンリング" position="Rings" buff="-1" />
+    <Gear name="ヘロンリング" position="Rings" buff="-1" />
+    <Gear name="ノディリング" position="Rings" buff="-1" />
+    <Gear name="パフィンリング" position="Rings" buff="-1" />
+    <Gear name="シーガルリング" position="Rings" buff="-1" />
+    <Gear name="ジュノピアス" position="Earrings" buff="-1" />
+    <Gear name="アトルガンピアス" position="Earrings" buff="-1" />
+    <Gear name="ウィンダスピアス" position="Earrings" buff="-1" />
+    <Gear name="カザムピアス" position="Earrings" buff="-1" />
+    <Gear name="サンドリアピアス" position="Earrings" buff="-1" />
+    <Gear name="マウラピアス" position="Earrings" buff="-1" />
+    <Gear name="ナシュモピアス" position="Earrings" buff="-1" />
+    <Gear name="ノーグピアス" position="Earrings" buff="-1" />
+    <Gear name="ラバオピアス" position="Earrings" buff="-1" />
+    <Gear name="バストゥークピアス" position="Earrings" buff="-1" />
+    <Gear name="タブナジアピアス" position="Earrings" buff="-1" />
+    <Gear name="セルビナピアス" position="Earrings" buff="-1" />
 </Gears>

@@ -281,8 +281,6 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            tabFishingMain.TabPages.Remove(tabFishingMainEquip);
-
             //アドオン・プラグインの更新
             updateAddonPlugin();
             //釣り情報グリッド初期化
@@ -293,6 +291,8 @@ namespace EnjoyFishing
             initGridFishingInfo(gridHistorySummary);
             //ハラキリグリッド初期化
             initGridHarakiri(gridHarakiri);
+            //装備初期化
+            initGear();
             //フォーム初期化
             initForm();
 
@@ -374,6 +374,28 @@ namespace EnjoyFishing
                 chkNoBaitNoRodCase.Checked = settings.Fishing.NoBaitNoRodCase;
                 chkNoBaitNoRodCmd.Checked = settings.Fishing.NoBaitNoRodCmd;
                 txtNoBaitNoRodCmdLine.Text = settings.Fishing.NoBaitNoRodCmdLine;
+                //釣り・装備
+                chkEquipEnable.Checked = settings.Fishing.EquipEnable;
+                cmbEquipRod.Text = settings.Fishing.EquipRod;
+                cmbEquipBait.Text = settings.Fishing.EquipBait;
+                cmbEquipMain.Text = settings.Fishing.EquipMain;
+                cmbEquipSub.Text = settings.Fishing.EquipSub;
+                cmbEquipHead.Text = settings.Fishing.EquipHead;
+                cmbEquipBody.Text = settings.Fishing.EquipBody;
+                cmbEquipHands.Text = settings.Fishing.EquipHands;
+                cmbEquipLegs.Text = settings.Fishing.EquipLegs;
+                cmbEquipFeet.Text = settings.Fishing.EquipFeet;
+                cmbEquipNeck.Text = settings.Fishing.EquipNeck;
+                cmbEquipWaist.Text = settings.Fishing.EquipWaist;
+                cmbEquipBack.Text = settings.Fishing.EquipBack;
+                cmbEquipEarLeft.Text = settings.Fishing.EquipEarLeft;
+                cmbEquipEarRight.Text = settings.Fishing.EquipEarRight;
+                cmbEquipRingLeft.Text = settings.Fishing.EquipRingLeft;
+                cmbEquipRingRight.Text = settings.Fishing.EquipRingRight;
+                chkUseWaist.Checked = settings.Fishing.UseWaist;
+                chkUseRingLeft.Checked = settings.Fishing.UseRingLeft;
+                chkUseRingRight.Checked = settings.Fishing.UseRingRight;
+                chkEquipEnable_CheckedChanged(this, new EventArgs());
                 //釣り・情報
                 updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
                 //設定・一般
@@ -589,6 +611,81 @@ namespace EnjoyFishing
             for (int i = 0; i < iGrid.Columns.Count; i++)
             {
                 iGrid.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+        }
+        /// <summary>
+        /// 装備コンボボックスを初期化する
+        /// </summary>
+        private void initGear()
+        {
+            cmbEquipRod.Items.Add(string.Empty);
+            cmbEquipBait.Items.Add(string.Empty);
+            cmbEquipMain.Items.Add(string.Empty);
+            cmbEquipSub.Items.Add(string.Empty);
+            cmbEquipHead.Items.Add(string.Empty);
+            cmbEquipBody.Items.Add(string.Empty);
+            cmbEquipHands.Items.Add(string.Empty);
+            cmbEquipLegs.Items.Add(string.Empty);
+            cmbEquipFeet.Items.Add(string.Empty);
+            cmbEquipNeck.Items.Add(string.Empty);
+            cmbEquipWaist.Items.Add(string.Empty);
+            cmbEquipBack.Items.Add(string.Empty);
+            cmbEquipEarLeft.Items.Add(string.Empty);
+            cmbEquipEarRight.Items.Add(string.Empty);
+            cmbEquipRingLeft.Items.Add(string.Empty);
+            cmbEquipRingRight.Items.Add(string.Empty);
+
+            foreach (string rod in fishDB.Rods)
+            {
+                cmbEquipRod.Items.Add(rod);
+            }
+            foreach (string bait in fishDB.Baits)
+            {
+                cmbEquipBait.Items.Add(bait);
+            }
+            foreach (GearDBGearModel gear in fishDB.SelectGear())
+            {
+                switch (gear.Position)
+                {
+                    case GearDBPositionKind.Main:
+                        cmbEquipMain.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Sub:
+                        cmbEquipSub.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Head:
+                        cmbEquipHead.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Body:
+                        cmbEquipBody.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Hands:
+                        cmbEquipHands.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Legs:
+                        cmbEquipLegs.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Feet:
+                        cmbEquipFeet.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Neck:
+                        cmbEquipNeck.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Waist:
+                        cmbEquipWaist.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Back:
+                        cmbEquipBack.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Earrings:
+                        cmbEquipEarLeft.Items.Add(gear.GearName);
+                        cmbEquipEarRight.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Rings:
+                        cmbEquipRingLeft.Items.Add(gear.GearName);
+                        cmbEquipRingRight.Items.Add(gear.GearName);
+                        break;
+                }
             }
         }
         /// <summary>
@@ -1600,6 +1697,27 @@ namespace EnjoyFishing
                 settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
                 settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
                 settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
+                //釣り設定・装備
+                settings.Fishing.EquipEnable = chkEquipEnable.Checked;
+                settings.Fishing.EquipRod = cmbEquipRod.Text;
+                settings.Fishing.EquipBait = cmbEquipBait.Text;
+                settings.Fishing.EquipMain = cmbEquipMain.Text;
+                settings.Fishing.EquipSub = cmbEquipSub.Text;
+                settings.Fishing.EquipHead = cmbEquipHead.Text;
+                settings.Fishing.EquipBody = cmbEquipBody.Text;
+                settings.Fishing.EquipHands = cmbEquipHands.Text;
+                settings.Fishing.EquipLegs = cmbEquipLegs.Text;
+                settings.Fishing.EquipFeet = cmbEquipFeet.Text;
+                settings.Fishing.EquipNeck = cmbEquipNeck.Text;
+                settings.Fishing.EquipWaist = cmbEquipWaist.Text;
+                settings.Fishing.EquipBack = cmbEquipBack.Text;
+                settings.Fishing.EquipEarLeft = cmbEquipEarLeft.Text;
+                settings.Fishing.EquipEarRight = cmbEquipEarRight.Text;
+                settings.Fishing.EquipRingLeft = cmbEquipRingLeft.Text;
+                settings.Fishing.EquipRingRight = cmbEquipRingRight.Text;
+                settings.Fishing.UseWaist = chkUseWaist.Checked;
+                settings.Fishing.UseRingLeft = chkUseRingLeft.Checked;
+                settings.Fishing.UseRingRight = chkUseRingRight.Checked;
                 //設定・ステータスバー表示
                 settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
                 settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
@@ -2075,6 +2193,127 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.EntryPort = chkEntryPort.Checked;
+        }
+        #endregion
+        #region 釣り設定・装備
+        private void chkEquipEnable_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbEquipRod.Enabled = chkEquipEnable.Checked;
+            cmbEquipBait.Enabled = chkEquipEnable.Checked;
+            cmbEquipMain.Enabled = chkEquipEnable.Checked;
+            cmbEquipSub.Enabled = chkEquipEnable.Checked;
+            cmbEquipHead.Enabled = chkEquipEnable.Checked;
+            cmbEquipBody.Enabled = chkEquipEnable.Checked;
+            cmbEquipHands.Enabled = chkEquipEnable.Checked;
+            cmbEquipLegs.Enabled = chkEquipEnable.Checked;
+            cmbEquipFeet.Enabled = chkEquipEnable.Checked;
+            cmbEquipNeck.Enabled = chkEquipEnable.Checked;
+            cmbEquipWaist.Enabled = chkEquipEnable.Checked;
+            cmbEquipBack.Enabled = chkEquipEnable.Checked;
+            cmbEquipEarLeft.Enabled = chkEquipEnable.Checked;
+            cmbEquipEarRight.Enabled = chkEquipEnable.Checked;
+            cmbEquipRingLeft.Enabled = chkEquipEnable.Checked;
+            cmbEquipRingRight.Enabled = chkEquipEnable.Checked;
+            chkUseWaist.Enabled = chkEquipEnable.Checked;
+            chkUseRingLeft.Enabled = chkEquipEnable.Checked;
+            chkUseRingRight.Enabled = chkEquipEnable.Checked;
+            if (startupFlg) return;
+            settings.Fishing.EquipEnable = chkEquipEnable.Checked;
+        }
+        private void cmbEquipRod_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipRod = cmbEquipRod.Text;
+        }
+        private void cmbEquipBait_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipBait = cmbEquipBait.Text;
+        }
+        private void cmbEquipMain_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipMain = cmbEquipMain.Text;
+        }
+        private void cmbEquipSub_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipSub = cmbEquipSub.Text;
+        }
+        private void cmbEquipHead_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipHead = cmbEquipHead.Text;
+        }
+        private void cmbEquipBody_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipBody = cmbEquipBody.Text;
+        }
+        private void cmbEquipHands_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipHands = cmbEquipHands.Text;
+        }
+        private void cmbEquipLegs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipLegs = cmbEquipLegs.Text;
+        }
+        private void cmbEquipFeet_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipFeet = cmbEquipFeet.Text;
+        }
+        private void cmbEquipNeck_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipNeck = cmbEquipNeck.Text;
+        }
+        private void cmbEquipWaist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipWaist = cmbEquipWaist.Text;
+        }
+        private void cmbEquipBack_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipBack = cmbEquipBack.Text;
+        }
+        private void cmbEquipEarLeft_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipEarLeft = cmbEquipEarLeft.Text;
+        }
+        private void cmbEquipEarRight_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipEarRight = cmbEquipEarRight.Text;
+        }
+        private void cmbEquipRingLeft_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipRingLeft = cmbEquipRingLeft.Text;
+        }
+        private void cmbEquipRingRight_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipRingRight = cmbEquipRingRight.Text;
+        }
+        private void chkUseWaist_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseWaist = chkUseWaist.Checked;
+        }
+        private void chkUseRingLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseRingLeft = chkUseRingLeft.Checked;
+        }
+        private void chkUseRingRight_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseRingRight = chkUseRingRight.Checked;
         }
         #endregion
         #endregion

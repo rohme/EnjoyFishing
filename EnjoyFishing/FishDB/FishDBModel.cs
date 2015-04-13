@@ -26,6 +26,22 @@ namespace EnjoyFishing
         Key,
         Unknown,
     }
+    public enum GearDBPositionKind
+    {
+        Unknown,
+        Main,
+        Sub,
+        Head,
+        Body,
+        Hands,
+        Legs,
+        Feet,
+        Neck,
+        Waist,
+        Back,
+        Rings,
+        Earrings,
+    }
 
     #region FishDBModel
     [XmlRoot("Rod")]
@@ -297,6 +313,22 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string GearName { get; set; }
+        [XmlAttribute("position")]
+        public GearDBPositionKind Position { get; set; }
+        [XmlAttribute("buff")]
+        public int BuffID { get; set; }
+        public GearDBGearModel()
+        {
+            this.GearName = string.Empty;
+            this.Position = GearDBPositionKind.Unknown;
+            this.BuffID = -1;
+        }
+        public GearDBGearModel(string iGearName, GearDBPositionKind iPosition, int iGearBuff)
+        {
+            this.GearName = iGearName;
+            this.Position = iPosition;
+            this.BuffID = iGearBuff;
+        }
     }
     #endregion
 }

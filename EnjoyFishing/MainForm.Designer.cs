@@ -101,9 +101,42 @@
             this.chkInventoryFullCmd = new System.Windows.Forms.CheckBox();
             this.txtInventoryFullCmdLine = new System.Windows.Forms.TextBox();
             this.tabFishingMainEquip = new System.Windows.Forms.TabPage();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.chkEquipEnable = new System.Windows.Forms.CheckBox();
+            this.chkUseRingRight = new System.Windows.Forms.CheckBox();
+            this.chkUseRingLeft = new System.Windows.Forms.CheckBox();
+            this.chkUseWaist = new System.Windows.Forms.CheckBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label32 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.label30 = new System.Windows.Forms.Label();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.cmbEquipRingRight = new System.Windows.Forms.ComboBox();
+            this.cmbEquipNeck = new System.Windows.Forms.ComboBox();
+            this.cmbEquipRingLeft = new System.Windows.Forms.ComboBox();
+            this.cmbEquipFeet = new System.Windows.Forms.ComboBox();
+            this.cmbEquipEarRight = new System.Windows.Forms.ComboBox();
+            this.cmbEquipLegs = new System.Windows.Forms.ComboBox();
+            this.cmbEquipEarLeft = new System.Windows.Forms.ComboBox();
+            this.cmbEquipHands = new System.Windows.Forms.ComboBox();
+            this.cmbEquipBack = new System.Windows.Forms.ComboBox();
+            this.cmbEquipBody = new System.Windows.Forms.ComboBox();
+            this.cmbEquipWaist = new System.Windows.Forms.ComboBox();
+            this.cmbEquipHead = new System.Windows.Forms.ComboBox();
+            this.cmbEquipSub = new System.Windows.Forms.ComboBox();
+            this.cmbEquipBait = new System.Windows.Forms.ComboBox();
+            this.cmbEquipMain = new System.Windows.Forms.ComboBox();
+            this.cmbEquipRod = new System.Windows.Forms.ComboBox();
             this.tabFishingMainInfo = new System.Windows.Forms.TabPage();
             this.lblFishingInfoTimeElapsed = new System.Windows.Forms.Label();
             this.lblFishingInfoSkill = new System.Windows.Forms.Label();
@@ -114,6 +147,7 @@
             this.lblFishingInfoBaitName = new System.Windows.Forms.Label();
             this.lblFishingInfoRodName = new System.Windows.Forms.Label();
             this.lblFishingInfoCatchCount = new System.Windows.Forms.Label();
+            this.lblFishingInfoWardrobe = new System.Windows.Forms.Label();
             this.lblFishingInfoCase = new System.Windows.Forms.Label();
             this.lblFishingInfoSack = new System.Windows.Forms.Label();
             this.lblFishingInfoSatchel = new System.Windows.Forms.Label();
@@ -121,6 +155,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -197,8 +232,6 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.label15 = new System.Windows.Forms.Label();
-            this.lblFishingInfoWardrobe = new System.Windows.Forms.Label();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -1240,9 +1273,42 @@
             // 
             // tabFishingMainEquip
             // 
-            this.tabFishingMainEquip.Controls.Add(this.comboBox3);
-            this.tabFishingMainEquip.Controls.Add(this.comboBox2);
-            this.tabFishingMainEquip.Controls.Add(this.comboBox1);
+            this.tabFishingMainEquip.Controls.Add(this.chkEquipEnable);
+            this.tabFishingMainEquip.Controls.Add(this.chkUseRingRight);
+            this.tabFishingMainEquip.Controls.Add(this.chkUseRingLeft);
+            this.tabFishingMainEquip.Controls.Add(this.chkUseWaist);
+            this.tabFishingMainEquip.Controls.Add(this.label33);
+            this.tabFishingMainEquip.Controls.Add(this.label25);
+            this.tabFishingMainEquip.Controls.Add(this.label32);
+            this.tabFishingMainEquip.Controls.Add(this.label24);
+            this.tabFishingMainEquip.Controls.Add(this.label31);
+            this.tabFishingMainEquip.Controls.Add(this.label23);
+            this.tabFishingMainEquip.Controls.Add(this.label30);
+            this.tabFishingMainEquip.Controls.Add(this.label22);
+            this.tabFishingMainEquip.Controls.Add(this.label29);
+            this.tabFishingMainEquip.Controls.Add(this.label21);
+            this.tabFishingMainEquip.Controls.Add(this.label28);
+            this.tabFishingMainEquip.Controls.Add(this.label20);
+            this.tabFishingMainEquip.Controls.Add(this.label27);
+            this.tabFishingMainEquip.Controls.Add(this.label19);
+            this.tabFishingMainEquip.Controls.Add(this.label26);
+            this.tabFishingMainEquip.Controls.Add(this.label18);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipRingRight);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipNeck);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipRingLeft);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipFeet);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipEarRight);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipLegs);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipEarLeft);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipHands);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipBack);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipBody);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipWaist);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipHead);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipSub);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipBait);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipMain);
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipRod);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
             this.tabFishingMainEquip.Size = new System.Drawing.Size(413, 291);
@@ -1250,33 +1316,372 @@
             this.tabFishingMainEquip.Text = "装備";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
             // 
-            // comboBox3
+            // chkEquipEnable
             // 
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(254, 15);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(121, 22);
-            this.comboBox3.TabIndex = 0;
+            this.chkEquipEnable.AutoSize = true;
+            this.chkEquipEnable.Location = new System.Drawing.Point(3, 6);
+            this.chkEquipEnable.Name = "chkEquipEnable";
+            this.chkEquipEnable.Size = new System.Drawing.Size(125, 18);
+            this.chkEquipEnable.TabIndex = 3;
+            this.chkEquipEnable.Text = "開始時に着替えを行う";
+            this.chkEquipEnable.UseVisualStyleBackColor = true;
+            this.chkEquipEnable.CheckedChanged += new System.EventHandler(this.chkEquipEnable_CheckedChanged);
             // 
-            // comboBox2
+            // chkUseRingRight
             // 
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(127, 15);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(121, 22);
-            this.comboBox2.TabIndex = 0;
+            this.chkUseRingRight.AutoSize = true;
+            this.chkUseRingRight.Location = new System.Drawing.Point(335, 153);
+            this.chkUseRingRight.Name = "chkUseRingRight";
+            this.chkUseRingRight.Size = new System.Drawing.Size(48, 18);
+            this.chkUseRingRight.TabIndex = 2;
+            this.chkUseRingRight.Text = "使用";
+            this.chkUseRingRight.UseVisualStyleBackColor = true;
+            this.chkUseRingRight.Visible = false;
+            this.chkUseRingRight.CheckedChanged += new System.EventHandler(this.chkUseRingRight_CheckedChanged);
             // 
-            // comboBox1
+            // chkUseRingLeft
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.ItemHeight = 14;
-            this.comboBox1.Location = new System.Drawing.Point(3, 15);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 22);
-            this.comboBox1.TabIndex = 0;
+            this.chkUseRingLeft.AutoSize = true;
+            this.chkUseRingLeft.Location = new System.Drawing.Point(335, 128);
+            this.chkUseRingLeft.Name = "chkUseRingLeft";
+            this.chkUseRingLeft.Size = new System.Drawing.Size(48, 18);
+            this.chkUseRingLeft.TabIndex = 2;
+            this.chkUseRingLeft.Text = "使用";
+            this.chkUseRingLeft.UseVisualStyleBackColor = true;
+            this.chkUseRingLeft.Visible = false;
+            this.chkUseRingLeft.CheckedChanged += new System.EventHandler(this.chkUseRingLeft_CheckedChanged);
+            // 
+            // chkUseWaist
+            // 
+            this.chkUseWaist.AutoSize = true;
+            this.chkUseWaist.Location = new System.Drawing.Point(159, 225);
+            this.chkUseWaist.Name = "chkUseWaist";
+            this.chkUseWaist.Size = new System.Drawing.Size(48, 18);
+            this.chkUseWaist.TabIndex = 2;
+            this.chkUseWaist.Text = "使用";
+            this.chkUseWaist.UseVisualStyleBackColor = true;
+            this.chkUseWaist.Visible = false;
+            this.chkUseWaist.CheckedChanged += new System.EventHandler(this.chkUseWaist_CheckedChanged);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(175, 153);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(29, 14);
+            this.label33.TabIndex = 1;
+            this.label33.Text = "右手";
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(-1, 201);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(18, 14);
+            this.label25.TabIndex = 1;
+            this.label25.Text = "首";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(175, 129);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(29, 14);
+            this.label32.TabIndex = 1;
+            this.label32.Text = "左手";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(-1, 177);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(29, 14);
+            this.label24.TabIndex = 1;
+            this.label24.Text = "両足";
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(175, 105);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(29, 14);
+            this.label31.TabIndex = 1;
+            this.label31.Text = "右耳";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(-1, 153);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(29, 14);
+            this.label23.TabIndex = 1;
+            this.label23.Text = "両脚";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(175, 81);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(29, 14);
+            this.label30.TabIndex = 1;
+            this.label30.Text = "左耳";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(-1, 129);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(29, 14);
+            this.label22.TabIndex = 1;
+            this.label22.Text = "両手";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(-1, 250);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(18, 14);
+            this.label29.TabIndex = 1;
+            this.label29.Text = "背";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(-1, 105);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(18, 14);
+            this.label21.TabIndex = 1;
+            this.label21.Text = "胴";
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(-1, 225);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(18, 14);
+            this.label28.TabIndex = 1;
+            this.label28.Text = "腰";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(-1, 81);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(18, 14);
+            this.label20.TabIndex = 1;
+            this.label20.Text = "頭";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(175, 57);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(24, 14);
+            this.label27.TabIndex = 1;
+            this.label27.Text = "サブ";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(-1, 57);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(24, 14);
+            this.label19.TabIndex = 1;
+            this.label19.Text = "エサ";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(175, 33);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(31, 14);
+            this.label26.TabIndex = 1;
+            this.label26.Text = "メイン";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(-1, 33);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(18, 14);
+            this.label18.TabIndex = 1;
+            this.label18.Text = "竿";
+            // 
+            // cmbEquipRingRight
+            // 
+            this.cmbEquipRingRight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipRingRight.FormattingEnabled = true;
+            this.cmbEquipRingRight.ItemHeight = 14;
+            this.cmbEquipRingRight.Location = new System.Drawing.Point(208, 150);
+            this.cmbEquipRingRight.Name = "cmbEquipRingRight";
+            this.cmbEquipRingRight.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipRingRight.TabIndex = 0;
+            this.cmbEquipRingRight.SelectedIndexChanged += new System.EventHandler(this.cmbEquipRingRight_SelectedIndexChanged);
+            // 
+            // cmbEquipNeck
+            // 
+            this.cmbEquipNeck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipNeck.FormattingEnabled = true;
+            this.cmbEquipNeck.ItemHeight = 14;
+            this.cmbEquipNeck.Location = new System.Drawing.Point(32, 198);
+            this.cmbEquipNeck.Name = "cmbEquipNeck";
+            this.cmbEquipNeck.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipNeck.TabIndex = 0;
+            this.cmbEquipNeck.SelectedIndexChanged += new System.EventHandler(this.cmbEquipNeck_SelectedIndexChanged);
+            // 
+            // cmbEquipRingLeft
+            // 
+            this.cmbEquipRingLeft.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipRingLeft.FormattingEnabled = true;
+            this.cmbEquipRingLeft.ItemHeight = 14;
+            this.cmbEquipRingLeft.Location = new System.Drawing.Point(208, 126);
+            this.cmbEquipRingLeft.Name = "cmbEquipRingLeft";
+            this.cmbEquipRingLeft.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipRingLeft.TabIndex = 0;
+            this.cmbEquipRingLeft.SelectedIndexChanged += new System.EventHandler(this.cmbEquipRingLeft_SelectedIndexChanged);
+            // 
+            // cmbEquipFeet
+            // 
+            this.cmbEquipFeet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipFeet.FormattingEnabled = true;
+            this.cmbEquipFeet.ItemHeight = 14;
+            this.cmbEquipFeet.Location = new System.Drawing.Point(32, 174);
+            this.cmbEquipFeet.Name = "cmbEquipFeet";
+            this.cmbEquipFeet.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipFeet.TabIndex = 0;
+            this.cmbEquipFeet.SelectedIndexChanged += new System.EventHandler(this.cmbEquipFeet_SelectedIndexChanged);
+            // 
+            // cmbEquipEarRight
+            // 
+            this.cmbEquipEarRight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipEarRight.FormattingEnabled = true;
+            this.cmbEquipEarRight.ItemHeight = 14;
+            this.cmbEquipEarRight.Location = new System.Drawing.Point(208, 102);
+            this.cmbEquipEarRight.Name = "cmbEquipEarRight";
+            this.cmbEquipEarRight.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipEarRight.TabIndex = 0;
+            this.cmbEquipEarRight.SelectedIndexChanged += new System.EventHandler(this.cmbEquipEarRight_SelectedIndexChanged);
+            // 
+            // cmbEquipLegs
+            // 
+            this.cmbEquipLegs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipLegs.FormattingEnabled = true;
+            this.cmbEquipLegs.ItemHeight = 14;
+            this.cmbEquipLegs.Location = new System.Drawing.Point(32, 150);
+            this.cmbEquipLegs.Name = "cmbEquipLegs";
+            this.cmbEquipLegs.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipLegs.TabIndex = 0;
+            this.cmbEquipLegs.SelectedIndexChanged += new System.EventHandler(this.cmbEquipLegs_SelectedIndexChanged);
+            // 
+            // cmbEquipEarLeft
+            // 
+            this.cmbEquipEarLeft.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipEarLeft.FormattingEnabled = true;
+            this.cmbEquipEarLeft.ItemHeight = 14;
+            this.cmbEquipEarLeft.Location = new System.Drawing.Point(208, 78);
+            this.cmbEquipEarLeft.Name = "cmbEquipEarLeft";
+            this.cmbEquipEarLeft.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipEarLeft.TabIndex = 0;
+            this.cmbEquipEarLeft.SelectedIndexChanged += new System.EventHandler(this.cmbEquipEarLeft_SelectedIndexChanged);
+            // 
+            // cmbEquipHands
+            // 
+            this.cmbEquipHands.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipHands.FormattingEnabled = true;
+            this.cmbEquipHands.ItemHeight = 14;
+            this.cmbEquipHands.Location = new System.Drawing.Point(32, 126);
+            this.cmbEquipHands.Name = "cmbEquipHands";
+            this.cmbEquipHands.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipHands.TabIndex = 0;
+            this.cmbEquipHands.SelectedIndexChanged += new System.EventHandler(this.cmbEquipHands_SelectedIndexChanged);
+            // 
+            // cmbEquipBack
+            // 
+            this.cmbEquipBack.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipBack.FormattingEnabled = true;
+            this.cmbEquipBack.ItemHeight = 14;
+            this.cmbEquipBack.Location = new System.Drawing.Point(32, 247);
+            this.cmbEquipBack.Name = "cmbEquipBack";
+            this.cmbEquipBack.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipBack.TabIndex = 0;
+            this.cmbEquipBack.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBack_SelectedIndexChanged);
+            // 
+            // cmbEquipBody
+            // 
+            this.cmbEquipBody.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipBody.FormattingEnabled = true;
+            this.cmbEquipBody.ItemHeight = 14;
+            this.cmbEquipBody.Location = new System.Drawing.Point(32, 102);
+            this.cmbEquipBody.Name = "cmbEquipBody";
+            this.cmbEquipBody.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipBody.TabIndex = 0;
+            this.cmbEquipBody.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBody_SelectedIndexChanged);
+            // 
+            // cmbEquipWaist
+            // 
+            this.cmbEquipWaist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipWaist.FormattingEnabled = true;
+            this.cmbEquipWaist.ItemHeight = 14;
+            this.cmbEquipWaist.Location = new System.Drawing.Point(32, 222);
+            this.cmbEquipWaist.Name = "cmbEquipWaist";
+            this.cmbEquipWaist.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipWaist.TabIndex = 0;
+            this.cmbEquipWaist.SelectedIndexChanged += new System.EventHandler(this.cmbEquipWaist_SelectedIndexChanged);
+            // 
+            // cmbEquipHead
+            // 
+            this.cmbEquipHead.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipHead.FormattingEnabled = true;
+            this.cmbEquipHead.ItemHeight = 14;
+            this.cmbEquipHead.Location = new System.Drawing.Point(32, 78);
+            this.cmbEquipHead.Name = "cmbEquipHead";
+            this.cmbEquipHead.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipHead.TabIndex = 0;
+            this.cmbEquipHead.SelectedIndexChanged += new System.EventHandler(this.cmbEquipHead_SelectedIndexChanged);
+            // 
+            // cmbEquipSub
+            // 
+            this.cmbEquipSub.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipSub.FormattingEnabled = true;
+            this.cmbEquipSub.ItemHeight = 14;
+            this.cmbEquipSub.Location = new System.Drawing.Point(208, 54);
+            this.cmbEquipSub.Name = "cmbEquipSub";
+            this.cmbEquipSub.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipSub.TabIndex = 0;
+            this.cmbEquipSub.SelectedIndexChanged += new System.EventHandler(this.cmbEquipSub_SelectedIndexChanged);
+            // 
+            // cmbEquipBait
+            // 
+            this.cmbEquipBait.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipBait.FormattingEnabled = true;
+            this.cmbEquipBait.ItemHeight = 14;
+            this.cmbEquipBait.Location = new System.Drawing.Point(32, 54);
+            this.cmbEquipBait.Name = "cmbEquipBait";
+            this.cmbEquipBait.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipBait.TabIndex = 0;
+            this.cmbEquipBait.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBait_SelectedIndexChanged);
+            // 
+            // cmbEquipMain
+            // 
+            this.cmbEquipMain.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipMain.FormattingEnabled = true;
+            this.cmbEquipMain.ItemHeight = 14;
+            this.cmbEquipMain.Location = new System.Drawing.Point(208, 30);
+            this.cmbEquipMain.Name = "cmbEquipMain";
+            this.cmbEquipMain.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipMain.TabIndex = 0;
+            this.cmbEquipMain.SelectedIndexChanged += new System.EventHandler(this.cmbEquipMain_SelectedIndexChanged);
+            // 
+            // cmbEquipRod
+            // 
+            this.cmbEquipRod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipRod.FormattingEnabled = true;
+            this.cmbEquipRod.ItemHeight = 14;
+            this.cmbEquipRod.Location = new System.Drawing.Point(32, 30);
+            this.cmbEquipRod.Name = "cmbEquipRod";
+            this.cmbEquipRod.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipRod.TabIndex = 0;
+            this.cmbEquipRod.SelectedIndexChanged += new System.EventHandler(this.cmbEquipRod_SelectedIndexChanged);
             // 
             // tabFishingMainInfo
             // 
@@ -1399,6 +1804,15 @@
             this.lblFishingInfoCatchCount.TabIndex = 7;
             this.lblFishingInfoCatchCount.Text = "999(999.9)";
             // 
+            // lblFishingInfoWardrobe
+            // 
+            this.lblFishingInfoWardrobe.AutoSize = true;
+            this.lblFishingInfoWardrobe.Location = new System.Drawing.Point(372, 29);
+            this.lblFishingInfoWardrobe.Name = "lblFishingInfoWardrobe";
+            this.lblFishingInfoWardrobe.Size = new System.Drawing.Size(40, 14);
+            this.lblFishingInfoWardrobe.TabIndex = 0;
+            this.lblFishingInfoWardrobe.Text = "99/99";
+            // 
             // lblFishingInfoCase
             // 
             this.lblFishingInfoCase.AutoSize = true;
@@ -1468,6 +1882,16 @@
             this.label5.Size = new System.Drawing.Size(29, 14);
             this.label5.TabIndex = 0;
             this.label5.Text = "竿：";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label15.Location = new System.Drawing.Point(333, 29);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(45, 14);
+            this.label15.TabIndex = 0;
+            this.label15.Text = "ワード：";
             // 
             // label11
             // 
@@ -2356,25 +2780,6 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label15.Location = new System.Drawing.Point(333, 29);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(45, 14);
-            this.label15.TabIndex = 0;
-            this.label15.Text = "ワード：";
-            // 
-            // lblFishingInfoWardrobe
-            // 
-            this.lblFishingInfoWardrobe.AutoSize = true;
-            this.lblFishingInfoWardrobe.Location = new System.Drawing.Point(372, 29);
-            this.lblFishingInfoWardrobe.Name = "lblFishingInfoWardrobe";
-            this.lblFishingInfoWardrobe.Size = new System.Drawing.Size(40, 14);
-            this.lblFishingInfoWardrobe.TabIndex = 0;
-            this.lblFishingInfoWardrobe.Text = "99/99";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -2420,6 +2825,7 @@
             this.flowLayoutPanel3.ResumeLayout(false);
             this.flowLayoutPanel3.PerformLayout();
             this.tabFishingMainEquip.ResumeLayout(false);
+            this.tabFishingMainEquip.PerformLayout();
             this.tabFishingMainInfo.ResumeLayout(false);
             this.tabFishingMainInfo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFishingInfo)).EndInit();
@@ -2576,9 +2982,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView gridHistorySummary;
         private System.Windows.Forms.TabPage tabFishingMainEquip;
-        private System.Windows.Forms.ComboBox comboBox3;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cmbEquipRod;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
         private System.Windows.Forms.CheckBox chkInventoryFullSack;
         private System.Windows.Forms.CheckBox chkInventoryFullSatchel;
@@ -2625,5 +3029,40 @@
         private System.Windows.Forms.CheckBox chkHarakiriStopFound;
         private System.Windows.Forms.Label lblFishingInfoWardrobe;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.ComboBox cmbEquipRingRight;
+        private System.Windows.Forms.ComboBox cmbEquipNeck;
+        private System.Windows.Forms.ComboBox cmbEquipRingLeft;
+        private System.Windows.Forms.ComboBox cmbEquipFeet;
+        private System.Windows.Forms.ComboBox cmbEquipEarRight;
+        private System.Windows.Forms.ComboBox cmbEquipLegs;
+        private System.Windows.Forms.ComboBox cmbEquipEarLeft;
+        private System.Windows.Forms.ComboBox cmbEquipHands;
+        private System.Windows.Forms.ComboBox cmbEquipBack;
+        private System.Windows.Forms.ComboBox cmbEquipBody;
+        private System.Windows.Forms.ComboBox cmbEquipWaist;
+        private System.Windows.Forms.ComboBox cmbEquipHead;
+        private System.Windows.Forms.ComboBox cmbEquipSub;
+        private System.Windows.Forms.ComboBox cmbEquipBait;
+        private System.Windows.Forms.ComboBox cmbEquipMain;
+        private System.Windows.Forms.CheckBox chkUseRingRight;
+        private System.Windows.Forms.CheckBox chkUseRingLeft;
+        private System.Windows.Forms.CheckBox chkUseWaist;
+        private System.Windows.Forms.CheckBox chkEquipEnable;
     }
 }

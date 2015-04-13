@@ -436,6 +436,26 @@ namespace EnjoyFishing
         public bool NoBaitNoRodCase { get; set; }
         public bool NoBaitNoRodCmd { get; set; }
         public string NoBaitNoRodCmdLine { get; set; }
+        public bool EquipEnable { get; set; }
+        public string EquipRod { get; set; }
+        public string EquipBait { get; set; }
+        public string EquipMain { get; set; }
+        public string EquipSub { get; set; }
+        public string EquipHead { get; set; }
+        public string EquipBody { get; set; }
+        public string EquipHands { get; set; }
+        public string EquipLegs { get; set; }
+        public string EquipFeet { get; set; }
+        public string EquipNeck { get; set; }
+        public string EquipWaist { get; set; }
+        public string EquipBack { get; set; }
+        public string EquipEarLeft { get; set; }
+        public string EquipEarRight { get; set; }
+        public string EquipRingLeft { get; set; }
+        public string EquipRingRight { get; set; }
+        public bool UseWaist { get; set; }
+        public bool UseRingLeft { get; set; }
+        public bool UseRingRight { get; set; }
         public SettingsPlayerFishingModel()
         {
             this.Learning = true;
@@ -485,6 +505,26 @@ namespace EnjoyFishing
             this.NoBaitNoRodCase = true;
             this.NoBaitNoRodCmd = false;
             this.NoBaitNoRodCmdLine = "/ma デジョン <me>";
+            this.EquipEnable = false;
+            this.EquipRod = string.Empty;
+            this.EquipBait = string.Empty;
+            this.EquipMain = string.Empty;
+            this.EquipSub = string.Empty;
+            this.EquipHead = string.Empty;
+            this.EquipBody = string.Empty;
+            this.EquipHands = string.Empty;
+            this.EquipLegs = string.Empty;
+            this.EquipFeet = string.Empty;
+            this.EquipNeck = string.Empty;
+            this.EquipWaist = string.Empty;
+            this.EquipBack = string.Empty;
+            this.EquipEarLeft = string.Empty;
+            this.EquipEarRight = string.Empty;
+            this.EquipRingLeft = string.Empty;
+            this.EquipRingRight = string.Empty;
+            this.UseWaist = false;
+            this.UseRingLeft = false;
+            this.UseRingRight = false;
         }
     }
     public class SettingsPlayerEtcModel

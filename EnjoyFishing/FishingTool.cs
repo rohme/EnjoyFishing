@@ -817,6 +817,9 @@ namespace EnjoyFishing
             FishHistoryDBFishModel fish = new FishHistoryDBFishModel();
 
             logger.Output(LogLevelKind.DEBUG, "釣りスレッド開始");
+            //着替え
+            setEquipGear();
+            //釣りメインループ
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 //日付が変わったら経過時間クリア
@@ -2043,6 +2046,50 @@ namespace EnjoyFishing
                 }
             }
             return false;
+        }
+        /// <summary>
+        /// 装備着替え
+        /// </summary>
+        /// <returns></returns>
+        private bool setEquipGear()
+        {
+            if (settings.Fishing.EquipEnable)
+            {
+                logger.Output(LogLevelKind.DEBUG, "装備着替え開始");
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipRod))
+                    fface.Windower.SendString(string.Format("/equip range {0}", settings.Fishing.EquipRod));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipBait))
+                    fface.Windower.SendString(string.Format("/equip ammo {0}", settings.Fishing.EquipBait));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipMain))
+                    fface.Windower.SendString(string.Format("/equip main {0}", settings.Fishing.EquipMain));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipSub))
+                    fface.Windower.SendString(string.Format("/equip sub {0}", settings.Fishing.EquipSub));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipHead))
+                    fface.Windower.SendString(string.Format("/equip head {0}", settings.Fishing.EquipHead));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipBody))
+                    fface.Windower.SendString(string.Format("/equip body {0}", settings.Fishing.EquipBody));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipHands))
+                    fface.Windower.SendString(string.Format("/equip hands {0}", settings.Fishing.EquipHands));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipLegs))
+                    fface.Windower.SendString(string.Format("/equip legs {0}", settings.Fishing.EquipLegs));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipFeet))
+                    fface.Windower.SendString(string.Format("/equip feet {0}", settings.Fishing.EquipFeet));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipNeck))
+                    fface.Windower.SendString(string.Format("/equip neck {0}", settings.Fishing.EquipNeck));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipWaist))
+                    fface.Windower.SendString(string.Format("/equip waist {0}", settings.Fishing.EquipWaist));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipBack))
+                    fface.Windower.SendString(string.Format("/equip back {0}", settings.Fishing.EquipBack));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipEarLeft))
+                    fface.Windower.SendString(string.Format("/equip ear1 {0}", settings.Fishing.EquipEarLeft));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipEarRight))
+                    fface.Windower.SendString(string.Format("/equip ear2 {0}", settings.Fishing.EquipEarRight));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
+                    fface.Windower.SendString(string.Format("/equip ring1 {0}", settings.Fishing.EquipRingLeft));
+                if (!string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
+                    fface.Windower.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));
+            }
+            return true;
         }
         #endregion
 
