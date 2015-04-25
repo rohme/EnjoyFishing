@@ -121,7 +121,27 @@ namespace EnjoyFishing
             Wait,
         }
         #endregion
-        
+
+        #region 構造体
+        /// <summary>
+        /// 割り込み処理用構造体
+        /// </summary>
+        struct FishingInterrupt
+        {
+            public bool ChatReceive;
+            public bool EnemyAttack;
+            public bool SneakWarning;
+            public bool ShipWarning;
+            public FishingInterrupt(bool iChatReceive, bool iEnemyAttack, bool iSneakWarning, bool iShipWarning)
+            {
+                this.ChatReceive = false;
+                this.EnemyAttack = false;
+                this.SneakWarning = false;
+                this.ShipWarning = false;
+            }
+        }
+        #endregion
+
         private PolTool pol;
         private FFACE fface;
         private Settings settings;
@@ -139,6 +159,7 @@ namespace EnjoyFishing
         private DateTime lastCastDate = new DateTime(2000, 1, 1);
         private int noCatchCount = 0;
         private int chatFishingSkill = 0;//チャットから取得した釣りスキル
+        private FishingInterrupt interrupt = new FishingInterrupt();
 
         #region メンバ
         /// <summary>
@@ -812,10 +833,7 @@ namespace EnjoyFishing
         private void threadFishing()
         {
             bool firstTime = true;
-            bool chatReceive = false;
-            bool enemyAttack = false;
-            bool sneakWaening = false;
-            bool shipWaening = false;
+            interrupt = new FishingInterrupt(false, false, false, false);
             noCatchCount = 0;
             lastRodName = string.Empty;
             lastBaitName = string.Empty;
@@ -842,7 +860,7 @@ namespace EnjoyFishing
                 lastCastDate = DateTime.Now.Date;
                 //敵からの攻撃感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;
-                if (enemyAttack)
+                if (interrupt.EnemyAttack)
                 {
                     setRunningStatus(RunningStatusKind.Stop);
                     setFishingStatus(FishingStatusKind.Error);
@@ -851,7 +869,7 @@ namespace EnjoyFishing
                 }
                 //チャット感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;
-                if (chatReceive)
+                if (interrupt.ChatReceive)
                 {
                     if (settings.Fishing.ChatRestart)
                     {
@@ -860,6 +878,7 @@ namespace EnjoyFishing
                         DateTime restartTime = DateTime.Now.AddMinutes(settings.Fishing.ChatRestartMinute);
                         setMessage(string.Format("チャット感知：再稼働待ち {0}(地球時間)まで待機", restartTime.ToString("HH:mm:ss")));
                         wait(waitSec, waitSec);
+                        interrupt.ChatReceive = false;
                         setFishingStatus(FishingStatusKind.Normal);
                     }
                     else
@@ -874,7 +893,7 @@ namespace EnjoyFishing
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (settings.Fishing.EntryPort)
                 {
-                    if (shipWaening)
+                    if (interrupt.ShipWarning)
                     {
                         setRunningStatus(RunningStatusKind.Stop);
                         setFishingStatus(FishingStatusKind.Normal);
@@ -931,11 +950,11 @@ namespace EnjoyFishing
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (settings.Fishing.SneakFishing && settings.UseCancel)
                 {
-                    if (sneakWaening || !control.IsBuff(StatusEffect.Sneak))
+                    if (interrupt.SneakWarning || !control.IsBuff(StatusEffect.Sneak))
                     {
                         setMessage("スニークをかけます");
                         castSneak();
-                        sneakWaening = false;
+                        interrupt.SneakWarning = false;
                     }
                 }
                 //鞄1
@@ -1066,7 +1085,7 @@ namespace EnjoyFishing
 
                 //魚を釣る
                 if (this.RunningStatus != RunningStatusKind.Running) break;
-                if (!FishingOnce(out fish, out chatReceive, out enemyAttack, out sneakWaening, out shipWaening))
+                if (!FishingOnce(out fish))
                 {
                     //エラー発生時処理
                     setRunningStatus(RunningStatusKind.Stop);
@@ -1085,7 +1104,7 @@ namespace EnjoyFishing
         /// <param name="oFish"></param>
         /// <param name="oMessage"></param>
         /// <returns></returns>
-        private bool FishingOnce(out FishHistoryDBFishModel oFish, out bool oChatReceive, out bool oEnemyAttack, out bool oSneakWarning, out bool oShipWarning)
+        private bool FishingOnce(out FishHistoryDBFishModel oFish)
         {
             //戻り値初期化
             oFish = new FishHistoryDBFishModel();
@@ -1117,10 +1136,6 @@ namespace EnjoyFishing
             oFish.FrogFishing = this.HasFrogFishing;
 
             bool fishedFlg = false;
-            oChatReceive = false;
-            oEnemyAttack = false;
-            oSneakWarning = false;
-            oShipWarning = false;
 
             setFishingStatus(FishingStatusKind.Normal);
             setMessage(string.Format("キャスト中：{0}x{1}", this.RodNameWithRemain, this.BaitNameWithRemain));
@@ -1136,7 +1151,7 @@ namespace EnjoyFishing
                 {
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
-                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
+                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
                     logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                     //エラーチェック
                     if (chatKbn == ChatKbnKind.CanNotFishing)
@@ -1163,11 +1178,16 @@ namespace EnjoyFishing
                         setMessage("エリアが切り替わったので停止");
                         return false;
                     }
-                    else if (oChatReceive) //チャット感知
+                    else if (interrupt.ChatReceive) //チャット感知
                     {
+                        while (this.PlayerStatus != Status.Standing)
+                        {
+                            fface.Windower.SendKeyPress(KeyCode.EscapeKey);
+                            Thread.Sleep(settings.Global.WaitBase);
+                        }
                         return true;
                     }
-                    else if (oEnemyAttack) //敵の攻撃感知
+                    else if (interrupt.EnemyAttack) //敵の攻撃感知
                     {
                         return true;
                     }
@@ -1190,7 +1210,7 @@ namespace EnjoyFishing
                 {
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
-                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
+                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
                     logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                     
                     if (chatKbn == ChatKbnKind.BaitSmallFish || chatKbn == ChatKbnKind.BaitLargeFish ||
@@ -1466,7 +1486,7 @@ namespace EnjoyFishing
                     {
                         oFish.Critical = true;
                     }
-                    else if (oChatReceive) //チャット感知
+                    else if (interrupt.ChatReceive) //チャット感知
                     {
                         //プレイヤステータスがStandingになるまで待つ
                         while (this.PlayerStatus != FFACETools.Status.Standing)
@@ -1476,7 +1496,7 @@ namespace EnjoyFishing
                         }
                         return true;
                     }
-                    else if (oEnemyAttack) //敵の攻撃感知
+                    else if (interrupt.EnemyAttack) //敵の攻撃感知
                     {
                         //プレイヤステータスがStandingになるまで待つ
                         while (this.PlayerStatus != FFACETools.Status.Standing)
@@ -1598,36 +1618,36 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iCl">チャットライン</param>
         /// <returns>チャット区分</returns>
-        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs, ref bool rChatRecieve, ref bool rEnemyAttack, ref bool rSneakWarning, ref bool rShipWarning)
+        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs)
         {
             oArgs = new List<string>();
             switch (iCl.Type)
             {
                 case ChatMode.RcvdTell:
-                case ChatMode.SentTell:
-                    if(settings.Fishing.ChatTell) rChatRecieve = true;
+                //case ChatMode.SentTell:
+                    if(settings.Fishing.ChatTell) interrupt.ChatReceive = true;
                     return ChatKbnKind.Tell;
                 case ChatMode.RcvdSay:
                 case ChatMode.SentSay:
-                    if(settings.Fishing.ChatSay) rChatRecieve = true;
+                    if (settings.Fishing.ChatSay) interrupt.ChatReceive = true;
                     return ChatKbnKind.Say;
                 case ChatMode.RcvdParty:
                 case ChatMode.SentParty:
-                    if(settings.Fishing.ChatParty) rChatRecieve = true;
+                    if (settings.Fishing.ChatParty) interrupt.ChatReceive = true;
                     return ChatKbnKind.Party;
                 case ChatMode.RcvdLinkShell:
                 case ChatMode.SentLinkShell:
-                    if(settings.Fishing.ChatLs) rChatRecieve = true;
+                    if (settings.Fishing.ChatLs) interrupt.ChatReceive = true;
                     return ChatKbnKind.Linkshell;
                 case ChatMode.RcvdShout:
                 case ChatMode.SentShout:
                 case ChatMode.RcvdYell:
                 case ChatMode.SentYell:
-                    if(settings.Fishing.ChatShout) rChatRecieve = true;
+                    if (settings.Fishing.ChatShout) interrupt.ChatReceive = true;
                     return ChatKbnKind.Shout;
                 case ChatMode.RcvdEmote:
                 case ChatMode.SentEmote:
-                    if (settings.Fishing.ChatEmote && iCl.Text.Contains(this.PlayerName)) rChatRecieve = true;
+                    if (settings.Fishing.ChatEmote && iCl.Text.Contains(this.PlayerName)) interrupt.ChatReceive = true;
                     return ChatKbnKind.Shout;
             }
             foreach (KeyValuePair<ChatKbnKind, string> v in dictionaryChat)
@@ -1655,11 +1675,11 @@ namespace EnjoyFishing
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
                     if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2)
                     {
-                        rEnemyAttack = true;
+                        interrupt.EnemyAttack = true;
                     }
                     if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/)
                     {
-                        rSneakWarning = true;
+                        interrupt.SneakWarning = true;
                     }
                     if (v.Key == ChatKbnKind.ShipWarning1 || v.Key == ChatKbnKind.ShipWarning2 ||
                         v.Key == ChatKbnKind.ShipWarning3 || v.Key == ChatKbnKind.ShipWarning4 ||
@@ -1667,7 +1687,7 @@ namespace EnjoyFishing
                         v.Key == ChatKbnKind.ShipWarning7 || v.Key == ChatKbnKind.ShipWarning8 ||
                         v.Key == ChatKbnKind.ShipWarning9)
                     {
-                        rShipWarning = true;
+                        interrupt.ShipWarning = true;
                     }
                     if (v.Key == ChatKbnKind.SkillLvUp)
                     {
@@ -1988,6 +2008,12 @@ namespace EnjoyFishing
                         return false;
                     }
                 }
+                //入港メッセージチェック
+                if (interrupt.ShipWarning)
+                {
+                    setMessage("入港するので竿の修理を中止");
+                    return false;
+                }
                 //合成
                 bool synthSuccess = RepairRodSynthesis(repairCrystal, breakRodName);
                 //ワードローブに竿を戻す
@@ -2123,38 +2149,8 @@ namespace EnjoyFishing
             if (maxLoop) return false;
             fface.Windower.SendKeyPress(KeyCode.EnterKey);
             //合成終了するまで待機
-            /*
-            maxLoop = true;
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
-            {
-                if (fface.Player.Status == Status.Synthing) 
-                {
-                    maxLoop = false;
-                    break;
-                }
-                Thread.Sleep(200);
-            }
-            if (maxLoop) return false;
-            maxLoop = true;
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
-            {
-                if (fface.Player.Status != Status.Synthing)
-                {
-                    maxLoop = false;
-                    break;
-                }
-                Thread.Sleep(200);
-            }
-            if (maxLoop) return false;
-            Thread.Sleep(settings.Global.WaitChat);
-            */
             //合成ログの確認
             Thread.Sleep(15000);
-
-            bool oChatReceive = false;
-            bool oEnemyAttack = false;
-            bool oSneakWarning = false;
-            bool oShipWarning = false;
 
             FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
             maxLoop = true;
@@ -2163,7 +2159,7 @@ namespace EnjoyFishing
                 if(!chat.GetNextChatLine(out cl)) break;
                 //チャット区分の取得
                 List<string> chatKbnArgs = new List<string>();
-                ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
+                ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
                 logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                 //合成失敗
                 if (chatKbn == ChatKbnKind.SynthFailure ||
