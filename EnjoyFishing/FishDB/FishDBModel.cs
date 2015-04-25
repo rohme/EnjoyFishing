@@ -277,6 +277,16 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string RodName { get; set; }
+        [XmlAttribute("break")]
+        public string BreakRodName { get; set; }
+        [XmlAttribute("crystal")]
+        public string RepairCrystal { get; set; }
+        public RodDBRodModel()
+        {
+            this.RodName = string.Empty;
+            this.BreakRodName = string.Empty;
+            this.RepairCrystal = string.Empty;
+        }
     }
     #endregion
 

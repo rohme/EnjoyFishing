@@ -53,6 +53,10 @@ namespace EnjoyFishing
             {ChatKbnKind.ShipWarning9, "Eunirange : そろそろ中桟橋かな。"},//バージ エメフィ支水路(南桟橋→中桟橋)
             {ChatKbnKind.SkillUp, "{0}の釣りスキルが、(.*)アップ！"},
             {ChatKbnKind.SkillLvUp, "{0}の釣りスキルは、(.*)になった。"},
+            {ChatKbnKind.SynthSuccess, "(.*)が([0-9]*)個、合成できた！"},
+            {ChatKbnKind.SynthFailure, "合成に失敗した。クリスタルは消失した。"},
+            {ChatKbnKind.SynthLostItem, "(.*)を失った…。"},
+            {ChatKbnKind.SynthNotEnoughSkill, "うまく合成できない。現在のスキルでは難しすぎるようだ。"},
         };
         #endregion
 
@@ -99,6 +103,10 @@ namespace EnjoyFishing
             ShipWarning9,
             SkillUp,
             SkillLvUp,
+            SynthSuccess,
+            SynthFailure,
+            SynthLostItem,
+            SynthNotEnoughSkill,
         }
         public enum RunningStatusKind
         {
@@ -954,7 +962,18 @@ namespace EnjoyFishing
                         !control.IsExistItem(lastRodName, InventoryType.Inventory) &&
                         !control.IsExistItem(lastRodName, InventoryType.Wardrobe))
                     {
-                        getItem(lastRodName);
+                        //予備の竿を鞄へ移動
+                        if (!getRodBaitItem(lastRodName))
+                        {
+                            //竿の修理
+                            if (!repairRod(lastRodName))
+                            {
+                                setRunningStatus(RunningStatusKind.Stop);
+                                setFishingStatus(FishingStatusKind.Error);
+                                //setMessage("釣り竿が無いので停止");
+                                break;
+                            }
+                        }
                     }
                     if (!setRod(lastRodName))
                     {
@@ -977,7 +996,7 @@ namespace EnjoyFishing
                         !control.IsExistItem(lastBaitName, InventoryType.Inventory) &&
                         !control.IsExistItem(lastBaitName, InventoryType.Wardrobe))
                     {
-                        getItem(lastBaitName);
+                        getRodBaitItem(lastBaitName);
                     }
                     if (!setBait(lastBaitName))
                     {
@@ -1897,6 +1916,270 @@ namespace EnjoyFishing
                 this.TimeElapsed++;
             }
         }
+        /// <summary>
+        /// 竿を修理する
+        /// </summary>
+        /// <param name="iRodName">修理する竿名称</param>
+        /// <returns>成功した場合Trueを返す</returns>
+        public bool repairRod(string iRodName)
+        {
+            //折れた竿名と修理に使用するクリスタルを取得
+            List<RodDBRodModel> rods = FishDB.SelectRod(iRodName);
+            if (rods.Count != 1) return false;
+            string breakRodName = rods[0].BreakRodName;
+            ushort breakRodID = (ushort)FFACE.ParseResources.GetItemID(breakRodName);
+            string repairCrystal = rods[0].RepairCrystal;
+
+            setMessage(string.Format("{0}を修理します", breakRodName));
+
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                //鞄に竿が入っていない場合、鞄に移動する
+                bool wardrobe = false;
+                if (!control.IsExistItem(breakRodName, InventoryType.Inventory))
+                {
+                    wardrobe = true;
+                    //ワードローブに竿があるか確認
+                    if (fface.Item.GetWardrobeItemCount(breakRodID) == 0)
+                    {
+                        setMessage(string.Format("{0}が見つからなかったので停止", breakRodName));
+                        return false;
+                    }
+                    //鞄がいっぱいの場合空きを作る
+                    if (this.InventoryCount >= this.InventoryMax)
+                    {
+                        if (!putFish())
+                        {
+                            setMessage("鞄がいっぱいで竿の修理ができなかったので停止");
+                            return false;
+                        }
+                    }
+                    //竿を鞄に移動
+                    if (!control.GetItem(breakRodName, InventoryType.Wardrobe))
+                    {
+                        setMessage(string.Format("{0}が鞄に移動できなかったので停止", breakRodName));
+                        return false;
+                    }
+                    setMessage(string.Format("{0}を{1}から取り出しました", breakRodName, InventoryType.Wardrobe.ToString()));
+                    Thread.Sleep(1000);
+                }
+                //鞄にクリスタルが入っていない場合、鞄に移動する
+                if (!control.IsExistItem(repairCrystal, InventoryType.Inventory))
+                {
+                    //クリスタルが存在する？
+                    if (control.GetInventoryTypeFromItemName(repairCrystal) == InventoryType.None)
+                    {
+                        setMessage(string.Format("{0}が見つからなかったので停止", repairCrystal));
+                        return false;
+                    }
+                    //鞄がいっぱいの場合空きを作る
+                    if (this.InventoryCount >= this.InventoryMax)
+                    {
+                        if (!putFish())
+                        {
+                            setMessage("鞄がいっぱいで竿の修理ができなかったので停止");
+                            return false;
+                        }
+                    }
+                    //クリスタルを鞄に移動
+                    if (!getItem(repairCrystal))
+                    {
+                        setMessage(string.Format("{0}が鞄に移動できなかったので停止", repairCrystal));
+                        return false;
+                    }
+                }
+                //合成
+                bool synthSuccess = RepairRodSynthesis(repairCrystal, breakRodName);
+                //ワードローブに竿を戻す
+                if (synthSuccess && wardrobe)
+                {
+                    if (!putItem(iRodName, InventoryType.Wardrobe))
+                    {
+                        setMessage(string.Format("{0}が{1}に移動できなかったので停止", breakRodName, InventoryType.Wardrobe.ToString()));
+                        return false;
+                    }
+                }
+                if (synthSuccess) return true;
+            }
+            setMessage("竿の修理が出来なかったので停止");
+            return false;
+        }
+        /// <summary>
+        /// 竿を修理する(合成)
+        /// </summary>
+        /// <param name="iCrystalName">使用クリスタル</param>
+        /// <param name="iBreakRod">修理する竿名</param>
+        /// <returns>成功した場合Trueを返す</returns>
+        public bool RepairRodSynthesis(string iCrystalName, string iBreakRodName)
+        {
+            //入力チェック
+            if (!control.IsExistItem(iCrystalName, InventoryType.Inventory) ||
+                !control.IsExistItem(iBreakRodName, InventoryType.Inventory)) return false;
+            //メニュー閉じる
+            bool maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT ; i++)
+            {
+                if (!fface.Menu.IsOpen)
+                {
+                    maxLoop = false;
+                    break;
+                }
+                fface.Windower.SendKeyPress(KeyCode.EscapeKey);
+                Thread.Sleep(100);
+            }
+            if (maxLoop) return false;
+            //アイテムメニュー表示
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (fface.Menu.Selection == "アイテム")
+                {
+                    maxLoop = false;
+                    break;
+                }
+                fface.Windower.SendKey(KeyCode.LeftCtrlKey, true);
+                fface.Windower.SendKey(KeyCode.LetterI, true);
+                fface.Windower.SendKey(KeyCode.LeftCtrlKey, false);
+                fface.Windower.SendKey(KeyCode.LetterI, false);
+                Thread.Sleep(100);
+            }
+            if (maxLoop) return false;
+            //クリスタルの選択
+            maxLoop = true;
+            bool firstTime = true;
+            for (int i = 0; i < 200; i++)
+            {
+                if (FFACE.ParseResources.GetItemName(fface.Item.SelectedItemID) == iCrystalName)
+                {
+                    maxLoop = false;
+                    break;
+                }
+                if (firstTime)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        fface.Windower.SendKeyPress(KeyCode.LeftArrow);
+                        Thread.Sleep(100);
+                    }
+                    firstTime = false;
+                }
+                fface.Windower.SendKeyPress(KeyCode.DownArrow);
+                Thread.Sleep(100);
+            }
+            if (maxLoop) return false;
+            //クリスタルでリターン押下
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (fface.Menu.Selection == "アイテム合成")
+                {
+                    maxLoop = false;
+                    break;
+                }
+                fface.Windower.SendKeyPress(KeyCode.EnterKey);
+                Thread.Sleep(100);
+            }
+            if (maxLoop) return false;
+            //アイテム情報取得
+            int itemID = FFACE.ParseResources.GetItemID(iBreakRodName);
+            int itemIndex = fface.Item.GetFirstIndexByItemID(itemID, InventoryType.Inventory);
+            //合成アイテムのセット
+            FFACE.TRADEITEM item = new FFACE.TRADEITEM();
+            item.ItemID = (ushort)itemID;
+            item.Index = (byte)itemIndex;
+            item.Count = 1;
+
+            FFACE.NPCTRADEINFO trade = new FFACE.NPCTRADEINFO();
+            Array.Resize(ref trade.items, 1);
+            trade.items[0] = item;
+            fface.Menu.SetCraftItems(trade);
+            //中止ボタンへ移動
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (fface.Menu.Help == "中止します。")
+                {
+                    maxLoop = false;
+                    break;
+                }
+                fface.Windower.SendKeyPress(KeyCode.EscapeKey);
+                Thread.Sleep(200);
+            }
+            if (maxLoop) return false;
+            //決定ボタンへ移動
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (fface.Menu.Help == "この組み合わせでアイテムを合成します。")
+                {
+                    maxLoop = false;
+                    break;
+                }
+                fface.Windower.SendKeyPress(KeyCode.UpArrow);
+                Thread.Sleep(200);
+                fface.Windower.SendKeyPress(KeyCode.RightArrow);
+                Thread.Sleep(200);
+            }
+            if (maxLoop) return false;
+            fface.Windower.SendKeyPress(KeyCode.EnterKey);
+            //合成終了するまで待機
+            /*
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (fface.Player.Status == Status.Synthing) 
+                {
+                    maxLoop = false;
+                    break;
+                }
+                Thread.Sleep(200);
+            }
+            if (maxLoop) return false;
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (fface.Player.Status != Status.Synthing)
+                {
+                    maxLoop = false;
+                    break;
+                }
+                Thread.Sleep(200);
+            }
+            if (maxLoop) return false;
+            Thread.Sleep(settings.Global.WaitChat);
+            */
+            //合成ログの確認
+            Thread.Sleep(15000);
+
+            bool oChatReceive = false;
+            bool oEnemyAttack = false;
+            bool oSneakWarning = false;
+            bool oShipWarning = false;
+
+            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            maxLoop = true;
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if(!chat.GetNextChatLine(out cl)) break;
+                //チャット区分の取得
+                List<string> chatKbnArgs = new List<string>();
+                ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs, ref oChatReceive, ref oEnemyAttack, ref oSneakWarning, ref oShipWarning);
+                logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                //合成失敗
+                if (chatKbn == ChatKbnKind.SynthFailure ||
+                    chatKbn == ChatKbnKind.SynthNotEnoughSkill)
+                {
+                    return false;
+                }
+                //合成成功
+                if (chatKbn == ChatKbnKind.SynthSuccess)
+                {
+                    return true;
+                }
+                Thread.Sleep(settings.Global.WaitChat);
+            }
+            return false;
+        }
         #endregion
 
         #region 装備アイテム
@@ -1988,6 +2271,43 @@ namespace EnjoyFishing
             bool moveOkFlg = false;
             if (settings.UseItemizer)
             {
+                if (!moveOkFlg && control.GetItem(iItemName, InventoryType.Satchel))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Satchel.ToString()));
+                    Thread.Sleep(1000);
+                }
+                if (!moveOkFlg && control.GetItem(iItemName, InventoryType.Sack))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Sack.ToString()));
+                    Thread.Sleep(1000);
+                }
+                if (!moveOkFlg && control.GetItem(iItemName, InventoryType.Case))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Case.ToString()));
+                    Thread.Sleep(1000);
+                }
+                if (!moveOkFlg && control.GetItem(iItemName, InventoryType.Wardrobe))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Wardrobe.ToString()));
+                    Thread.Sleep(1000);
+                }
+            }
+            return moveOkFlg;
+        }
+        /// <summary>
+        /// 竿・エサを鞄へ移動する
+        /// </summary>
+        /// <param name="iItemName"></param>
+        /// <returns></returns>
+        private bool getRodBaitItem(string iItemName)
+        {
+            bool moveOkFlg = false;
+            if (settings.UseItemizer)
+            {
                 if (!moveOkFlg && settings.Fishing.NoBaitNoRodSatchel)
                     if (control.GetItem(iItemName, InventoryType.Satchel))
                     {
@@ -2011,6 +2331,24 @@ namespace EnjoyFishing
                     }
             }
             return moveOkFlg;
+        }
+        /// <summary>
+        /// アイテムを鞄から指定した場所へ移動する
+        /// </summary>
+        /// <param name="iItemName">アイテム名</param>
+        /// <param name="iInventoryType">移動先</param>
+        /// <returns>成功した場合Truwを返す</returns>
+        private bool putItem(string iItemName, InventoryType iInventoryType)
+        {
+            if (control.GetInventoryCountByType(iInventoryType) >= control.GetInventoryMaxByType(iInventoryType)) return false;
+            if (control.IsExistItem(iItemName, InventoryType.Inventory))
+            {
+                control.PutItem(iItemName, iInventoryType);
+                setMessage(string.Format("{0}を{1}に移動しました", iItemName, iInventoryType.ToString()));
+                Thread.Sleep(1000);
+                return true;
+            }
+            return false;
         }
         /// <summary>
         /// 魚を鞄から移動する
