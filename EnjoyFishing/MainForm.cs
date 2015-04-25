@@ -363,6 +363,8 @@ namespace EnjoyFishing
                 chkChatRestart.Checked = settings.Fishing.ChatRestart;
                 txtChatRestartMinute.Value = settings.Fishing.ChatRestartMinute;
                 chkEntryPort.Checked = settings.Fishing.EntryPort;
+                chkEnemyAttackCmd.Checked = settings.Fishing.EnemyAttackCmd;
+                txtEnemyAttackCmdLine.Text = settings.Fishing.EnemyAttackCmdLine;
                 //釣り設定・鞄いっぱい
                 chkInventoryFullSack.Checked = settings.Fishing.InventoryFullSack;
                 chkInventoryFullSatchel.Checked = settings.Fishing.InventoryFullSatchel;
@@ -1687,6 +1689,8 @@ namespace EnjoyFishing
                 settings.Fishing.ChatRestart = chkChatRestart.Checked;
                 settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
                 settings.Fishing.EntryPort = chkEntryPort.Checked;
+                settings.Fishing.EnemyAttackCmd = chkEnemyAttackCmd.Checked;
+                settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
                 //釣り設定・鞄いっぱい
                 settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
                 settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
@@ -2207,6 +2211,16 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.EntryPort = chkEntryPort.Checked;
+        }
+        private void chkEnemyAttack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EnemyAttackCmd = chkEnemyAttackCmd.Checked;
+        }
+        private void txtEnemyAttackCmd_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
         }
         #endregion
         #region 釣り設定・装備
@@ -2750,5 +2764,6 @@ namespace EnjoyFishing
             }
         }
         #endregion
+
     }
 }

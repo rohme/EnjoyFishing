@@ -426,6 +426,8 @@ namespace EnjoyFishing
         public bool ChatRestart { get; set; }
         public int ChatRestartMinute { get; set; }
         public bool EntryPort { get; set; }
+        public bool EnemyAttackCmd { get; set; }
+        public string EnemyAttackCmdLine { get; set; }
         public bool InventoryFullSack { get; set; }
         public bool InventoryFullSatchel { get; set; }
         public bool InventoryFullCase { get; set; }
@@ -495,6 +497,8 @@ namespace EnjoyFishing
             this.ChatRestart = false;
             this.ChatRestartMinute = 10;
             this.EntryPort = true;
+            this.EnemyAttackCmd = false;
+            this.EnemyAttackCmdLine = "/ma デジョン <me>";
             this.InventoryFullSack = true;
             this.InventoryFullSatchel = true;
             this.InventoryFullCase = true;

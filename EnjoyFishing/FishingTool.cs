@@ -40,6 +40,7 @@ namespace EnjoyFishing
             {ChatKbnKind.NoCatch, "獲物に逃げられてしまった。"},
             {ChatKbnKind.EnemyAttack1, "(.*)の攻撃→{0}に、(.*)"},
             {ChatKbnKind.EnemyAttack2, "→{0}に、([0-9]*)ダメージ。"},
+            {ChatKbnKind.EnemyAttack3, "(.*)は、遠隔攻撃を実行→{0}に、ミス。"},
             {ChatKbnKind.SneakWarning1, "スニークの効果がきれそうだ。"},
             {ChatKbnKind.SneakWarning2, "{0}は、スニークの効果がきれた。"},
             {ChatKbnKind.ShipWarning1, "まもなく(.*)へ到着します。"},//汽船航路・外洋航路・銀海航路
@@ -90,6 +91,7 @@ namespace EnjoyFishing
             Unknown,
             EnemyAttack1,
             EnemyAttack2,
+            EnemyAttack3,
             SneakWarning1,
             SneakWarning2,
             ShipWarning1,
@@ -865,6 +867,11 @@ namespace EnjoyFishing
                     setRunningStatus(RunningStatusKind.Stop);
                     setFishingStatus(FishingStatusKind.Error);
                     setMessage("敵から攻撃されたので停止");
+                    //コマンド実行
+                    if (settings.Fishing.EnemyAttackCmd)
+                    {
+                        fface.Windower.SendString(settings.Fishing.EnemyAttackCmdLine);
+                    }
                     break;
                 }
                 //チャット感知
@@ -1657,8 +1664,9 @@ namespace EnjoyFishing
                 if (v.Key == ChatKbnKind.CatchSingle ||
                     v.Key == ChatKbnKind.CatchMultiple ||
                     v.Key == ChatKbnKind.CatchMonster ||
-                    v.Key == ChatKbnKind.EnemyAttack1 || 
+                    v.Key == ChatKbnKind.EnemyAttack1 ||
                     v.Key == ChatKbnKind.EnemyAttack2 ||
+                    v.Key == ChatKbnKind.EnemyAttack3 ||
                     v.Key == ChatKbnKind.SneakWarning2 ||
                     v.Key == ChatKbnKind.SkillUp ||
                     v.Key == ChatKbnKind.SkillLvUp)

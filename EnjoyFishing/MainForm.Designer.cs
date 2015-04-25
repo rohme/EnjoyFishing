@@ -47,6 +47,7 @@
             this.chkIgnoreSmallFish = new System.Windows.Forms.CheckBox();
             this.chkIgnoreLargeFish = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkEnemyAttackCmd = new System.Windows.Forms.CheckBox();
             this.txtChatRestartMinute = new System.Windows.Forms.NumericUpDown();
             this.chkChatRestart = new System.Windows.Forms.CheckBox();
             this.chkChatEmote = new System.Windows.Forms.CheckBox();
@@ -201,6 +202,7 @@
             this.btnExecHarakiri = new System.Windows.Forms.Button();
             this.tabMainSetting = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.chkMessageEcho = new System.Windows.Forms.CheckBox();
             this.chkWindowActivate = new System.Windows.Forms.CheckBox();
             this.chkWindowFlash = new System.Windows.Forms.CheckBox();
             this.chkWindowTopMost = new System.Windows.Forms.CheckBox();
@@ -232,7 +234,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.chkMessageEcho = new System.Windows.Forms.CheckBox();
+            this.txtEnemyAttackCmdLine = new System.Windows.Forms.TextBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -436,6 +438,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtEnemyAttackCmdLine);
+            this.groupBox1.Controls.Add(this.chkEnemyAttackCmd);
             this.groupBox1.Controls.Add(this.txtChatRestartMinute);
             this.groupBox1.Controls.Add(this.chkChatRestart);
             this.groupBox1.Controls.Add(this.chkChatEmote);
@@ -459,6 +463,18 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
+            // 
+            // chkEnemyAttackCmd
+            // 
+            this.chkEnemyAttackCmd.AutoSize = true;
+            this.chkEnemyAttackCmd.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkEnemyAttackCmd.Location = new System.Drawing.Point(92, 70);
+            this.chkEnemyAttackCmd.Name = "chkEnemyAttackCmd";
+            this.chkEnemyAttackCmd.Size = new System.Drawing.Size(77, 18);
+            this.chkEnemyAttackCmd.TabIndex = 16;
+            this.chkEnemyAttackCmd.Text = "攻撃受けた";
+            this.chkEnemyAttackCmd.UseVisualStyleBackColor = true;
+            this.chkEnemyAttackCmd.CheckedChanged += new System.EventHandler(this.chkEnemyAttack_CheckedChanged);
             // 
             // txtChatRestartMinute
             // 
@@ -2418,6 +2434,18 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "一般";
             // 
+            // chkMessageEcho
+            // 
+            this.chkMessageEcho.AutoSize = true;
+            this.chkMessageEcho.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkMessageEcho.Location = new System.Drawing.Point(258, 44);
+            this.chkMessageEcho.Name = "chkMessageEcho";
+            this.chkMessageEcho.Size = new System.Drawing.Size(138, 18);
+            this.chkMessageEcho.TabIndex = 8;
+            this.chkMessageEcho.Text = "メッセージを/Echoで表示";
+            this.chkMessageEcho.UseVisualStyleBackColor = true;
+            this.chkMessageEcho.CheckedChanged += new System.EventHandler(this.chkMessageEcho_CheckedChanged);
+            // 
             // chkWindowActivate
             // 
             this.chkWindowActivate.AutoSize = true;
@@ -2782,17 +2810,15 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // chkMessageEcho
+            // txtEnemyAttackCmdLine
             // 
-            this.chkMessageEcho.AutoSize = true;
-            this.chkMessageEcho.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkMessageEcho.Location = new System.Drawing.Point(258, 44);
-            this.chkMessageEcho.Name = "chkMessageEcho";
-            this.chkMessageEcho.Size = new System.Drawing.Size(138, 18);
-            this.chkMessageEcho.TabIndex = 8;
-            this.chkMessageEcho.Text = "メッセージを/Echoで表示";
-            this.chkMessageEcho.UseVisualStyleBackColor = true;
-            this.chkMessageEcho.CheckedChanged += new System.EventHandler(this.chkMessageEcho_CheckedChanged);
+            this.txtEnemyAttackCmdLine.AcceptsReturn = true;
+            this.txtEnemyAttackCmdLine.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtEnemyAttackCmdLine.Location = new System.Drawing.Point(163, 68);
+            this.txtEnemyAttackCmdLine.Name = "txtEnemyAttackCmdLine";
+            this.txtEnemyAttackCmdLine.Size = new System.Drawing.Size(124, 21);
+            this.txtEnemyAttackCmdLine.TabIndex = 17;
+            this.txtEnemyAttackCmdLine.TextChanged += new System.EventHandler(this.txtEnemyAttackCmd_TextChanged);
             // 
             // MainForm
             // 
@@ -3079,5 +3105,7 @@
         private System.Windows.Forms.CheckBox chkUseWaist;
         private System.Windows.Forms.CheckBox chkEquipEnable;
         private System.Windows.Forms.CheckBox chkMessageEcho;
+        private System.Windows.Forms.CheckBox chkEnemyAttackCmd;
+        private System.Windows.Forms.TextBox txtEnemyAttackCmdLine;
     }
 }
