@@ -1353,7 +1353,6 @@
             this.chkUseRingRight.TabIndex = 2;
             this.chkUseRingRight.Text = "使用";
             this.chkUseRingRight.UseVisualStyleBackColor = true;
-            this.chkUseRingRight.Visible = false;
             this.chkUseRingRight.CheckedChanged += new System.EventHandler(this.chkUseRingRight_CheckedChanged);
             // 
             // chkUseRingLeft
@@ -1365,7 +1364,6 @@
             this.chkUseRingLeft.TabIndex = 2;
             this.chkUseRingLeft.Text = "使用";
             this.chkUseRingLeft.UseVisualStyleBackColor = true;
-            this.chkUseRingLeft.Visible = false;
             this.chkUseRingLeft.CheckedChanged += new System.EventHandler(this.chkUseRingLeft_CheckedChanged);
             // 
             // chkUseWaist
@@ -1377,7 +1375,6 @@
             this.chkUseWaist.TabIndex = 2;
             this.chkUseWaist.Text = "使用";
             this.chkUseWaist.UseVisualStyleBackColor = true;
-            this.chkUseWaist.Visible = false;
             this.chkUseWaist.CheckedChanged += new System.EventHandler(this.chkUseWaist_CheckedChanged);
             // 
             // label33

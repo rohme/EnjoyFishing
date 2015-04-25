@@ -479,6 +479,7 @@ namespace EnjoyFishing
                     }
                 }
             }
+            ret.Sort(RodDBModel.SortTypeName);
             logger.VarDump(ret);
             return ret;
         }
@@ -553,6 +554,7 @@ namespace EnjoyFishing
                     }
                 }
             }
+            ret.Sort(BaitDBModel.SortTypeName);
             logger.VarDump(ret);
             return ret;
         }
@@ -629,6 +631,7 @@ namespace EnjoyFishing
                     }
                 }
             }
+            ret.Sort(GearDBModel.SortTypeName);
             logger.VarDump(ret);
             return ret;
         }

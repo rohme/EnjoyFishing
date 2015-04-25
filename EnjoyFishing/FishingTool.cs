@@ -40,7 +40,7 @@ namespace EnjoyFishing
             {ChatKbnKind.NoCatch, "獲物に逃げられてしまった。"},
             {ChatKbnKind.EnemyAttack1, "(.*)の攻撃→{0}に、(.*)"},
             {ChatKbnKind.EnemyAttack2, "→{0}に、([0-9]*)ダメージ。"},
-            {ChatKbnKind.EnemyAttack3, "(.*)は、遠隔攻撃を実行→{0}に、ミス。"},
+            {ChatKbnKind.EnemyAttack3, "(.*)は、遠隔攻撃を実行→{0}に、ミス。(.*)"},
             {ChatKbnKind.SneakWarning1, "スニークの効果がきれそうだ。"},
             {ChatKbnKind.SneakWarning2, "{0}は、スニークの効果がきれた。"},
             {ChatKbnKind.ShipWarning1, "まもなく(.*)へ到着します。"},//汽船航路・外洋航路・銀海航路
@@ -58,6 +58,8 @@ namespace EnjoyFishing
             {ChatKbnKind.SynthFailure, "合成に失敗した。クリスタルは消失した。"},
             {ChatKbnKind.SynthLostItem, "(.*)を失った…。"},
             {ChatKbnKind.SynthNotEnoughSkill, "うまく合成できない。現在のスキルでは難しすぎるようだ。"},
+            {ChatKbnKind.UseItemSuccess, "{0}は、(.*)を使用。(.*)"},
+            {ChatKbnKind.UseItemFailure, "（コマンドでエラーがあったようです…）"},
         };
         #endregion
 
@@ -109,6 +111,8 @@ namespace EnjoyFishing
             SynthFailure,
             SynthLostItem,
             SynthNotEnoughSkill,
+            UseItemSuccess,
+            UseItemFailure,
         }
         public enum RunningStatusKind
         {
@@ -1053,6 +1057,15 @@ namespace EnjoyFishing
                         break;
                     }
                 }
+                //エンチャントアイテム使用
+                if (this.RunningStatus != RunningStatusKind.Running) break;
+                if (!useEnchantedItem())
+                {
+                    setRunningStatus(RunningStatusKind.Stop);
+                    setFishingStatus(FishingStatusKind.Error);
+                    setMessage("エンチャントアイテムが使用できなかったので停止");
+                    break;
+                }
                 //ヴァナ時間
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 while (settings.Fishing.VanaTime &&
@@ -1669,7 +1682,8 @@ namespace EnjoyFishing
                     v.Key == ChatKbnKind.EnemyAttack3 ||
                     v.Key == ChatKbnKind.SneakWarning2 ||
                     v.Key == ChatKbnKind.SkillUp ||
-                    v.Key == ChatKbnKind.SkillLvUp)
+                    v.Key == ChatKbnKind.SkillLvUp ||
+                    v.Key == ChatKbnKind.UseItemSuccess)
                 {
                     searchStr = string.Format(v.Value, this.PlayerName);
                 }
@@ -1949,7 +1963,7 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iRodName">修理する竿名称</param>
         /// <returns>成功した場合Trueを返す</returns>
-        public bool repairRod(string iRodName)
+        private bool repairRod(string iRodName)
         {
             //折れた竿名と修理に使用するクリスタルを取得
             List<RodDBRodModel> rods = FishDB.SelectRod(iRodName);
@@ -2044,7 +2058,7 @@ namespace EnjoyFishing
         /// <param name="iCrystalName">使用クリスタル</param>
         /// <param name="iBreakRod">修理する竿名</param>
         /// <returns>成功した場合Trueを返す</returns>
-        public bool RepairRodSynthesis(string iCrystalName, string iBreakRodName)
+        private bool RepairRodSynthesis(string iCrystalName, string iBreakRodName)
         {
             //入力チェック
             if (!control.IsExistItem(iCrystalName, InventoryType.Inventory) ||
@@ -2181,6 +2195,84 @@ namespace EnjoyFishing
                     return true;
                 }
                 Thread.Sleep(settings.Global.WaitChat);
+            }
+            return false;
+        }
+        /// <summary>
+        /// エンチャントアイテムの使用
+        /// </summary>
+        /// <returns></returns>
+        public bool useEnchantedItem()
+        {
+            if (!settings.Fishing.EquipEnable) return true;
+            //腰
+            if (settings.Fishing.UseWaist)
+            {
+                List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipWaist, GearDBPositionKind.Rings);
+                if (item.Count > 0 && item[0].BuffID > 0)
+                {
+                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    {
+                        setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
+                        useItem(item[0].GearName);
+                    }
+                }
+            }
+            //左指
+            if (settings.Fishing.UseRingLeft)
+            {
+                List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingLeft, GearDBPositionKind.Rings);
+                if (item.Count > 0 && item[0].BuffID > 0)
+                {
+                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    {
+                        setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
+                        useItem(item[0].GearName);
+                    }
+                }
+            }
+            //右指
+            if (settings.Fishing.UseRingRight)
+            {
+                List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingRight, GearDBPositionKind.Rings);
+                if (item.Count > 0 && item[0].BuffID > 0)
+                {
+                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    {
+                        setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
+                        useItem(item[0].GearName);
+                    }
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// アイテムの使用
+        /// </summary>
+        /// <param name="iItemname">アイテム名</param>
+        /// <returns></returns>
+        public bool useItem(string iItemname)
+        {
+            fface.Windower.SendString(string.Format("/item {0} <me>",iItemname));
+            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                chat.GetNextChatLine(out cl);
+                //チャット区分の取得
+                List<string> chatKbnArgs = new List<string>();
+                ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
+                logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                //失敗
+                if (chatKbn == ChatKbnKind.UseItemFailure)
+                {
+                    return false;
+                }
+                //成功
+                if (chatKbn == ChatKbnKind.UseItemSuccess)
+                {
+                    return true;
+                }
+                Thread.Sleep(settings.Global.WaitBase);
             }
             return false;
         }

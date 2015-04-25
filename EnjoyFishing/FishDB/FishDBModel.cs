@@ -272,6 +272,11 @@ namespace EnjoyFishing
         {
             this.Rod = new List<RodDBRodModel>();
         }
+        public static int SortTypeName(RodDBRodModel iRod1, RodDBRodModel iRod2)
+        {
+            //1番目のキー：RodNameでソート
+            return string.Compare(iRod1.RodName, iRod2.RodName);
+        }
     }
     public class RodDBRodModel
     {
@@ -300,6 +305,11 @@ namespace EnjoyFishing
         {
             this.Bait = new List<BaitDBBaitModel>();
         }
+        public static int SortTypeName(BaitDBBaitModel iBait1, BaitDBBaitModel iBait2)
+        {
+            //1番目のキー：BaitNameでソート
+            return string.Compare(iBait1.BaitName, iBait2.BaitName);
+        }
     }
     public class BaitDBBaitModel
     {
@@ -317,6 +327,11 @@ namespace EnjoyFishing
         public GearDBModel()
         {
             this.Gear = new List<GearDBGearModel>();
+        }
+        public static int SortTypeName(GearDBGearModel iGear1, GearDBGearModel iGear2)
+        {
+            //1番目のキー：GearNameでソート
+            return string.Compare(iGear1.GearName, iGear2.GearName);
         }
     }
     public class GearDBGearModel
