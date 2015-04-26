@@ -332,6 +332,10 @@ namespace EnjoyFishing
                 chkHP0.Checked = settings.Fishing.HP0;
                 txtHP0Min.Value = (decimal)settings.Fishing.HP0Min;
                 txtHP0Max.Value = (decimal)settings.Fishing.HP0Max;
+                chkIgnoreSmallFish.Checked = settings.Fishing.IgnoreSmallFish;
+                chkIgnoreLargeFish.Checked = settings.Fishing.IgnoreLargeFish;
+                chkIgnoreMonster.Checked = settings.Fishing.IgnoreMonster;
+                chkIgnoreItem.Checked = settings.Fishing.IgnoreItem;
                 chkReactionTime.Checked = settings.Fishing.ReactionTime;
                 txtReactionTimeMin.Value = (decimal)settings.Fishing.ReactionTimeMin;
                 txtReactionTimeMax.Value = (decimal)settings.Fishing.ReactionTimeMax;
@@ -344,10 +348,8 @@ namespace EnjoyFishing
                 chkEarthTime.Checked = settings.Fishing.EarthTime;
                 txtEarthTimeFrom.Value = settings.Fishing.EarthTimeFrom;
                 txtEarthTimeTo.Value = settings.Fishing.EarthTimeTo;
-                chkIgnoreSmallFish.Checked = settings.Fishing.IgnoreSmallFish;
-                chkIgnoreLargeFish.Checked = settings.Fishing.IgnoreLargeFish;
-                chkIgnoreMonster.Checked = settings.Fishing.IgnoreMonster;
-                chkIgnoreItem.Checked = settings.Fishing.IgnoreItem;
+                chkRepairRod.Checked = settings.Fishing.RepairRod;
+                //釣り設定・停止条件
                 chkMaxCatch.Checked = settings.Fishing.MaxCatch;
                 txtMaxCatchCount.Value = settings.Fishing.MaxCatchCount;
                 chkMaxNoCatch.Checked = settings.Fishing.MaxNoCatch;
@@ -1591,6 +1593,7 @@ namespace EnjoyFishing
                 chkNoBaitNoRodCase.Enabled = true;
                 txtNoBaitNoRodCmdLine.Enabled = true;
                 chkNoBaitNoRodCmd.Enabled = true;
+                chkRepairRod.Enabled = true;
             }
             else
             {
@@ -1605,6 +1608,7 @@ namespace EnjoyFishing
                 chkNoBaitNoRodCase.Enabled = false;
                 txtNoBaitNoRodCmdLine.Enabled = false;
                 chkNoBaitNoRodCmd.Enabled = false;
+                chkRepairRod.Enabled = false;
             }
             if (settings.UseEnternity)
             {
@@ -1670,6 +1674,8 @@ namespace EnjoyFishing
                 settings.Fishing.EarthTime = chkEarthTime.Checked;
                 settings.Fishing.EarthTimeFrom = (int)txtEarthTimeFrom.Value;
                 settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
+                settings.Fishing.RepairRod = chkRepairRod.Checked;
+                //釣り設定・停止条件
                 settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
                 settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
                 settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
@@ -2005,6 +2011,26 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Fishing.HP0Max = (int)txtHP0Max.Value;
         }
+        private void chkIgnoreSmallFish_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
+        }
+        private void chkIgnoreLargeFish_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
+        }
+        private void chkIgnoreMonster_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
+        }
+        private void chkIgnoreItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreItem = chkIgnoreItem.Checked;
+        }
         private void chkReactionTime_CheckedChanged(object sender, EventArgs e)
         {
             if (startupFlg) return;
@@ -2065,75 +2091,10 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
         }
-        private void chkIgnoreSmallFish_CheckedChanged(object sender, EventArgs e)
+        private void chkRepairRod_CheckedChanged(object sender, EventArgs e)
         {
             if (startupFlg) return;
-            settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
-        }
-        private void chkIgnoreLargeFish_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
-        }
-        private void chkIgnoreMonster_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
-        }
-        private void chkIgnoreItem_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.IgnoreItem = chkIgnoreItem.Checked;
-        }
-        private void chkInventoryFullSack_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
-        }
-        private void chkInventoryFullSatchel_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
-        }
-        private void chkInventoryFullCase_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
-        }
-        private void chkInventoryFullCmd_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
-        }
-        private void txtInventoryFullCmdLine_TextChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
-        }
-        private void chkNoBaitNoRodSack_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
-        }
-        private void chkNoBaitNoRodSatchel_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
-        }
-        private void chkNoBaitNoRodCase_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
-        }
-        private void chkNoBaitNoRodCmd_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
-        }
-        private void txtNoBaitNoRodCmdLine_TextChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
+            settings.Fishing.RepairRod = chkRepairRod.Checked;
         }
         #endregion
         #region 釣り設定・停止条件
@@ -2221,6 +2182,60 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
+        }
+        #endregion
+        #region 釣り設定・鞄いっぱい
+        private void chkInventoryFullSack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
+        }
+        private void chkInventoryFullSatchel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
+        }
+        private void chkInventoryFullCase_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
+        }
+        private void chkInventoryFullCmd_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
+        }
+        private void txtInventoryFullCmdLine_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
+        }
+        #endregion
+        #region 釣り設定・竿エサなし
+        private void chkNoBaitNoRodSack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
+        }
+        private void chkNoBaitNoRodSatchel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
+        }
+        private void chkNoBaitNoRodCase_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
+        }
+        private void chkNoBaitNoRodCmd_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
+        }
+        private void txtNoBaitNoRodCmdLine_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
         }
         #endregion
         #region 釣り設定・装備

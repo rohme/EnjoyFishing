@@ -395,6 +395,10 @@ namespace EnjoyFishing
         public bool HP0 { get; set; }
         public int HP0Min { get; set; }
         public int HP0Max { get; set; }
+        public bool IgnoreSmallFish { get; set; }
+        public bool IgnoreLargeFish { get; set; }
+        public bool IgnoreMonster { get; set; }
+        public bool IgnoreItem { get; set; }
         public bool ReactionTime { get; set; }
         public float ReactionTimeMin { get; set; }
         public float ReactionTimeMax { get; set; }
@@ -407,10 +411,7 @@ namespace EnjoyFishing
         public bool EarthTime { get; set; }
         public int EarthTimeFrom { get; set; }
         public int EarthTimeTo { get; set; }
-        public bool IgnoreSmallFish { get; set; }
-        public bool IgnoreLargeFish { get; set; }
-        public bool IgnoreMonster { get; set; }
-        public bool IgnoreItem { get; set; }
+        public bool RepairRod { get; set; }
         public bool MaxCatch { get; set; }
         public int MaxCatchCount { get; set; }
         public bool MaxNoCatch { get; set; }
@@ -466,6 +467,10 @@ namespace EnjoyFishing
             this.HP0 = false;
             this.HP0Min = 5;
             this.HP0Max = 10;
+            this.IgnoreSmallFish = false;
+            this.IgnoreLargeFish = false;
+            this.IgnoreMonster = true;
+            this.IgnoreItem = true;
             this.ReactionTime = true;
             this.ReactionTimeMin = 0.5F;
             this.ReactionTimeMax = 2.5F;
@@ -478,10 +483,7 @@ namespace EnjoyFishing
             this.EarthTime = false;
             this.EarthTimeFrom = 0;
             this.EarthTimeTo = 6;
-            this.IgnoreSmallFish = false;
-            this.IgnoreLargeFish = false;
-            this.IgnoreMonster = true;
-            this.IgnoreItem = true;
+            this.RepairRod = false;
             this.MaxCatch = false;
             this.MaxCatchCount = 200;
             this.MaxNoCatch = true;
@@ -550,9 +552,9 @@ namespace EnjoyFishing
         public SettingsPlayerEtcModel()
         {
             this.WindowTopMost = false;
-            this.WindowFlash = true;
-            this.WindowActivate = true;
-            this.MessageEcho = true;
+            this.WindowFlash = false;
+            this.WindowActivate = false;
+            this.MessageEcho = false;
             this.VisibleMoonPhase = true;
             this.VisibleVanaTime = true;
             this.VisibleEarthTime = false;

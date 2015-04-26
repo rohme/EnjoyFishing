@@ -47,6 +47,7 @@
             this.chkIgnoreSmallFish = new System.Windows.Forms.CheckBox();
             this.chkIgnoreLargeFish = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtEnemyAttackCmdLine = new System.Windows.Forms.TextBox();
             this.chkEnemyAttackCmd = new System.Windows.Forms.CheckBox();
             this.txtChatRestartMinute = new System.Windows.Forms.NumericUpDown();
             this.chkChatRestart = new System.Windows.Forms.CheckBox();
@@ -234,7 +235,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.txtEnemyAttackCmdLine = new System.Windows.Forms.TextBox();
+            this.chkRepairRod = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -328,7 +329,7 @@
             this.lblHP,
             this.barRemainTime,
             this.lblRemainTime});
-            this.statusStrip.Location = new System.Drawing.Point(0, 351);
+            this.statusStrip.Location = new System.Drawing.Point(0, 365);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.ShowItemToolTips = true;
             this.statusStrip.Size = new System.Drawing.Size(569, 22);
@@ -457,12 +458,22 @@
             this.groupBox1.Controls.Add(this.chkChatTell);
             this.groupBox1.Controls.Add(this.chkMaxCatch);
             this.groupBox1.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupBox1.Location = new System.Drawing.Point(0, 120);
+            this.groupBox1.Location = new System.Drawing.Point(0, 135);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(411, 99);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
+            // 
+            // txtEnemyAttackCmdLine
+            // 
+            this.txtEnemyAttackCmdLine.AcceptsReturn = true;
+            this.txtEnemyAttackCmdLine.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtEnemyAttackCmdLine.Location = new System.Drawing.Point(163, 68);
+            this.txtEnemyAttackCmdLine.Name = "txtEnemyAttackCmdLine";
+            this.txtEnemyAttackCmdLine.Size = new System.Drawing.Size(124, 21);
+            this.txtEnemyAttackCmdLine.TabIndex = 17;
+            this.txtEnemyAttackCmdLine.TextChanged += new System.EventHandler(this.txtEnemyAttackCmd_TextChanged);
             // 
             // chkEnemyAttackCmd
             // 
@@ -734,6 +745,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.chkRepairRod);
             this.groupBox3.Controls.Add(this.txtHP0Max);
             this.groupBox3.Controls.Add(this.txtHP0Min);
             this.groupBox3.Controls.Add(this.chkHP0);
@@ -759,7 +771,7 @@
             this.groupBox3.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(411, 120);
+            this.groupBox3.Size = new System.Drawing.Size(411, 135);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "動作";
@@ -1109,7 +1121,7 @@
             this.tabFishingMain.Name = "tabFishingMain";
             this.tabFishingMain.Padding = new System.Drawing.Point(0, 0);
             this.tabFishingMain.SelectedIndex = 0;
-            this.tabFishingMain.Size = new System.Drawing.Size(421, 318);
+            this.tabFishingMain.Size = new System.Drawing.Size(421, 332);
             this.tabFishingMain.TabIndex = 9;
             // 
             // tabFishingMainSetting
@@ -1121,7 +1133,7 @@
             this.tabFishingMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainSetting.Name = "tabFishingMainSetting";
             this.tabFishingMainSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainSetting.Size = new System.Drawing.Size(413, 291);
+            this.tabFishingMainSetting.Size = new System.Drawing.Size(413, 305);
             this.tabFishingMainSetting.TabIndex = 0;
             this.tabFishingMainSetting.Text = "釣り設定";
             this.tabFishingMainSetting.UseVisualStyleBackColor = true;
@@ -1130,7 +1142,7 @@
             // 
             this.groupNoBiteNoRod.Controls.Add(this.flowLayoutPanel4);
             this.groupNoBiteNoRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupNoBiteNoRod.Location = new System.Drawing.Point(206, 220);
+            this.groupNoBiteNoRod.Location = new System.Drawing.Point(206, 233);
             this.groupNoBiteNoRod.Name = "groupNoBiteNoRod";
             this.groupNoBiteNoRod.Size = new System.Drawing.Size(205, 71);
             this.groupNoBiteNoRod.TabIndex = 3;
@@ -1211,7 +1223,7 @@
             // 
             this.groupInventoryFull.Controls.Add(this.flowLayoutPanel3);
             this.groupInventoryFull.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupInventoryFull.Location = new System.Drawing.Point(0, 219);
+            this.groupInventoryFull.Location = new System.Drawing.Point(0, 234);
             this.groupInventoryFull.Name = "groupInventoryFull";
             this.groupInventoryFull.Size = new System.Drawing.Size(203, 71);
             this.groupInventoryFull.TabIndex = 2;
@@ -2101,7 +2113,7 @@
             // splitMain.Panel2
             // 
             this.splitMain.Panel2.Controls.Add(this.tabFishingMain);
-            this.splitMain.Size = new System.Drawing.Size(555, 318);
+            this.splitMain.Size = new System.Drawing.Size(555, 332);
             this.splitMain.SplitterDistance = 130;
             this.splitMain.TabIndex = 8;
             // 
@@ -2200,7 +2212,7 @@
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(569, 351);
+            this.tabMain.Size = new System.Drawing.Size(569, 365);
             this.tabMain.TabIndex = 0;
             // 
             // tabMainFishing
@@ -2209,7 +2221,7 @@
             this.tabMainFishing.Location = new System.Drawing.Point(4, 23);
             this.tabMainFishing.Name = "tabMainFishing";
             this.tabMainFishing.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainFishing.Size = new System.Drawing.Size(561, 324);
+            this.tabMainFishing.Size = new System.Drawing.Size(561, 338);
             this.tabMainFishing.TabIndex = 0;
             this.tabMainFishing.Text = "釣り";
             this.tabMainFishing.UseVisualStyleBackColor = true;
@@ -2404,7 +2416,7 @@
             this.tabMainSetting.Controls.Add(this.groupBox7);
             this.tabMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabMainSetting.Name = "tabMainSetting";
-            this.tabMainSetting.Size = new System.Drawing.Size(561, 324);
+            this.tabMainSetting.Size = new System.Drawing.Size(561, 338);
             this.tabMainSetting.TabIndex = 2;
             this.tabMainSetting.Text = "設定";
             this.tabMainSetting.UseVisualStyleBackColor = true;
@@ -2437,9 +2449,9 @@
             this.chkMessageEcho.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.chkMessageEcho.Location = new System.Drawing.Point(258, 44);
             this.chkMessageEcho.Name = "chkMessageEcho";
-            this.chkMessageEcho.Size = new System.Drawing.Size(138, 18);
+            this.chkMessageEcho.Size = new System.Drawing.Size(118, 18);
             this.chkMessageEcho.TabIndex = 8;
-            this.chkMessageEcho.Text = "メッセージを/Echoで表示";
+            this.chkMessageEcho.Text = "メッセージをFFに表示";
             this.chkMessageEcho.UseVisualStyleBackColor = true;
             this.chkMessageEcho.CheckedChanged += new System.EventHandler(this.chkMessageEcho_CheckedChanged);
             // 
@@ -2807,22 +2819,24 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // txtEnemyAttackCmdLine
+            // chkRepairRod
             // 
-            this.txtEnemyAttackCmdLine.AcceptsReturn = true;
-            this.txtEnemyAttackCmdLine.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtEnemyAttackCmdLine.Location = new System.Drawing.Point(163, 68);
-            this.txtEnemyAttackCmdLine.Name = "txtEnemyAttackCmdLine";
-            this.txtEnemyAttackCmdLine.Size = new System.Drawing.Size(124, 21);
-            this.txtEnemyAttackCmdLine.TabIndex = 17;
-            this.txtEnemyAttackCmdLine.TextChanged += new System.EventHandler(this.txtEnemyAttackCmd_TextChanged);
+            this.chkRepairRod.AutoSize = true;
+            this.chkRepairRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkRepairRod.Location = new System.Drawing.Point(6, 113);
+            this.chkRepairRod.Name = "chkRepairRod";
+            this.chkRepairRod.Size = new System.Drawing.Size(68, 18);
+            this.chkRepairRod.TabIndex = 21;
+            this.chkRepairRod.Text = "竿の修理";
+            this.chkRepairRod.UseVisualStyleBackColor = true;
+            this.chkRepairRod.CheckedChanged += new System.EventHandler(this.chkRepairRod_CheckedChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(569, 373);
+            this.ClientSize = new System.Drawing.Size(569, 387);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -3104,5 +3118,6 @@
         private System.Windows.Forms.CheckBox chkMessageEcho;
         private System.Windows.Forms.CheckBox chkEnemyAttackCmd;
         private System.Windows.Forms.TextBox txtEnemyAttackCmdLine;
+        private System.Windows.Forms.CheckBox chkRepairRod;
     }
 }

@@ -887,8 +887,15 @@ namespace EnjoyFishing
                         setFishingStatus(FishingStatusKind.Wait);
                         double waitSec = (double)(settings.Fishing.ChatRestartMinute * 60);
                         DateTime restartTime = DateTime.Now.AddMinutes(settings.Fishing.ChatRestartMinute);
-                        setMessage(string.Format("チャット感知：再稼働待ち {0}(地球時間)まで待機", restartTime.ToString("HH:mm:ss")));
+                        setMessage(string.Format("チャット感知：再始動待ち {0}(地球時間)まで待機", restartTime.ToString("HH:mm:ss")));
                         wait(waitSec, waitSec);
+                        //チャットバッファをクリア
+                        FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                        while (chat.GetNextChatLine(out cl))
+                        {
+                            Thread.Sleep(10);
+                        }
+                        //チャット受信フラグクリア
                         interrupt.ChatReceive = false;
                         setFishingStatus(FishingStatusKind.Normal);
                     }
@@ -996,12 +1003,14 @@ namespace EnjoyFishing
                         if (!getRodBaitItem(lastRodName))
                         {
                             //竿の修理
-                            if (!repairRod(lastRodName))
+                            if (settings.Fishing.RepairRod && settings.UseItemizer)
                             {
-                                setRunningStatus(RunningStatusKind.Stop);
-                                setFishingStatus(FishingStatusKind.Error);
-                                //setMessage("釣り竿が無いので停止");
-                                break;
+                                if (!repairRod(lastRodName))
+                                {
+                                    setRunningStatus(RunningStatusKind.Stop);
+                                    setFishingStatus(FishingStatusKind.Error);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -1695,7 +1704,7 @@ namespace EnjoyFishing
                 if (MiscTool.IsRegexString(iCl.Text, searchStr))
                 {
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
-                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2)
+                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2 || v.Key == ChatKbnKind.EnemyAttack3)
                     {
                         interrupt.EnemyAttack = true;
                     }
@@ -1972,8 +1981,6 @@ namespace EnjoyFishing
             ushort breakRodID = (ushort)FFACE.ParseResources.GetItemID(breakRodName);
             string repairCrystal = rods[0].RepairCrystal;
 
-            setMessage(string.Format("{0}を修理します", breakRodName));
-
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 //鞄に竿が入っていない場合、鞄に移動する
@@ -1984,7 +1991,7 @@ namespace EnjoyFishing
                     //ワードローブに竿があるか確認
                     if (fface.Item.GetWardrobeItemCount(breakRodID) == 0)
                     {
-                        setMessage(string.Format("{0}が見つからなかったので停止", breakRodName));
+                        setMessage(string.Format("竿の修理：{0}が見つからなかったので停止", breakRodName));
                         return false;
                     }
                     //鞄がいっぱいの場合空きを作る
@@ -1992,14 +1999,14 @@ namespace EnjoyFishing
                     {
                         if (!putFish())
                         {
-                            setMessage("鞄がいっぱいで竿の修理ができなかったので停止");
+                            setMessage("竿の修理：鞄がいっぱいで竿の修理ができなかったので停止");
                             return false;
                         }
                     }
                     //竿を鞄に移動
                     if (!control.GetItem(breakRodName, InventoryType.Wardrobe))
                     {
-                        setMessage(string.Format("{0}が鞄に移動できなかったので停止", breakRodName));
+                        setMessage(string.Format("竿の修理：{0}が鞄に移動できなかったので停止", breakRodName));
                         return false;
                     }
                     setMessage(string.Format("{0}を{1}から取り出しました", breakRodName, InventoryType.Wardrobe.ToString()));
@@ -2011,7 +2018,7 @@ namespace EnjoyFishing
                     //クリスタルが存在する？
                     if (control.GetInventoryTypeFromItemName(repairCrystal) == InventoryType.None)
                     {
-                        setMessage(string.Format("{0}が見つからなかったので停止", repairCrystal));
+                        setMessage(string.Format("竿の修理：{0}が見つからなかったので停止", repairCrystal));
                         return false;
                     }
                     //鞄がいっぱいの場合空きを作る
@@ -2019,37 +2026,39 @@ namespace EnjoyFishing
                     {
                         if (!putFish())
                         {
-                            setMessage("鞄がいっぱいで竿の修理ができなかったので停止");
+                            setMessage("竿の修理：鞄がいっぱいで竿の修理ができなかったので停止");
                             return false;
                         }
                     }
                     //クリスタルを鞄に移動
                     if (!getItem(repairCrystal))
                     {
-                        setMessage(string.Format("{0}が鞄に移動できなかったので停止", repairCrystal));
+                        setMessage(string.Format("竿の修理：{0}が鞄に移動できなかったので停止", repairCrystal));
                         return false;
                     }
                 }
                 //入港メッセージチェック
                 if (interrupt.ShipWarning)
                 {
-                    setMessage("入港するので竿の修理を中止");
+                    setMessage("竿の修理：入港するので竿の修理を中止");
                     return false;
                 }
                 //合成
+                setMessage(string.Format("竿の修理：{0}を修理します", breakRodName));
                 bool synthSuccess = RepairRodSynthesis(repairCrystal, breakRodName);
                 //ワードローブに竿を戻す
                 if (synthSuccess && wardrobe)
                 {
                     if (!putItem(iRodName, InventoryType.Wardrobe))
                     {
-                        setMessage(string.Format("{0}が{1}に移動できなかったので停止", breakRodName, InventoryType.Wardrobe.ToString()));
+                        setMessage(string.Format("竿の修理：{0}が{1}に移動できなかったので停止", breakRodName, InventoryType.Wardrobe.ToString()));
                         return false;
                     }
+                    setMessage(string.Format("竿の修理：{0}をワードローブに移動しました", iRodName));
                 }
                 if (synthSuccess) return true;
             }
-            setMessage("竿の修理が出来なかったので停止");
+            setMessage("竿の修理：竿の修理が出来なかったので停止");
             return false;
         }
         /// <summary>
@@ -2102,17 +2111,20 @@ namespace EnjoyFishing
                     maxLoop = false;
                     break;
                 }
-                if (firstTime)
+                else if (firstTime)
                 {
-                    for (int j = 0; j < 10; j++)
+                    for (int j = 0; j < 15; j++)
                     {
-                        fface.Windower.SendKeyPress(KeyCode.LeftArrow);
+                        fface.Windower.SendKeyPress(KeyCode.RightArrow);
                         Thread.Sleep(100);
                     }
                     firstTime = false;
                 }
-                fface.Windower.SendKeyPress(KeyCode.DownArrow);
-                Thread.Sleep(100);
+                else
+                {
+                    fface.Windower.SendKeyPress(KeyCode.UpArrow);
+                    Thread.Sleep(100);
+                }
             }
             if (maxLoop) return false;
             //クリスタルでリターン押下
@@ -2206,7 +2218,7 @@ namespace EnjoyFishing
         {
             if (!settings.Fishing.EquipEnable) return true;
             //腰
-            if (settings.Fishing.UseWaist)
+            if (settings.Fishing.UseWaist || !string.IsNullOrEmpty(settings.Fishing.EquipWaist))
             {
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipWaist, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
@@ -2219,7 +2231,7 @@ namespace EnjoyFishing
                 }
             }
             //左指
-            if (settings.Fishing.UseRingLeft)
+            if (settings.Fishing.UseRingLeft || !string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
             {
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingLeft, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
@@ -2232,7 +2244,7 @@ namespace EnjoyFishing
                 }
             }
             //右指
-            if (settings.Fishing.UseRingRight)
+            if (settings.Fishing.UseRingRight || !string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
             {
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingRight, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
