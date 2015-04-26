@@ -395,6 +395,10 @@ namespace EnjoyFishing
         public bool HP0 { get; set; }
         public int HP0Min { get; set; }
         public int HP0Max { get; set; }
+        public bool IgnoreSmallFish { get; set; }
+        public bool IgnoreLargeFish { get; set; }
+        public bool IgnoreMonster { get; set; }
+        public bool IgnoreItem { get; set; }
         public bool ReactionTime { get; set; }
         public float ReactionTimeMin { get; set; }
         public float ReactionTimeMax { get; set; }
@@ -407,10 +411,7 @@ namespace EnjoyFishing
         public bool EarthTime { get; set; }
         public int EarthTimeFrom { get; set; }
         public int EarthTimeTo { get; set; }
-        public bool IgnoreSmallFish { get; set; }
-        public bool IgnoreLargeFish { get; set; }
-        public bool IgnoreMonster { get; set; }
-        public bool IgnoreItem { get; set; }
+        public bool RepairRod { get; set; }
         public bool MaxCatch { get; set; }
         public int MaxCatchCount { get; set; }
         public bool MaxNoCatch { get; set; }
@@ -426,6 +427,8 @@ namespace EnjoyFishing
         public bool ChatRestart { get; set; }
         public int ChatRestartMinute { get; set; }
         public bool EntryPort { get; set; }
+        public bool EnemyAttackCmd { get; set; }
+        public string EnemyAttackCmdLine { get; set; }
         public bool InventoryFullSack { get; set; }
         public bool InventoryFullSatchel { get; set; }
         public bool InventoryFullCase { get; set; }
@@ -436,6 +439,26 @@ namespace EnjoyFishing
         public bool NoBaitNoRodCase { get; set; }
         public bool NoBaitNoRodCmd { get; set; }
         public string NoBaitNoRodCmdLine { get; set; }
+        public bool EquipEnable { get; set; }
+        public string EquipRod { get; set; }
+        public string EquipBait { get; set; }
+        public string EquipMain { get; set; }
+        public string EquipSub { get; set; }
+        public string EquipHead { get; set; }
+        public string EquipBody { get; set; }
+        public string EquipHands { get; set; }
+        public string EquipLegs { get; set; }
+        public string EquipFeet { get; set; }
+        public string EquipNeck { get; set; }
+        public string EquipWaist { get; set; }
+        public string EquipBack { get; set; }
+        public string EquipEarLeft { get; set; }
+        public string EquipEarRight { get; set; }
+        public string EquipRingLeft { get; set; }
+        public string EquipRingRight { get; set; }
+        public bool UseWaist { get; set; }
+        public bool UseRingLeft { get; set; }
+        public bool UseRingRight { get; set; }
         public SettingsPlayerFishingModel()
         {
             this.Learning = true;
@@ -444,6 +467,10 @@ namespace EnjoyFishing
             this.HP0 = false;
             this.HP0Min = 5;
             this.HP0Max = 10;
+            this.IgnoreSmallFish = false;
+            this.IgnoreLargeFish = false;
+            this.IgnoreMonster = true;
+            this.IgnoreItem = true;
             this.ReactionTime = true;
             this.ReactionTimeMin = 0.5F;
             this.ReactionTimeMax = 2.5F;
@@ -456,10 +483,7 @@ namespace EnjoyFishing
             this.EarthTime = false;
             this.EarthTimeFrom = 0;
             this.EarthTimeTo = 6;
-            this.IgnoreSmallFish = false;
-            this.IgnoreLargeFish = false;
-            this.IgnoreMonster = true;
-            this.IgnoreItem = true;
+            this.RepairRod = false;
             this.MaxCatch = false;
             this.MaxCatchCount = 200;
             this.MaxNoCatch = true;
@@ -475,6 +499,8 @@ namespace EnjoyFishing
             this.ChatRestart = false;
             this.ChatRestartMinute = 10;
             this.EntryPort = true;
+            this.EnemyAttackCmd = false;
+            this.EnemyAttackCmdLine = "/ma デジョン <me>";
             this.InventoryFullSack = true;
             this.InventoryFullSatchel = true;
             this.InventoryFullCase = true;
@@ -485,6 +511,26 @@ namespace EnjoyFishing
             this.NoBaitNoRodCase = true;
             this.NoBaitNoRodCmd = false;
             this.NoBaitNoRodCmdLine = "/ma デジョン <me>";
+            this.EquipEnable = false;
+            this.EquipRod = string.Empty;
+            this.EquipBait = string.Empty;
+            this.EquipMain = string.Empty;
+            this.EquipSub = string.Empty;
+            this.EquipHead = string.Empty;
+            this.EquipBody = string.Empty;
+            this.EquipHands = string.Empty;
+            this.EquipLegs = string.Empty;
+            this.EquipFeet = string.Empty;
+            this.EquipNeck = string.Empty;
+            this.EquipWaist = string.Empty;
+            this.EquipBack = string.Empty;
+            this.EquipEarLeft = string.Empty;
+            this.EquipEarRight = string.Empty;
+            this.EquipRingLeft = string.Empty;
+            this.EquipRingRight = string.Empty;
+            this.UseWaist = false;
+            this.UseRingLeft = false;
+            this.UseRingRight = false;
         }
     }
     public class SettingsPlayerEtcModel
@@ -492,6 +538,7 @@ namespace EnjoyFishing
         public bool WindowTopMost { get; set; }
         public bool WindowFlash { get; set; }
         public bool WindowActivate { get; set; }
+        public bool MessageEcho { get; set; }
         public bool VisibleMoonPhase { get; set; }
         public bool VisibleVanaTime { get; set; }
         public bool VisibleEarthTime { get; set; }
@@ -505,8 +552,9 @@ namespace EnjoyFishing
         public SettingsPlayerEtcModel()
         {
             this.WindowTopMost = false;
-            this.WindowFlash = true;
-            this.WindowActivate = true;
+            this.WindowFlash = false;
+            this.WindowActivate = false;
+            this.MessageEcho = false;
             this.VisibleMoonPhase = true;
             this.VisibleVanaTime = true;
             this.VisibleEarthTime = false;

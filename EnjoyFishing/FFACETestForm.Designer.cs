@@ -46,6 +46,7 @@
             this.ChatType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.FirstLine = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChatText = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -92,6 +93,7 @@
             // 
             // splitContainer2.Panel1
             // 
+            this.splitContainer2.Panel1.Controls.Add(this.label1);
             this.splitContainer2.Panel1.Controls.Add(this.chkTopMost);
             this.splitContainer2.Panel1.Controls.Add(this.lblPlayerName);
             this.splitContainer2.Panel1.Controls.Add(this.lblProcID);
@@ -140,7 +142,7 @@
             // 
             this.trcOpacity.AutoSize = false;
             this.trcOpacity.LargeChange = 10;
-            this.trcOpacity.Location = new System.Drawing.Point(206, 5);
+            this.trcOpacity.Location = new System.Drawing.Point(227, 5);
             this.trcOpacity.Maximum = 100;
             this.trcOpacity.Minimum = 50;
             this.trcOpacity.Name = "trcOpacity";
@@ -252,6 +254,15 @@
             this.ChatText.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.ChatText.Width = 37;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(206, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 14);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "透過";
+            // 
             // FFACETestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
@@ -298,6 +309,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatType;
         private System.Windows.Forms.DataGridViewTextBoxColumn FirstLine;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatText;
+        private System.Windows.Forms.Label label1;
 
     }
 }

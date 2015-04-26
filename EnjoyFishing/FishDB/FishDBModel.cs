@@ -26,6 +26,22 @@ namespace EnjoyFishing
         Key,
         Unknown,
     }
+    public enum GearDBPositionKind
+    {
+        Unknown,
+        Main,
+        Sub,
+        Head,
+        Body,
+        Hands,
+        Legs,
+        Feet,
+        Neck,
+        Waist,
+        Back,
+        Rings,
+        Earrings,
+    }
 
     #region FishDBModel
     [XmlRoot("Rod")]
@@ -256,11 +272,26 @@ namespace EnjoyFishing
         {
             this.Rod = new List<RodDBRodModel>();
         }
+        public static int SortTypeName(RodDBRodModel iRod1, RodDBRodModel iRod2)
+        {
+            //1番目のキー：RodNameでソート
+            return string.Compare(iRod1.RodName, iRod2.RodName);
+        }
     }
     public class RodDBRodModel
     {
         [XmlAttribute("name")]
         public string RodName { get; set; }
+        [XmlAttribute("break")]
+        public string BreakRodName { get; set; }
+        [XmlAttribute("crystal")]
+        public string RepairCrystal { get; set; }
+        public RodDBRodModel()
+        {
+            this.RodName = string.Empty;
+            this.BreakRodName = string.Empty;
+            this.RepairCrystal = string.Empty;
+        }
     }
     #endregion
 
@@ -273,6 +304,11 @@ namespace EnjoyFishing
         public BaitDBModel()
         {
             this.Bait = new List<BaitDBBaitModel>();
+        }
+        public static int SortTypeName(BaitDBBaitModel iBait1, BaitDBBaitModel iBait2)
+        {
+            //1番目のキー：BaitNameでソート
+            return string.Compare(iBait1.BaitName, iBait2.BaitName);
         }
     }
     public class BaitDBBaitModel
@@ -292,11 +328,32 @@ namespace EnjoyFishing
         {
             this.Gear = new List<GearDBGearModel>();
         }
+        public static int SortTypeName(GearDBGearModel iGear1, GearDBGearModel iGear2)
+        {
+            //1番目のキー：GearNameでソート
+            return string.Compare(iGear1.GearName, iGear2.GearName);
+        }
     }
     public class GearDBGearModel
     {
         [XmlAttribute("name")]
         public string GearName { get; set; }
+        [XmlAttribute("position")]
+        public GearDBPositionKind Position { get; set; }
+        [XmlAttribute("buff")]
+        public int BuffID { get; set; }
+        public GearDBGearModel()
+        {
+            this.GearName = string.Empty;
+            this.Position = GearDBPositionKind.Unknown;
+            this.BuffID = -1;
+        }
+        public GearDBGearModel(string iGearName, GearDBPositionKind iPosition, int iGearBuff)
+        {
+            this.GearName = iGearName;
+            this.Position = iPosition;
+            this.BuffID = iGearBuff;
+        }
     }
     #endregion
 }

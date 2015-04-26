@@ -28,7 +28,6 @@ namespace EnjoyFishing
         private LoggerTool logger;
         private List<string> _Rods = new List<string>();
         private List<string> _Baits = new List<string>();
-        private List<string> _Gears = new List<string>();
 
         #region コンストラクタ
         /// <summary>
@@ -46,17 +45,12 @@ namespace EnjoyFishing
             {
                 this._Baits.Add(bait.BaitName);
             }
-            foreach (GearDBGearModel gear in SelectGear())
-            {
-                this._Gears.Add(gear.GearName);
-            }
         }
         #endregion
 
         #region メンバ
         public List<string> Rods { get { return _Rods; } }
         public List<string> Baits { get { return _Baits; } }
-        public List<string> Gears { get { return _Gears; } }
         #endregion
         
         #region FishDB
@@ -485,6 +479,7 @@ namespace EnjoyFishing
                     }
                 }
             }
+            ret.Sort(RodDBModel.SortTypeName);
             logger.VarDump(ret);
             return ret;
         }
@@ -559,6 +554,7 @@ namespace EnjoyFishing
                     }
                 }
             }
+            ret.Sort(BaitDBModel.SortTypeName);
             logger.VarDump(ret);
             return ret;
         }
@@ -604,35 +600,38 @@ namespace EnjoyFishing
         /// <summary>
         /// 装備を取得する（引数無し）
         /// </summary>
-        /// <returns>餌の一覧</returns>
+        /// <returns>装備の一覧</returns>
         public List<GearDBGearModel> SelectGear()
         {
-            return SelectGear(string.Empty);
+            return SelectGear(string.Empty, GearDBPositionKind.Unknown);
         }
         /// <summary>
         /// 装備を取得する
         /// </summary>
         /// <param name="iSearchString">餌名称（正規表現）</param>
-        /// <returns>餌の一覧</returns>
-        public List<GearDBGearModel> SelectGear(string iSearchString)
+        /// <returns>装備の一覧</returns>
+        public List<GearDBGearModel> SelectGear(string iSearchString, GearDBPositionKind iPosition)
         {
             logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
             List<GearDBGearModel> ret = new List<GearDBGearModel>();
             GearDBModel gearDB = getGearDB();
-            if (iSearchString == string.Empty)
+            if (iSearchString == string.Empty && iPosition == GearDBPositionKind.Unknown)
             {
                 ret = gearDB.Gear;
             }
             else
             {
-                foreach (GearDBGearModel Gear in gearDB.Gear)
+                foreach (GearDBGearModel gear in gearDB.Gear)
                 {
-                    if (MiscTool.IsRegexString(Gear.GearName, iSearchString))
+                    if ((iSearchString != string.Empty && iPosition != GearDBPositionKind.Unknown && MiscTool.IsRegexString(gear.GearName, iSearchString) && gear.Position == iPosition) ||
+                       (iSearchString != string.Empty && iPosition == GearDBPositionKind.Unknown && MiscTool.IsRegexString(gear.GearName, iSearchString)) ||
+                       (iSearchString == string.Empty && iPosition != GearDBPositionKind.Unknown && gear.Position == iPosition))
                     {
-                        ret.Add(Gear);
+                        ret.Add(gear);
                     }
                 }
             }
+            ret.Sort(GearDBModel.SortTypeName);
             logger.VarDump(ret);
             return ret;
         }

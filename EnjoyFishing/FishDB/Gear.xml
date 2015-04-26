@@ -1,46 +1,48 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Gears version="1.0.0">
-  <!-- Body -->
-  <Gear name="アングラーチュニカ" />
-  <Gear name="漁師エプロン" />
-  <Gear name="漁師スモック" />
-  <Gear name="フィッシャチュニカ" />
-  <!-- Hands -->
-  <Gear name="アングラーグローブ" />
-  <Gear name="フィッシャグローブ" />
-  <!-- Legs -->
-  <Gear name="アングラーホーズ" />
-  <Gear name="フィッシャホーズ" />
-  <!-- Feet -->
-  <Gear name="アングラーブーツ" />
-  <Gear name="フィッシャブーツ" />
-  <Gear name="ウエーダー" />
-  <!-- Head -->
-  <Gear name="トレイニーグラス" />
-  <!-- Neck -->
-  <Gear name="フィッシャトルク" />
-  <!-- Waist -->
-  <Gear name="フィッシャロープ" />
-  <Gear name="漁師ベルト" />
-  <!-- Rings -->
-  <Gear name="アルバトロスリング" />
-  <Gear name="ペリカンリング" />
-  <Gear name="ペンギンリング" />
-  <Gear name="ヘロンリング" />
-  <Gear name="ノディリング" />
-  <Gear name="パフィンリング" />
-  <Gear name="シーガルリング" />
-  <!-- Earrings -->
-  <Gear name="ジュノピアス" />
-  <Gear name="アトルガンピアス" />
-  <Gear name="ウィンダスピアス" />
-  <Gear name="カザムピアス" />
-  <Gear name="サンドリアピアス" />
-  <Gear name="マウラピアス" />
-  <Gear name="ナシュモピアス" />
-  <Gear name="ノーグピアス" />
-  <Gear name="ラバオピアス" />
-  <Gear name="バストゥークピアス" />
-  <Gear name="タブナジアピアス" />
-  <Gear name="セルビナピアス" />
+  <!--頭-->
+  <Gear name="トレイニーグラス" position="Head" />
+  <!--胴-->
+  <Gear name="アングラーチュニカ" position="Body" />
+  <Gear name="漁師エプロン" position="Body" />
+  <Gear name="漁師スモック" position="Body" />
+  <Gear name="フィッシャチュニカ" position="Body" />
+  <!--手-->
+  <Gear name="アングラーグローブ" position="Hands" />
+  <Gear name="フィッシャグローブ" position="Hands" />
+  <!--脚-->
+  <Gear name="アングラーホーズ" position="Legs" />
+  <Gear name="フィッシャホーズ" position="Legs" />
+  <!--足-->
+  <Gear name="アングラーブーツ" position="Feet" />
+  <Gear name="フィッシャブーツ" position="Feet" />
+  <Gear name="ウエーダー" position="Feet" />
+  <!--首-->
+  <Gear name="フィッシャトルク" position="Neck" />
+  <!--腰-->
+  <Gear name="フィッシャロープ" position="Waist" />
+  <Gear name="漁師ベルト" position="Waist" buff="235" />
+  <!--指-->
+  <Gear name="アルバトロスリング" position="Rings" buff="162" />
+  <Gear name="ペリカンリング" position="Rings" buff="162" />
+  <Gear name="ペンギンリング" position="Rings" buff="162" />
+  <Gear name="ヘロンリング" position="Rings" />
+  <Gear name="ノディリング" position="Rings" />
+  <Gear name="パフィンリング" position="Rings" />
+  <Gear name="シーガルリング" position="Rings" />
+  <!--ダックリングの強化IDは不明-->
+  <Gear name="ダックリング" position="Rings" buff="162" />
+  <!--耳-->
+  <Gear name="ジュノピアス" position="Earrings" />
+  <Gear name="アトルガンピアス" position="Earrings" />
+  <Gear name="ウィンダスピアス" position="Earrings" />
+  <Gear name="カザムピアス" position="Earrings" />
+  <Gear name="サンドリアピアス" position="Earrings" />
+  <Gear name="マウラピアス" position="Earrings" />
+  <Gear name="ナシュモピアス" position="Earrings" />
+  <Gear name="ノーグピアス" position="Earrings" />
+  <Gear name="ラバオピアス" position="Earrings" />
+  <Gear name="バストゥークピアス" position="Earrings" />
+  <Gear name="タブナジアピアス" position="Earrings" />
+  <Gear name="セルビナピアス" position="Earrings" />
 </Gears>

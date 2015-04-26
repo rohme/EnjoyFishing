@@ -81,24 +81,38 @@ namespace EnjoyFishing
             //dicStatus.Add("テンポラリ", string.Format("{0}/{1}", fface.Item.TemporaryCount, fface.Item.TemporaryMax));
             dicStatus.Add("ケース", string.Format("{0}/{1}", fface.Item.CaseCount, fface.Item.CaseMax));
             dicStatus.Add("ワードローブ", string.Format("{0}/{1}", fface.Item.WardrobeCount, fface.Item.WardrobeMax));
-            dicStatus.Add("竿-装備", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Range), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range))));
-            dicStatus.Add("竿-装備-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Inventory).ToString());
-            dicStatus.Add("竿-装備-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Wardrobe).ToString());
-            dicStatus.Add("エサ-装備", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Ammo), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Ammo))));
-            dicStatus.Add("エサ-装備-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Inventory).ToString());
-            dicStatus.Add("エサ-装備-サッチェル残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Satchel).ToString());
-            dicStatus.Add("エサ-装備-サック残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Sack).ToString());
-            dicStatus.Add("エサ-装備-ケース残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Case).ToString());
-            dicStatus.Add("エサ-装備-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Wardrobe).ToString());
+            dicStatus.Add("装備-竿", string.Format("{0}({1})", FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range)), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range))));
+            dicStatus.Add("装備-竿-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Inventory).ToString());
+            dicStatus.Add("装備-竿-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Wardrobe).ToString());
+            dicStatus.Add("装備-エサ", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Ammo), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Ammo))));
+            dicStatus.Add("装備-エサ-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Inventory).ToString());
+            dicStatus.Add("装備-エサ-サッチェル残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Satchel).ToString());
+            dicStatus.Add("装備-エサ-サック残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Sack).ToString());
+            dicStatus.Add("装備-エサ-ケース残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Case).ToString());
+            dicStatus.Add("装備-エサ-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Ammo), InventoryType.Wardrobe).ToString());
+            dicStatus.Add("装備-メイン", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Main), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Main))));
+            dicStatus.Add("装備-サブ", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Shield), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Shield))));
+            dicStatus.Add("装備-頭", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Head), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Head))));
+            dicStatus.Add("装備-胴", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Body), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Body))));
+            dicStatus.Add("装備-手", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Hands), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Hands))));
+            dicStatus.Add("装備-脚", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Legs), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Legs))));
+            dicStatus.Add("装備-足", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Feet), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Feet))));
+            dicStatus.Add("装備-首", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Neck), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Neck))));
+            dicStatus.Add("装備-背", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Back), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Back))));
+            dicStatus.Add("装備-腰", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Waist), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Waist))));
+            dicStatus.Add("装備-左耳", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.RingLeft), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.RingLeft))));
+            dicStatus.Add("装備-右耳", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.RingRight), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.RingRight))));
+            dicStatus.Add("装備-左手", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.EarLeft), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.EarLeft))));
+            dicStatus.Add("装備-右手", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.EarRight), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.EarRight))));
             //Windower
-            //dicStatus.Add("Windower.ArgumentCount", fface.Windower.ArgumentCount().ToString());
+            //dicStatus.Add("コマンド引数-数", fface.Windower.ArgumentCount().ToString());
             //string argumentStr = string.Empty;
             //for (short i = 0; i < fface.Windower.ArgumentCount(); i++)
             //{
-            ////    argumentStr += fface.Windower.GetArgument(i) + " ";
+            //    argumentStr += fface.Windower.GetArgument(i) + " ";
             //}
-            //dicStatus.Add("Windower.GetArgument", argumentStr);
-            //dicStatus.Add("Windower.IsNewCommand", fface.Windower.IsNewCommand().ToString());
+            //dicStatus.Add("コマンド引数-コマンド", argumentStr);
+            //dicStatus.Add("コマンド引数-IsNewCommand", fface.Windower.IsNewCommand().ToString());
 
             refreshStatus(dicStatus);
         }

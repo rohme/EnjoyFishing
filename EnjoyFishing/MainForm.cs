@@ -240,6 +240,7 @@ namespace EnjoyFishing
             settings = new Settings(iPol.FFACE.Player.Name);
             //ChatTool初期設定
             chat = new ChatTool(iPol.FFACE);
+            chat.ReceivedCommand += new ChatTool.ReceivedCommandEventHandler(this.ChatTool_ReceivedCommand);
             logger.Output(LogLevelKind.DEBUG, "ChatTool起動");
             //FishingTool初期設定
             fishing = new FishingTool(iPol, chat, settings, logger);
@@ -281,8 +282,6 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            tabFishingMain.TabPages.Remove(tabFishingMainEquip);
-
             //アドオン・プラグインの更新
             updateAddonPlugin();
             //釣り情報グリッド初期化
@@ -293,6 +292,8 @@ namespace EnjoyFishing
             initGridFishingInfo(gridHistorySummary);
             //ハラキリグリッド初期化
             initGridHarakiri(gridHarakiri);
+            //装備初期化
+            initGear();
             //フォーム初期化
             initForm();
 
@@ -331,6 +332,10 @@ namespace EnjoyFishing
                 chkHP0.Checked = settings.Fishing.HP0;
                 txtHP0Min.Value = (decimal)settings.Fishing.HP0Min;
                 txtHP0Max.Value = (decimal)settings.Fishing.HP0Max;
+                chkIgnoreSmallFish.Checked = settings.Fishing.IgnoreSmallFish;
+                chkIgnoreLargeFish.Checked = settings.Fishing.IgnoreLargeFish;
+                chkIgnoreMonster.Checked = settings.Fishing.IgnoreMonster;
+                chkIgnoreItem.Checked = settings.Fishing.IgnoreItem;
                 chkReactionTime.Checked = settings.Fishing.ReactionTime;
                 txtReactionTimeMin.Value = (decimal)settings.Fishing.ReactionTimeMin;
                 txtReactionTimeMax.Value = (decimal)settings.Fishing.ReactionTimeMax;
@@ -343,10 +348,8 @@ namespace EnjoyFishing
                 chkEarthTime.Checked = settings.Fishing.EarthTime;
                 txtEarthTimeFrom.Value = settings.Fishing.EarthTimeFrom;
                 txtEarthTimeTo.Value = settings.Fishing.EarthTimeTo;
-                chkIgnoreSmallFish.Checked = settings.Fishing.IgnoreSmallFish;
-                chkIgnoreLargeFish.Checked = settings.Fishing.IgnoreLargeFish;
-                chkIgnoreMonster.Checked = settings.Fishing.IgnoreMonster;
-                chkIgnoreItem.Checked = settings.Fishing.IgnoreItem;
+                chkRepairRod.Checked = settings.Fishing.RepairRod;
+                //釣り設定・停止条件
                 chkMaxCatch.Checked = settings.Fishing.MaxCatch;
                 txtMaxCatchCount.Value = settings.Fishing.MaxCatchCount;
                 chkMaxNoCatch.Checked = settings.Fishing.MaxNoCatch;
@@ -362,6 +365,8 @@ namespace EnjoyFishing
                 chkChatRestart.Checked = settings.Fishing.ChatRestart;
                 txtChatRestartMinute.Value = settings.Fishing.ChatRestartMinute;
                 chkEntryPort.Checked = settings.Fishing.EntryPort;
+                chkEnemyAttackCmd.Checked = settings.Fishing.EnemyAttackCmd;
+                txtEnemyAttackCmdLine.Text = settings.Fishing.EnemyAttackCmdLine;
                 //釣り設定・鞄いっぱい
                 chkInventoryFullSack.Checked = settings.Fishing.InventoryFullSack;
                 chkInventoryFullSatchel.Checked = settings.Fishing.InventoryFullSatchel;
@@ -374,12 +379,35 @@ namespace EnjoyFishing
                 chkNoBaitNoRodCase.Checked = settings.Fishing.NoBaitNoRodCase;
                 chkNoBaitNoRodCmd.Checked = settings.Fishing.NoBaitNoRodCmd;
                 txtNoBaitNoRodCmdLine.Text = settings.Fishing.NoBaitNoRodCmdLine;
+                //釣り・装備
+                chkEquipEnable.Checked = settings.Fishing.EquipEnable;
+                cmbEquipRod.Text = settings.Fishing.EquipRod;
+                cmbEquipBait.Text = settings.Fishing.EquipBait;
+                cmbEquipMain.Text = settings.Fishing.EquipMain;
+                cmbEquipSub.Text = settings.Fishing.EquipSub;
+                cmbEquipHead.Text = settings.Fishing.EquipHead;
+                cmbEquipBody.Text = settings.Fishing.EquipBody;
+                cmbEquipHands.Text = settings.Fishing.EquipHands;
+                cmbEquipLegs.Text = settings.Fishing.EquipLegs;
+                cmbEquipFeet.Text = settings.Fishing.EquipFeet;
+                cmbEquipNeck.Text = settings.Fishing.EquipNeck;
+                cmbEquipWaist.Text = settings.Fishing.EquipWaist;
+                cmbEquipBack.Text = settings.Fishing.EquipBack;
+                cmbEquipEarLeft.Text = settings.Fishing.EquipEarLeft;
+                cmbEquipEarRight.Text = settings.Fishing.EquipEarRight;
+                cmbEquipRingLeft.Text = settings.Fishing.EquipRingLeft;
+                cmbEquipRingRight.Text = settings.Fishing.EquipRingRight;
+                chkUseWaist.Checked = settings.Fishing.UseWaist;
+                chkUseRingLeft.Checked = settings.Fishing.UseRingLeft;
+                chkUseRingRight.Checked = settings.Fishing.UseRingRight;
+                chkEquipEnable_CheckedChanged(this, new EventArgs());
                 //釣り・情報
                 updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
                 //設定・一般
                 chkWindowTopMost.Checked = settings.Etc.WindowTopMost;
                 chkWindowFlash.Checked = settings.Etc.WindowFlash;
                 chkWindowActivate.Checked = settings.Etc.WindowActivate;
+                chkMessageEcho.Checked = settings.Etc.MessageEcho;
                 //設定・ステータスバー表示
                 chkStatusBarVisibleMoonPhase.Checked = settings.Etc.VisibleMoonPhase;
                 chkStatusBarVisibleVanaTime.Checked = settings.Etc.VisibleVanaTime;
@@ -592,6 +620,81 @@ namespace EnjoyFishing
             }
         }
         /// <summary>
+        /// 装備コンボボックスを初期化する
+        /// </summary>
+        private void initGear()
+        {
+            cmbEquipRod.Items.Add(string.Empty);
+            cmbEquipBait.Items.Add(string.Empty);
+            cmbEquipMain.Items.Add(string.Empty);
+            cmbEquipSub.Items.Add(string.Empty);
+            cmbEquipHead.Items.Add(string.Empty);
+            cmbEquipBody.Items.Add(string.Empty);
+            cmbEquipHands.Items.Add(string.Empty);
+            cmbEquipLegs.Items.Add(string.Empty);
+            cmbEquipFeet.Items.Add(string.Empty);
+            cmbEquipNeck.Items.Add(string.Empty);
+            cmbEquipWaist.Items.Add(string.Empty);
+            cmbEquipBack.Items.Add(string.Empty);
+            cmbEquipEarLeft.Items.Add(string.Empty);
+            cmbEquipEarRight.Items.Add(string.Empty);
+            cmbEquipRingLeft.Items.Add(string.Empty);
+            cmbEquipRingRight.Items.Add(string.Empty);
+
+            foreach (string rod in fishDB.Rods)
+            {
+                cmbEquipRod.Items.Add(rod);
+            }
+            foreach (string bait in fishDB.Baits)
+            {
+                cmbEquipBait.Items.Add(bait);
+            }
+            foreach (GearDBGearModel gear in fishDB.SelectGear())
+            {
+                switch (gear.Position)
+                {
+                    case GearDBPositionKind.Main:
+                        cmbEquipMain.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Sub:
+                        cmbEquipSub.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Head:
+                        cmbEquipHead.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Body:
+                        cmbEquipBody.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Hands:
+                        cmbEquipHands.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Legs:
+                        cmbEquipLegs.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Feet:
+                        cmbEquipFeet.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Neck:
+                        cmbEquipNeck.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Waist:
+                        cmbEquipWaist.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Back:
+                        cmbEquipBack.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Earrings:
+                        cmbEquipEarLeft.Items.Add(gear.GearName);
+                        cmbEquipEarRight.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Rings:
+                        cmbEquipRingLeft.Items.Add(gear.GearName);
+                        cmbEquipRingRight.Items.Add(gear.GearName);
+                        break;
+                }
+            }
+        }
+        /// <summary>
         /// グリッドにテキストボックス列を追加する
         /// </summary>
         /// <param name="iDataGridView">グリッド</param>
@@ -796,7 +899,7 @@ namespace EnjoyFishing
                 fishingFlg = false;
                 btnExecFishing.Text = "開　始";
                 bool ret = fishing.FishingAbort();
-                if(iShowStopMessage) lblMessage.Text = "停止しました";
+                if(iShowStopMessage) setMessage("停止しました");
 
                 //ハラキリボタン有効化
                 btnExecHarakiri.Enabled = true;
@@ -1063,7 +1166,7 @@ namespace EnjoyFishing
                 harakiriFlg = false;
                 btnExecHarakiri.Text = "開　始";
                 bool ret = harakiri.HarakiriAbort();
-                if(iShowStopMessage) lblMessage.Text = "停止しました";
+                if(iShowStopMessage) setMessage("停止しました");
                 
                 //釣りボタン有効化
                 btnExecFishing.Enabled = true;
@@ -1490,6 +1593,7 @@ namespace EnjoyFishing
                 chkNoBaitNoRodCase.Enabled = true;
                 txtNoBaitNoRodCmdLine.Enabled = true;
                 chkNoBaitNoRodCmd.Enabled = true;
+                chkRepairRod.Enabled = true;
             }
             else
             {
@@ -1504,6 +1608,7 @@ namespace EnjoyFishing
                 chkNoBaitNoRodCase.Enabled = false;
                 txtNoBaitNoRodCmdLine.Enabled = false;
                 chkNoBaitNoRodCmd.Enabled = false;
+                chkRepairRod.Enabled = false;
             }
             if (settings.UseEnternity)
             {
@@ -1569,6 +1674,8 @@ namespace EnjoyFishing
                 settings.Fishing.EarthTime = chkEarthTime.Checked;
                 settings.Fishing.EarthTimeFrom = (int)txtEarthTimeFrom.Value;
                 settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
+                settings.Fishing.RepairRod = chkRepairRod.Checked;
+                //釣り設定・停止条件
                 settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
                 settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
                 settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
@@ -1588,6 +1695,8 @@ namespace EnjoyFishing
                 settings.Fishing.ChatRestart = chkChatRestart.Checked;
                 settings.Fishing.ChatRestartMinute = (int)txtChatRestartMinute.Value;
                 settings.Fishing.EntryPort = chkEntryPort.Checked;
+                settings.Fishing.EnemyAttackCmd = chkEnemyAttackCmd.Checked;
+                settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
                 //釣り設定・鞄いっぱい
                 settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
                 settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
@@ -1600,17 +1709,27 @@ namespace EnjoyFishing
                 settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
                 settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
                 settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
-                //設定・ステータスバー表示
-                settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
-                settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
-                settings.Etc.VisibleEarthTime = chkStatusBarVisibleEarthTime.Checked;
-                settings.Etc.VisibleDayType = chkStatusBarVisibleDayType.Checked;
-                settings.Etc.VisibleLoginStatus = chkStatusBarVisibleLoginStatus.Checked;
-                settings.Etc.VisiblePlayerStatus = chkStatusBarVisiblePlayerStatus.Checked;
-                settings.Etc.VisibleHpBar = chkStatusBarVisibleHpBar.Checked;
-                settings.Etc.VisibleHP = chkStatusBarVisibleHP.Checked;
-                settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
-                settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
+                //釣り設定・装備
+                settings.Fishing.EquipEnable = chkEquipEnable.Checked;
+                settings.Fishing.EquipRod = cmbEquipRod.Text;
+                settings.Fishing.EquipBait = cmbEquipBait.Text;
+                settings.Fishing.EquipMain = cmbEquipMain.Text;
+                settings.Fishing.EquipSub = cmbEquipSub.Text;
+                settings.Fishing.EquipHead = cmbEquipHead.Text;
+                settings.Fishing.EquipBody = cmbEquipBody.Text;
+                settings.Fishing.EquipHands = cmbEquipHands.Text;
+                settings.Fishing.EquipLegs = cmbEquipLegs.Text;
+                settings.Fishing.EquipFeet = cmbEquipFeet.Text;
+                settings.Fishing.EquipNeck = cmbEquipNeck.Text;
+                settings.Fishing.EquipWaist = cmbEquipWaist.Text;
+                settings.Fishing.EquipBack = cmbEquipBack.Text;
+                settings.Fishing.EquipEarLeft = cmbEquipEarLeft.Text;
+                settings.Fishing.EquipEarRight = cmbEquipEarRight.Text;
+                settings.Fishing.EquipRingLeft = cmbEquipRingLeft.Text;
+                settings.Fishing.EquipRingRight = cmbEquipRingRight.Text;
+                settings.Fishing.UseWaist = chkUseWaist.Checked;
+                settings.Fishing.UseRingLeft = chkUseRingLeft.Checked;
+                settings.Fishing.UseRingRight = chkUseRingRight.Checked;
                 //履歴
                 DataGridViewColumn sortCol = gridHistory.SortedColumn;
                 if (sortCol != null)
@@ -1672,6 +1791,18 @@ namespace EnjoyFishing
                 settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
                 settings.Etc.WindowFlash = chkWindowFlash.Checked;
                 settings.Etc.WindowActivate = chkWindowActivate.Checked;
+                settings.Etc.MessageEcho = chkMessageEcho.Checked;
+                //設定・ステータスバー表示
+                settings.Etc.VisibleMoonPhase = chkStatusBarVisibleMoonPhase.Checked;
+                settings.Etc.VisibleVanaTime = chkStatusBarVisibleVanaTime.Checked;
+                settings.Etc.VisibleEarthTime = chkStatusBarVisibleEarthTime.Checked;
+                settings.Etc.VisibleDayType = chkStatusBarVisibleDayType.Checked;
+                settings.Etc.VisibleLoginStatus = chkStatusBarVisibleLoginStatus.Checked;
+                settings.Etc.VisiblePlayerStatus = chkStatusBarVisiblePlayerStatus.Checked;
+                settings.Etc.VisibleHpBar = chkStatusBarVisibleHpBar.Checked;
+                settings.Etc.VisibleHP = chkStatusBarVisibleHP.Checked;
+                settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
+                settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
                 //保存開始
                 if (fishing != null) settings.Save(fishing.PlayerName);
 
@@ -1742,6 +1873,17 @@ namespace EnjoyFishing
                 this.Activate();
                 this.TopMost = true;
                 if (!settings.Etc.WindowTopMost) this.TopMost = false;
+            }
+        }
+        /// <summary>
+        /// メッセージを表示する
+        /// </summary>
+        private void setMessage(string iMessage)
+        {
+            lblMessage.Text = iMessage;
+            if (settings.Etc.MessageEcho && iMessage != string.Empty)
+            {
+                fface.Windower.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
             }
         }
         #endregion
@@ -1869,6 +2011,26 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Fishing.HP0Max = (int)txtHP0Max.Value;
         }
+        private void chkIgnoreSmallFish_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
+        }
+        private void chkIgnoreLargeFish_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
+        }
+        private void chkIgnoreMonster_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
+        }
+        private void chkIgnoreItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.IgnoreItem = chkIgnoreItem.Checked;
+        }
         private void chkReactionTime_CheckedChanged(object sender, EventArgs e)
         {
             if (startupFlg) return;
@@ -1929,75 +2091,10 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
         }
-        private void chkIgnoreSmallFish_CheckedChanged(object sender, EventArgs e)
+        private void chkRepairRod_CheckedChanged(object sender, EventArgs e)
         {
             if (startupFlg) return;
-            settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
-        }
-        private void chkIgnoreLargeFish_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
-        }
-        private void chkIgnoreMonster_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.IgnoreMonster = chkIgnoreMonster.Checked;
-        }
-        private void chkIgnoreItem_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.IgnoreItem = chkIgnoreItem.Checked;
-        }
-        private void chkInventoryFullSack_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
-        }
-        private void chkInventoryFullSatchel_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
-        }
-        private void chkInventoryFullCase_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
-        }
-        private void chkInventoryFullCmd_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
-        }
-        private void txtInventoryFullCmdLine_TextChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
-        }
-        private void chkNoBaitNoRodSack_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
-        }
-        private void chkNoBaitNoRodSatchel_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
-        }
-        private void chkNoBaitNoRodCase_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
-        }
-        private void chkNoBaitNoRodCmd_CheckedChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
-        }
-        private void txtNoBaitNoRodCmdLine_TextChanged(object sender, EventArgs e)
-        {
-            if (startupFlg) return;
-            settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
+            settings.Fishing.RepairRod = chkRepairRod.Checked;
         }
         #endregion
         #region 釣り設定・停止条件
@@ -2075,6 +2172,191 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.EntryPort = chkEntryPort.Checked;
+        }
+        private void chkEnemyAttack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EnemyAttackCmd = chkEnemyAttackCmd.Checked;
+        }
+        private void txtEnemyAttackCmd_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
+        }
+        #endregion
+        #region 釣り設定・鞄いっぱい
+        private void chkInventoryFullSack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
+        }
+        private void chkInventoryFullSatchel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
+        }
+        private void chkInventoryFullCase_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullCase = chkInventoryFullCase.Checked;
+        }
+        private void chkInventoryFullCmd_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullCmd = chkInventoryFullCmd.Checked;
+        }
+        private void txtInventoryFullCmdLine_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.InventoryFullCmdLine = txtInventoryFullCmdLine.Text;
+        }
+        #endregion
+        #region 釣り設定・竿エサなし
+        private void chkNoBaitNoRodSack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodSack = chkNoBaitNoRodSack.Checked;
+        }
+        private void chkNoBaitNoRodSatchel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodSatchel = chkNoBaitNoRodSatchel.Checked;
+        }
+        private void chkNoBaitNoRodCase_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodCase = chkNoBaitNoRodCase.Checked;
+        }
+        private void chkNoBaitNoRodCmd_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodCmd = chkNoBaitNoRodCmd.Checked;
+        }
+        private void txtNoBaitNoRodCmdLine_TextChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.NoBaitNoRodCmdLine = txtNoBaitNoRodCmdLine.Text;
+        }
+        #endregion
+        #region 釣り設定・装備
+        private void chkEquipEnable_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbEquipRod.Enabled = chkEquipEnable.Checked;
+            cmbEquipBait.Enabled = chkEquipEnable.Checked;
+            cmbEquipMain.Enabled = chkEquipEnable.Checked;
+            cmbEquipSub.Enabled = chkEquipEnable.Checked;
+            cmbEquipHead.Enabled = chkEquipEnable.Checked;
+            cmbEquipBody.Enabled = chkEquipEnable.Checked;
+            cmbEquipHands.Enabled = chkEquipEnable.Checked;
+            cmbEquipLegs.Enabled = chkEquipEnable.Checked;
+            cmbEquipFeet.Enabled = chkEquipEnable.Checked;
+            cmbEquipNeck.Enabled = chkEquipEnable.Checked;
+            cmbEquipWaist.Enabled = chkEquipEnable.Checked;
+            cmbEquipBack.Enabled = chkEquipEnable.Checked;
+            cmbEquipEarLeft.Enabled = chkEquipEnable.Checked;
+            cmbEquipEarRight.Enabled = chkEquipEnable.Checked;
+            cmbEquipRingLeft.Enabled = chkEquipEnable.Checked;
+            cmbEquipRingRight.Enabled = chkEquipEnable.Checked;
+            chkUseWaist.Enabled = chkEquipEnable.Checked;
+            chkUseRingLeft.Enabled = chkEquipEnable.Checked;
+            chkUseRingRight.Enabled = chkEquipEnable.Checked;
+            if (startupFlg) return;
+            settings.Fishing.EquipEnable = chkEquipEnable.Checked;
+        }
+        private void cmbEquipRod_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipRod = cmbEquipRod.Text;
+        }
+        private void cmbEquipBait_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipBait = cmbEquipBait.Text;
+        }
+        private void cmbEquipMain_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipMain = cmbEquipMain.Text;
+        }
+        private void cmbEquipSub_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipSub = cmbEquipSub.Text;
+        }
+        private void cmbEquipHead_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipHead = cmbEquipHead.Text;
+        }
+        private void cmbEquipBody_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipBody = cmbEquipBody.Text;
+        }
+        private void cmbEquipHands_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipHands = cmbEquipHands.Text;
+        }
+        private void cmbEquipLegs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipLegs = cmbEquipLegs.Text;
+        }
+        private void cmbEquipFeet_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipFeet = cmbEquipFeet.Text;
+        }
+        private void cmbEquipNeck_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipNeck = cmbEquipNeck.Text;
+        }
+        private void cmbEquipWaist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipWaist = cmbEquipWaist.Text;
+        }
+        private void cmbEquipBack_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipBack = cmbEquipBack.Text;
+        }
+        private void cmbEquipEarLeft_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipEarLeft = cmbEquipEarLeft.Text;
+        }
+        private void cmbEquipEarRight_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipEarRight = cmbEquipEarRight.Text;
+        }
+        private void cmbEquipRingLeft_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipRingLeft = cmbEquipRingLeft.Text;
+        }
+        private void cmbEquipRingRight_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EquipRingRight = cmbEquipRingRight.Text;
+        }
+        private void chkUseWaist_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseWaist = chkUseWaist.Checked;
+        }
+        private void chkUseRingLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseRingLeft = chkUseRingLeft.Checked;
+        }
+        private void chkUseRingRight_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseRingRight = chkUseRingRight.Checked;
         }
         #endregion
         #endregion
@@ -2267,11 +2549,16 @@ namespace EnjoyFishing
             if (startupFlg) return;
             settings.Etc.WindowActivate = chkWindowActivate.Checked;
         }
+        private void chkMessageEcho_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Etc.MessageEcho = chkMessageEcho.Checked;
+        }
         #endregion
         #endregion
         #endregion
 
-        #region PolTool/FishingTool/HarakiriToolイベント
+        #region PolTool/ChatTool/FishingTool/HarakiriToolイベント
         /// <summary>
         /// PolTool ChangeStatusイベント
         /// </summary>
@@ -2316,6 +2603,24 @@ namespace EnjoyFishing
                 System.Environment.Exit(0);//プログラム終了
             }
         }
+        private void ChatTool_ReceivedCommand(object sender, ChatTool.ReceivedCommandEventArgs e)
+        {
+            List<string> cmd = e.Command;
+            if (cmd.Count > 0)
+            {
+                switch (cmd[0])
+                {
+                    case "start":
+                        Console.WriteLine(cmd[0]);
+                        if(!fishingFlg) startFishing();
+                        break;
+                    case "stop":
+                        Console.WriteLine(cmd[0]);
+                        if (fishingFlg) stopFishing(true);
+                        break;
+                }
+            }
+        }
         /// <summary>
         /// FishingTool Fishedイベント
         /// </summary>
@@ -2342,7 +2647,7 @@ namespace EnjoyFishing
             else
             {
                 //メッセージの更新
-                lblMessage.Text = e.Message;
+                setMessage(e.Message);
             }
         }
         /// <summary>
@@ -2420,7 +2725,7 @@ namespace EnjoyFishing
             else
             {
                 //メッセージの更新
-                lblMessage.Text = e.Message;
+                setMessage(e.Message);
             }
         }
         /// <summary>
@@ -2474,5 +2779,6 @@ namespace EnjoyFishing
             }
         }
         #endregion
+
     }
 }

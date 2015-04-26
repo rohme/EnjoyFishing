@@ -343,6 +343,21 @@ namespace MiscTools
             return ExecLua(cmd, scriptName);
         }
         /// <summary>
+        /// 指定したアイテムが何処に存在するか
+        /// </summary>
+        /// <param name="iItemName"></param>
+        /// <returns></returns>
+        public InventoryType GetInventoryTypeFromItemName(string iItemName)
+        {
+            ushort id = (ushort)FFACE.ParseResources.GetItemID(iItemName);
+            if (fface.Item.GetInventoryItemCount(id) > 0) return InventoryType.Inventory;
+            if (fface.Item.GetSackItemCount(id) > 0) return InventoryType.Sack;
+            if (fface.Item.GetSatchelItemCount(id) > 0) return InventoryType.Satchel;
+            if (fface.Item.GetCaseItemCount(id) > 0) return InventoryType.Case;
+            if (fface.Item.GetWardrobeItemCount(id) > 0) return InventoryType.Wardrobe;
+            return InventoryType.None;
+        }
+        /// <summary>
         /// 指定した倉庫タイプにアイテムが存在するか否か
         /// </summary>
         /// <param name="iItemName">アイテム名</param>
