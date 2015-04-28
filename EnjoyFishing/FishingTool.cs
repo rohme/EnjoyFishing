@@ -2218,7 +2218,7 @@ namespace EnjoyFishing
         {
             if (!settings.Fishing.EquipEnable) return true;
             //腰
-            if (settings.Fishing.UseWaist || !string.IsNullOrEmpty(settings.Fishing.EquipWaist))
+            if (settings.Fishing.UseWaist && !string.IsNullOrEmpty(settings.Fishing.EquipWaist))
             {
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipWaist, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
@@ -2231,7 +2231,7 @@ namespace EnjoyFishing
                 }
             }
             //左指
-            if (settings.Fishing.UseRingLeft || !string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
+            if (settings.Fishing.UseRingLeft && !string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
             {
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingLeft, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
@@ -2244,7 +2244,7 @@ namespace EnjoyFishing
                 }
             }
             //右指
-            if (settings.Fishing.UseRingRight || !string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
+            if (settings.Fishing.UseRingRight && !string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
             {
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingRight, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
