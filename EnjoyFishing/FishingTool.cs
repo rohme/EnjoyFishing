@@ -1011,6 +1011,7 @@ namespace EnjoyFishing
                                     setFishingStatus(FishingStatusKind.Error);
                                     break;
                                 }
+                                Thread.Sleep(2000);
                             }
                         }
                     }
@@ -2046,6 +2047,7 @@ namespace EnjoyFishing
                 //合成
                 setMessage(string.Format("竿の修理：{0}を修理します", breakRodName));
                 bool synthSuccess = RepairRodSynthesis(repairCrystal, breakRodName);
+                Thread.Sleep(500);
                 //ワードローブに竿を戻す
                 if (synthSuccess && wardrobe)
                 {
@@ -2054,6 +2056,7 @@ namespace EnjoyFishing
                         setMessage(string.Format("竿の修理：{0}が{1}に移動できなかったので停止", breakRodName, InventoryType.Wardrobe.ToString()));
                         return false;
                     }
+                    Thread.Sleep(500);
                     setMessage(string.Format("竿の修理：{0}をワードローブに移動しました", iRodName));
                 }
                 if (synthSuccess) return true;
@@ -2309,16 +2312,14 @@ namespace EnjoyFishing
             //アイテムの装備
             if (rodCnt > 0)
             {
-                fface.Windower.SendString(string.Format("/equip Range {0}", iRodName));
-                Thread.Sleep(settings.Global.WaitEquip);
+                for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+                {
+                    if (this.RodName == iRodName) return true;
+                    fface.Windower.SendString(string.Format("/equip Range {0}", iRodName));
+                    Thread.Sleep(settings.Global.WaitEquip);
+                }
             }
-            else
-            {
-                return false;
-            }
-            //装備のチェック
-            if (this.RodName != iRodName) return false;
-            return true;
+            return false;
         }
         /// <summary>
         /// エサを装備する
@@ -2338,16 +2339,15 @@ namespace EnjoyFishing
             //アイテムの装備
             if (baitCnt > 0)
             {
-                fface.Windower.SendString(string.Format("/equip Ammo {0}", iBaitName));
-                Thread.Sleep(settings.Global.WaitEquip);
-            }
-            else
-            {
-                return false;
+                for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+                {
+                    if (this.BaitName == iBaitName) return true;
+                    fface.Windower.SendString(string.Format("/equip Ammo {0}", iBaitName));
+                    Thread.Sleep(settings.Global.WaitEquip);
+                }
             }
             //装備のチェック
-            if (this.BaitName != iBaitName) return false;
-            return true;
+            return false;
         }
         /// <summary>
         /// 指定されたアイテム名が釣り竿かどうか判定
