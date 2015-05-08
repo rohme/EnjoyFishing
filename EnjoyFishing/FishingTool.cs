@@ -2047,7 +2047,7 @@ namespace EnjoyFishing
                 //合成
                 setMessage(string.Format("竿の修理：{0}を修理します", breakRodName));
                 bool synthSuccess = RepairRodSynthesis(repairCrystal, breakRodName);
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
                 //ワードローブに竿を戻す
                 if (synthSuccess && wardrobe)
                 {
@@ -2186,11 +2186,20 @@ namespace EnjoyFishing
             if (maxLoop) return false;
             fface.Windower.SendKeyPress(KeyCode.EnterKey);
             //合成終了するまで待機
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (this.PlayerStatus == Status.Synthing) break;
+                Thread.Sleep(settings.Global.WaitBase);
+            }
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                if (this.PlayerStatus != Status.Synthing) break;
+                Thread.Sleep(settings.Global.WaitBase);
+            }
+            Thread.Sleep(settings.Global.WaitChat);
             //合成ログの確認
-            Thread.Sleep(15000);
-
+            logger.Output(LogLevelKind.DEBUG, "竿の修理：ログ確認");
             FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
-            maxLoop = true;
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 if(!chat.GetNextChatLine(out cl)) break;
@@ -2202,15 +2211,18 @@ namespace EnjoyFishing
                 if (chatKbn == ChatKbnKind.SynthFailure ||
                     chatKbn == ChatKbnKind.SynthNotEnoughSkill)
                 {
+                    logger.Output(LogLevelKind.DEBUG, "竿の修理：合成失敗");
                     return false;
                 }
                 //合成成功
                 if (chatKbn == ChatKbnKind.SynthSuccess)
                 {
+                    logger.Output(LogLevelKind.DEBUG, "竿の修理：合成成功");
                     return true;
                 }
                 Thread.Sleep(settings.Global.WaitChat);
             }
+            logger.Output(LogLevelKind.DEBUG, "竿の修理：合成失敗 タイムアウト");
             return false;
         }
         /// <summary>
@@ -2314,7 +2326,12 @@ namespace EnjoyFishing
             {
                 for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
                 {
-                    if (this.RodName == iRodName) return true;
+                    if (this.RodName == iRodName)
+                    {
+                        //イベント発生
+                        EventFished(FishResultStatusKind.Unknown);
+                        return true;
+                    }
                     fface.Windower.SendString(string.Format("/equip Range {0}", iRodName));
                     Thread.Sleep(settings.Global.WaitEquip);
                 }
@@ -2341,7 +2358,12 @@ namespace EnjoyFishing
             {
                 for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
                 {
-                    if (this.BaitName == iBaitName) return true;
+                    if (this.BaitName == iBaitName)
+                    {
+                        //イベント発生
+                        EventFished(FishResultStatusKind.Unknown);
+                        return true;
+                    }
                     fface.Windower.SendString(string.Format("/equip Ammo {0}", iBaitName));
                     Thread.Sleep(settings.Global.WaitEquip);
                 }
@@ -2540,6 +2562,8 @@ namespace EnjoyFishing
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
                     fface.Windower.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));
+                //イベント発生
+                EventFished(FishResultStatusKind.Unknown);
             }
             return true;
         }
