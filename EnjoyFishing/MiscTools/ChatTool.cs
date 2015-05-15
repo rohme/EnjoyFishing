@@ -208,7 +208,8 @@ namespace MiscTools
                                 }
                             }
                             //チャットが複数行に渡ってある場合、一行にまとめる処理
-                            if (cl.RawString[20] == "00")//1行目か否か
+                            string[] stArrayData = cl.RawString[12].Split(',');
+                            if (stArrayData[8] == "00")//1行目か否か
                             {
                                 chatLines.Add(cl);
                                 currChatLineIndex = chatLines.Count - 1;
