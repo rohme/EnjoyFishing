@@ -487,18 +487,33 @@ namespace MiscTools
         public bool SetTargetFromId(int iId, bool iWithEnter = false)
         {
             logger.Output(LogLevelKind.DEBUG,  "SetTargetFromId", string.Format("Id={0} WithEnter={1}", iId, iWithEnter));
-            for (int i = 0; i < this.MaxLoopCount; i++)
+            //ToDo:FFACEが修正されるまでTABを使用するように暫定対応
+            //for (int i = 0; i < this.MaxLoopCount; i++)
+            //{
+            //    fface.Target.SetNPCTarget(iId);
+            //    System.Threading.Thread.Sleep(this.BaseWait);
+            //    fface.Windower.SendString("/ta <t>");
+            //    System.Threading.Thread.Sleep(this.BaseWait);
+            //    if (iWithEnter)
+            //    {
+            //        fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
+            //        System.Threading.Thread.Sleep(this.ChatWait);//Wait
+            //    }
+            //    if (fface.Target.ID == iId) return true;
+            //}
+            for (int i= 0; i < this.MaxLoopCount; i++)
             {
-                fface.Target.SetNPCTarget(iId);
+                fface.Windower.SendKeyPress(KeyCode.TabKey);//Tab
                 System.Threading.Thread.Sleep(this.BaseWait);
-                fface.Windower.SendString("/ta <t>");
-                System.Threading.Thread.Sleep(this.BaseWait);
-                if (iWithEnter)
+                if (fface.Target.ID == iId) 
                 {
-                    fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
-                    System.Threading.Thread.Sleep(this.ChatWait);//Wait
+                    if (iWithEnter)
+                    {
+                        fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
+                        System.Threading.Thread.Sleep(this.ChatWait);//Wait
+                    }
+                    return true; 
                 }
-                if (fface.Target.ID == iId) return true;
             }
             logger.Output(LogLevelKind.WARN, "SetTargetFromId", "タイムアウトしました");
             return false;
