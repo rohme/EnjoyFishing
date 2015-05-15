@@ -58,7 +58,8 @@ namespace EnjoyFishing
             {ChatKbnKind.SynthFailure, "合成に失敗した。クリスタルは消失した。"},
             {ChatKbnKind.SynthLostItem, "(.*)を失った…。"},
             {ChatKbnKind.SynthNotEnoughSkill, "うまく合成できない。現在のスキルでは難しすぎるようだ。"},
-            {ChatKbnKind.UseItemSuccess, "{0}は、(.*)を使用。(.*)"},
+            {ChatKbnKind.UseItemSuccess1, "{0}は、(.*)を使用。(.*)"},
+            {ChatKbnKind.UseItemSuccess2, "{0}が、(.*)を使用した。(.*)"},
             {ChatKbnKind.UseItemFailure, "（コマンドでエラーがあったようです…）"},
         };
         #endregion
@@ -111,7 +112,8 @@ namespace EnjoyFishing
             SynthFailure,
             SynthLostItem,
             SynthNotEnoughSkill,
-            UseItemSuccess,
+            UseItemSuccess1,
+            UseItemSuccess2,
             UseItemFailure,
         }
         public enum RunningStatusKind
@@ -1693,7 +1695,8 @@ namespace EnjoyFishing
                     v.Key == ChatKbnKind.SneakWarning2 ||
                     v.Key == ChatKbnKind.SkillUp ||
                     v.Key == ChatKbnKind.SkillLvUp ||
-                    v.Key == ChatKbnKind.UseItemSuccess)
+                    v.Key == ChatKbnKind.UseItemSuccess1 ||
+                    v.Key == ChatKbnKind.UseItemSuccess2)
                 {
                     searchStr = string.Format(v.Value, this.PlayerName);
                 }
@@ -2295,8 +2298,10 @@ namespace EnjoyFishing
                     return false;
                 }
                 //成功
-                if (chatKbn == ChatKbnKind.UseItemSuccess)
+                if (chatKbn == ChatKbnKind.UseItemSuccess1 ||
+                    chatKbn == ChatKbnKind.UseItemSuccess2)
                 {
+                    Thread.Sleep(5000);
                     return true;
                 }
                 Thread.Sleep(settings.Global.WaitBase);
