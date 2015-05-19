@@ -339,7 +339,7 @@ namespace MiscTools
             string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), fface.Player.Name);
             //string cmd = string.Format("input /puts \"{0}\" {1}", iItemName, iInventoryType.ToString());
             //return ExecScript(cmd, scriptName);
-            string cmd = string.Format("windower.send_command(\"input //put {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
+            string cmd = string.Format("windower.send_command(\"input //puts {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
             return ExecLua(cmd, scriptName);
         }
         /// <summary>
