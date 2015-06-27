@@ -34,7 +34,7 @@ namespace EnjoyFishing
             {ChatKbnKind.CatchTempItem, "テンポラリアイテム:(.*)を手にいれた！"},
             {ChatKbnKind.LineBreak, "釣り糸が切れてしまった。"},
             {ChatKbnKind.RodBreak, "釣り竿が折れてしまった。"},
-            {ChatKbnKind.InventoryFull, "見事に(.*)を釣り上げたが、"},
+            {ChatKbnKind.InventoryFull, "{0}は見事に(.*)を釣り上げたが、これ以上持てないので、仕方なくリリースした。"},
             {ChatKbnKind.NoBait, "何も釣れなかった。"},
             {ChatKbnKind.Release, "あきらめて仕掛けをたぐり寄せた。"},
             {ChatKbnKind.NoCatch, "獲物に逃げられてしまった。"},
@@ -1689,6 +1689,7 @@ namespace EnjoyFishing
                 if (v.Key == ChatKbnKind.CatchSingle ||
                     v.Key == ChatKbnKind.CatchMultiple ||
                     v.Key == ChatKbnKind.CatchMonster ||
+                    v.Key == ChatKbnKind.InventoryFull ||
                     v.Key == ChatKbnKind.EnemyAttack1 ||
                     v.Key == ChatKbnKind.EnemyAttack2 ||
                     v.Key == ChatKbnKind.EnemyAttack3 ||

@@ -20,11 +20,6 @@ EnjoyFishingはFF11の釣りを支援するツールです。
 * 釣果の履歴を表示
 * FF11からEnjoyFishingの起動・停止
 
-## インストール
-* [こちら](https://github.com/rohme/EnjoyFishing/releases)から、最新版のバイナリを取得する。
-* 適当なディレクトリに、バイナリを解凍する。
-* アンインストールは、解凍したディレクトリを削除するだけです。
-
 ## 使用方法
 1. FF11を起動し、キャラクター選択後にEnjoyFishingを管理者モードで起動してください。  
 	最初に、使用中のアドオン／プラグインを確認するのにチャットログが流れますが、皆には見えていないのでびびらないように。
@@ -239,11 +234,16 @@ FFよりEnjoyFishingの制御を行いたい場合、/Echoにて以下の文字�
 本当は`//EnjoyFishing`でやりたかったんですけど、このコマンドを取ろうとするとFFACEがエラーを吐くので断念・・・。  
 直ったら/echoでやる方法を変更するかもしれません。
 
+## インストール・アンインストール
+1. [こちら](https://github.com/rohme/EnjoyFishing/releases)から、最新版のバイナリを取得する。
+2. 適当なディレクトリに、バイナリを解凍する。
+3. アンインストールは、解凍したディレクトリを削除するだけです。
+
 ## 動かない場合
 * 管理者権限で実行してください。
 * [Windower4](http://windower.net/)をインストールする。
 * 最新の[FFACE](http://www.ffevo.net/)をインストールする。  
-http://delvl.ffevo.net/RZN/FFACE4-Public/tree/master
+http://delvl.ffevo.net/Lolwutt/FFACE4-Public/tree/master
 * [VisualStudio2013のランタイム](http://www.microsoft.com/ja-JP/download/details.aspx?id=40784)をインストールする。**（必ずx86版を使用してください）**
 * [.Net4.0](http://www.microsoft.com/ja-JP/download/details.aspx?id=17718)をインストールする。
 
@@ -268,6 +268,11 @@ https://github.com/rohme/
 このソフトウェアを使用したことによって生じたすべての障害・損害・不具合等に関しては、作者は一切の責任を負いません。各自の責任においてご使用ください。  
 
 ## 修正履歴
+* **2015-06-28 Ver1.0.11**
+    - 他人の鞄がいっぱいログが表示されると、釣りが停止してしまうのを修正
+    - アドオンのItemizerが複数個の移動に対応したので、関連箇所の修正
+    - バージョンアップで追加されたアイテムを`Rod.xml``Bait.xml``Gear.xml`に追加
+    - 複数行のチャットを正常に認識できなくなったのを修正(ChatTool)
 * **2015-05-15 Ver1.0.10**
     - エンチャントアイテム使用後に釣りが停止してしまうのを修正
     - ハラキリ後、エリアチェンジするとクライアントが落ちるのを修正  
