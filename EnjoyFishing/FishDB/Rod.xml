@@ -10,7 +10,9 @@
     <Rod name="ヒューム式釣竿" break="折れたヒューム釣竿" crystal="光のクリスタル" />
     <Rod name="ハルシオンロッド" break="折れたハルシオン竿" crystal="光のクリスタル" />
     <Rod name="太公望の釣竿" break="折れた太公望の釣竿" crystal="光のクリスタル" />
+    <Rod name="真太公望の釣竿" break="折れた真太公望" crystal="光のクリスタル" />
     <Rod name="恵比寿釣竿" />
+    <Rod name="真恵比寿釣竿" />
     <Rod name="物干し竿" break="折れた物干し竿" crystal="光のクリスタル" />
     <Rod name="一本釣りの竿" break="折れた一本釣りの竿" crystal="光のクリスタル" />
     <Rod name="ミスラ式釣竿" break="折れたミスラ式釣竿" crystal="光のクリスタル" />

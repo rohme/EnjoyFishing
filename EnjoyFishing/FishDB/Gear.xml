@@ -2,6 +2,7 @@
 <Gears version="1.0.0">
   <!--頭-->
   <Gear name="トレイニーグラス" position="Head" />
+  <Gear name="トラトラマグラス" position="Head" />
   <!--胴-->
   <Gear name="アングラーチュニカ" position="Body" />
   <Gear name="漁師エプロン" position="Body" />
@@ -10,6 +11,7 @@
   <!--手-->
   <Gear name="アングラーグローブ" position="Hands" />
   <Gear name="フィッシャグローブ" position="Hands" />
+  <Gear name="カチナグローブ" position="Hands" />
   <!--脚-->
   <Gear name="アングラーホーズ" position="Legs" />
   <Gear name="フィッシャホーズ" position="Legs" />

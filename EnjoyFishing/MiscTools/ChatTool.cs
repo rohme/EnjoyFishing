@@ -187,6 +187,7 @@ namespace MiscTools
             try
             {
                 int currChatLineIndex = 0;
+                string lastIndex = "";
                 if (fface != null && fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
                 {
                     if (fface.Chat.IsNewLine)
@@ -209,7 +210,7 @@ namespace MiscTools
                             }
                             //チャットが複数行に渡ってある場合、一行にまとめる処理
                             string[] stArrayData = cl.RawString[12].Split(',');
-                            if (stArrayData[8] == "00")//1行目か否か
+                            if (cl.RawString[4] != lastIndex)//1行目か否か
                             {
                                 chatLines.Add(cl);
                                 currChatLineIndex = chatLines.Count - 1;
@@ -218,6 +219,7 @@ namespace MiscTools
                             {
                                 chatLines[currChatLineIndex].Text = chatLines[currChatLineIndex].Text + cl.Text;
                             }
+                            lastIndex = cl.RawString[4];
                             maxIndex = cl.Index;
                             cl = fface.Chat.GetNextLine();
                         }
