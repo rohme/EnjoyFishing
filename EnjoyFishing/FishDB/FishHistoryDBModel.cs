@@ -44,6 +44,8 @@ namespace EnjoyFishing
         public string PlayerName { get; set; }
         [XmlAttribute("date")]
         public string EarthDate { get; set; }
+        [XmlAttribute("uploaded")]
+        public bool Uploaded { get; set; }
         public int TimeElapsed { get; set; }
         [XmlArray("Fishes")]
         [XmlArrayItem("Fish")]
@@ -56,6 +58,7 @@ namespace EnjoyFishing
             this.Version = string.Empty;
             this.PlayerName = string.Empty;
             this.EarthDate = DateTime.Today.ToString();
+            this.Uploaded = false;
             this.TimeElapsed = 0;
             this.Fishes = new List<FishHistoryDBFishModel>();
             this.Harakiri = new List<FishHistoryDBHarakiriModel>();

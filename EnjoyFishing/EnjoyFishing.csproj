@@ -104,6 +104,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="FishDB\FishHistoryDBModel1_0_5.cs" />
+    <Compile Include="UpdateDBTool.cs" />
     <Compile Include="FFACETestForm.cs">
       <SubType>Form</SubType>
     </Compile>

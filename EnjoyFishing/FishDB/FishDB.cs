@@ -23,7 +23,7 @@ namespace EnjoyFishing
         public const string FILENAME_RODDB = "Rod.xml";
         public const string FILENAME_BAITDB = "Bait.xml";
         public const string FILENAME_GEARDB = "Gear.xml";
-        private const string VERSION = "1.0.5";
+        private const string VERSION = "1.1.0";
 
         private LoggerTool logger;
         private List<string> _Rods = new List<string>();

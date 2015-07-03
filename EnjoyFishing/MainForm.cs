@@ -131,14 +131,17 @@ namespace EnjoyFishing
         private FishDB fishDB;
         private FishHistoryDB fishHistoryDB;
         private HarakiriDB harakiriDB;
+        private UpdateDBTool updatedb;
 
         private Thread thFishing;
         private Thread thHarakiri;
+        private Thread thUpdateDB;
         private Thread thMonitor;
         private bool loginFlg = true;//キャラクターログイン中のフラグ
         private bool startupFlg = false;//初期化中のフラグ
         private bool fishingFlg = false;//釣り中のフラグ
         private bool harakiriFlg = false;//ハラキリ中のフラグ
+        private bool updatedbFlg = false;//DB更新中のフラグ
         private SettingsArgsModel args = new SettingsArgsModel();
         private Dictionary<string, SettingsPlayerFishListWantedModel> fishListKey = new Dictionary<string, SettingsPlayerFishListWantedModel>();
 
@@ -149,6 +152,8 @@ namespace EnjoyFishing
         delegate void StopFishingDelegate(bool iShowStopMessage);
         delegate void StartHarakiriDelegate();
         delegate void StopHarakiriDelegate(bool iShowStopMessage);
+        delegate void StartUpdateDBDelegate();
+        delegate void StopUpdateDBDelegate(bool iShowStopMessage);
         delegate void SetStatusStripBackColorDelegate();
         delegate void UpdateFishListDelegate();
         delegate void UpdateHistoryDelegate();
@@ -159,6 +164,7 @@ namespace EnjoyFishing
         delegate void FishingTool_ChangeMessageDelegate(object sender, FishingTool.ChangeMessageEventArgs e);
         delegate void HarakiriTool_ChangeStatusDelegate(object sender, HarakiriTool.ChangeStatusEventArgs e);
         delegate void HarakiriTool_ChangeMessageDelegate(object sender, HarakiriTool.ChangeMessageEventArgs e);
+        delegate void UpdateDBTool_ReceiveMessageDelegate(object sender, UpdateDBTool.ReceiveMessageEventArgs e);
         delegate void SaveSettingsDelegate();
         delegate void LockControlDelegate(bool iLock);
         delegate void ThreadHarakiriDelegate();
@@ -223,6 +229,7 @@ namespace EnjoyFishing
         /// <param name="iPol"></param>
         private void constructor(PolTool iPol)
         {
+            tabMain.TabPages.Remove(tabFishedList);
             //PolTool初期設定
             pol = iPol;
             pol.ChangeStatus += new PolTool.ChangeStatusEventHandler(this.PolTool_ChangeStatus);
@@ -271,6 +278,9 @@ namespace EnjoyFishing
             harakiriDB = new HarakiriDB(logger);
             //古いデータをコンバート
             converter();
+            //DB更新
+            updatedb = new UpdateDBTool(settings, logger);
+            updatedb.ReceiveMessage += new UpdateDBTool.ReceiveMessageEventHandler(this.UpdateDBTool_ReceiveMessage);
         }
         #endregion
 
@@ -298,6 +308,30 @@ namespace EnjoyFishing
             initForm();
 
             startupFlg = false;
+        }
+        /// <summary>
+        /// フォーム Shownイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            //ネットワーク接続の確認
+            if (settings.Global.UpdateDB.LastUpdate == string.Empty)
+            {
+                SystemSounds.Asterisk.Play();
+                string message = "ネットワーク接続を有効にしますか？\nネットワーク接続を有効にすると、釣りの履歴データがサーバーへアップロードされ、\n最新の魚情報を取得する事ができます。\n\nキャラクターを特定するような情報は全て削除されてアップロードされます。";
+                DialogResult ret = MessageBox.Show(message, "EnjoyFishing ネットワーク接続の確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                settings.Global.UpdateDB.Enable = (ret == DialogResult.Yes);
+                settings.Global.UpdateDB.LastUpdate = "2000/01/01 00:00:00";
+                chkUpdateDBEnable.Checked = settings.Global.UpdateDB.Enable;
+                //btnExecUpdateDB.Enabled = settings.Global.UpdateDB.Enable;
+            }
+            //自動更新
+            if (settings.Global.UpdateDB.Enable && settings.Global.UpdateDB.AutoUpdate)
+            {
+                btnExecUpdateDB_Click(this,new EventArgs());
+            }
         }
         /// <summary>
         /// フォーム初期化
@@ -403,6 +437,11 @@ namespace EnjoyFishing
                 chkEquipEnable_CheckedChanged(this, new EventArgs());
                 //釣り・情報
                 updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
+                //DB更新
+                lblLastUpdate.Text = settings.Global.UpdateDB.LastUpdate;
+                chkUpdateDBEnable.Checked = settings.Global.UpdateDB.Enable;
+                chkUpdateDBAutoUpdate.Checked = settings.Global.UpdateDB.AutoUpdate;
+                txtUpdateDBLog.Text = string.Empty;
                 //設定・一般
                 chkWindowTopMost.Checked = settings.Etc.WindowTopMost;
                 chkWindowFlash.Checked = settings.Etc.WindowFlash;
@@ -817,6 +856,8 @@ namespace EnjoyFishing
             if (thFishing != null && thFishing.IsAlive) thFishing.Abort();
             thFishing = null;
             logger.Output(LogLevelKind.DEBUG, "メインスレッド停止");
+            //DB更新スレッド停止
+            if (updatedb != null) updatedb.SystemAbort();
             //監視スレッド停止
             if (thMonitor != null && thMonitor.IsAlive) thMonitor.Abort();
             thMonitor = null;
@@ -1111,12 +1152,12 @@ namespace EnjoyFishing
         {
             if (!harakiriFlg)
             {
-                //釣り開始
+                //ハラキリ開始
                 startHarakiri();
             }
             else
             {
-                //釣り停止
+                //ハラキリ停止
                 stopHarakiri(true);
             }
         }
@@ -1173,7 +1214,7 @@ namespace EnjoyFishing
             }
         }
         /// <summary>
-        /// 釣りメインスレッド
+        /// ハラキリメインスレッド
         /// </summary>
         private void threadHarakiri()
         {
@@ -1199,6 +1240,101 @@ namespace EnjoyFishing
         private void btnHarakiriUpdate_Click(object sender, EventArgs e)
         {
             updateHarakiriFishList();
+        }
+        /// <summary>
+        /// DB更新ボタンClickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnExecUpdateDB_Click(object sender, EventArgs e)
+        {
+            //ネットワーク有効チェック
+            if (!settings.Global.UpdateDB.Enable) return;
+
+            if (!updatedbFlg)
+            {
+                //DB更新開始
+                startUpdateDB();
+            }
+            else
+            {
+                //DB更新停止
+                stopUpdateDB(true);
+            }
+        }
+        /// <summary>
+        /// DB更新開始
+        /// </summary>
+        private void startUpdateDB()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new StartUpdateDBDelegate(startUpdateDB), null);
+            }
+            else
+            {
+                logger.Output(LogLevelKind.INFO, "DB更新開始");
+                //setMessage("データベースを更新しています");
+                updatedbFlg = true;
+                btnExecUpdateDB.Text = "停　止";
+                txtUpdateDBLog.Text = string.Empty;
+
+                thUpdateDB = new Thread(threadUpdateDB);
+                thUpdateDB.Start();
+            }
+        }
+        /// <summary>
+        /// DB更新停止
+        /// </summary>
+        private void stopUpdateDB(bool iShowStopMessage)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new StopUpdateDBDelegate(stopUpdateDB), iShowStopMessage);
+            }
+            else
+            {
+                logger.Output(LogLevelKind.INFO, "DB更新停止");
+                updatedbFlg = false;
+                btnExecUpdateDB.Text = "開　始";
+                updatedb.UpdateDBAbort();
+                //if (iShowStopMessage) setMessage("データベースの更新を停止しました");
+
+                //最終更新日の画面表示更新
+                lblLastUpdate.Text = settings.Global.UpdateDB.LastUpdate;
+                //設定保存
+                saveSettings();
+            }
+        }
+        /// <summary>
+        /// DB更新メインスレッド
+        /// </summary>
+        private void threadUpdateDB()
+        {
+
+            bool ret = updatedb.UpdateDBStart();
+            stopUpdateDB(false);
+            //if (ret)
+            //{
+            //    //正常終了
+            //    setMessage("データベースの更新が正常終了しました"); 
+            //    SystemSounds.Asterisk.Play();
+            //}
+            //else
+            //{
+            //    //エラー
+            //    setMessage("データベースの更新が以上終了しました");
+            //    SystemSounds.Hand.Play();
+            //}
+        }
+        /// <summary>
+        /// 統計情報 Clickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lblUpdateDBUrl_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(UpdateDBTool.SERVER_NAME);
         }
         #endregion
 
@@ -1787,6 +1923,9 @@ namespace EnjoyFishing
                 settings.Harakiri.FishNameSelect = cmbHarakiriFishname.Text;
                 settings.Harakiri.FishNameInput = txtHarakiriFishname.Text;
                 settings.Harakiri.StopFound = chkHarakiriStopFound.Checked;
+                //DB更新
+                settings.Global.UpdateDB.Enable = chkUpdateDBEnable.Checked;
+                settings.Global.UpdateDB.AutoUpdate = chkUpdateDBAutoUpdate.Checked;
                 //設定・一般
                 settings.Etc.WindowTopMost = chkWindowTopMost.Checked;
                 settings.Etc.WindowFlash = chkWindowFlash.Checked;
@@ -2391,6 +2530,19 @@ namespace EnjoyFishing
             settings.Harakiri.StopFound = chkHarakiriStopFound.Checked;
         }
         #endregion
+        #region DB更新
+        private void chkUpdateDBEnable_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Global.UpdateDB.Enable = chkUpdateDBEnable.Checked;
+            btnExecUpdateDB.Enabled = settings.Global.UpdateDB.Enable;
+        }
+        private void chkAutoDBUpdate_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Global.UpdateDB.AutoUpdate = chkUpdateDBAutoUpdate.Checked;
+        }
+        #endregion
         #region 設定
         #region 設定・ステータスバー表示
         private void chkVisibleMoonPhase_CheckedChanged(object sender, EventArgs e)
@@ -2603,6 +2755,11 @@ namespace EnjoyFishing
                 System.Environment.Exit(0);//プログラム終了
             }
         }
+        /// <summary>
+        /// ChatTool ReceivedCommandイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChatTool_ReceivedCommand(object sender, ChatTool.ReceivedCommandEventArgs e)
         {
             List<string> cmd = e.Command;
@@ -2778,7 +2935,48 @@ namespace EnjoyFishing
                 }
             }
         }
+        /// <summary>
+        /// UpdateDBTool ReceiveMessageイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateDBTool_ReceiveMessage(object sender, UpdateDBTool.ReceiveMessageEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new UpdateDBTool_ReceiveMessageDelegate(UpdateDBTool_ReceiveMessage), sender, e);
+            }
+            else
+            {
+                txtUpdateDBLog.SelectionStart = txtUpdateDBLog.Text.Length;
+                //改行
+                if (txtUpdateDBLog.Text != string.Empty) txtUpdateDBLog.SelectedText = Environment.NewLine;
+                //日時
+                txtUpdateDBLog.SelectionColor = Color.BlueViolet;
+                txtUpdateDBLog.SelectionFont = new System.Drawing.Font("Tahoma", 9, FontStyle.Bold);
+                txtUpdateDBLog.SelectedText = "[" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + "] ";
+                //メッセージ
+                txtUpdateDBLog.SelectionColor = e.Color;
+                if (e.Bold)
+                {
+                    txtUpdateDBLog.SelectionFont = new System.Drawing.Font("Meiryo UI", 9, FontStyle.Bold);
+                }
+                else
+                {
+                    txtUpdateDBLog.SelectionFont = new System.Drawing.Font("Meiryo UI", 9, FontStyle.Regular);
+                }
+                txtUpdateDBLog.SelectedText = e.Message;
+                //最終行へスクロール
+                txtUpdateDBLog.ScrollToCaret();
+            }
+        }
         #endregion
+
+
+
+
+
+
 
     }
 }

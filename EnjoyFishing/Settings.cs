@@ -231,7 +231,7 @@ namespace EnjoyFishing
 
         public SettingsModel()
         {
-            this.Version = "1.0.0";
+            this.Version = "1.1.0";
             this.Global = new SettingsGlobalModel();
             this.Player = new List<SettingsPlayerModel>();
         }
@@ -242,12 +242,27 @@ namespace EnjoyFishing
         public int WaitChat { get; set; }
         public int WaitEquip { get; set; }
         public Settings.SaveModeKind SaveMode { get; set; }
+        public SettingsGlobalUpdateDBModel UpdateDB { get; set; }
         public SettingsGlobalModel()
         {
             this.WaitBase = 300;
             this.WaitChat = 1000;
             this.WaitEquip = 1000;
             this.SaveMode = Settings.SaveModeKind.Shared;
+            this.UpdateDB = new SettingsGlobalUpdateDBModel();
+
+        }
+    }
+    public class SettingsGlobalUpdateDBModel
+    {
+        public bool Enable { get; set; }
+        public bool AutoUpdate { get; set; }
+        public string LastUpdate { get; set; }
+        public SettingsGlobalUpdateDBModel()
+        {
+            this.Enable = true;
+            this.AutoUpdate = true;
+            this.LastUpdate = string.Empty;
         }
     }
     public class SettingsPlayerModel

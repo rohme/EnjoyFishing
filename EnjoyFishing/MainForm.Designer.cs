@@ -68,6 +68,7 @@
             this.chkIgnoreItem = new System.Windows.Forms.CheckBox();
             this.chkIgnoreMonster = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chkRepairRod = new System.Windows.Forms.CheckBox();
             this.txtHP0Max = new System.Windows.Forms.NumericUpDown();
             this.txtHP0Min = new System.Windows.Forms.NumericUpDown();
             this.chkHP0 = new System.Windows.Forms.CheckBox();
@@ -201,6 +202,18 @@
             this.gridHarakiri = new System.Windows.Forms.DataGridView();
             this.cmbHarakiriFishname = new System.Windows.Forms.ComboBox();
             this.btnExecHarakiri = new System.Windows.Forms.Button();
+            this.tabDB = new System.Windows.Forms.TabPage();
+            this.chkUpdateDBEnable = new System.Windows.Forms.CheckBox();
+            this.lblUpdateDBUrl = new System.Windows.Forms.Label();
+            this.lblLastUpdate = new System.Windows.Forms.Label();
+            this.label35 = new System.Windows.Forms.Label();
+            this.txtUpdateDBLog = new System.Windows.Forms.RichTextBox();
+            this.chkUpdateDBAutoUpdate = new System.Windows.Forms.CheckBox();
+            this.btnExecUpdateDB = new System.Windows.Forms.Button();
+            this.tabFishedList = new System.Windows.Forms.TabPage();
+            this.btnUpdateIsana = new System.Windows.Forms.Button();
+            this.btnResetIsana = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabMainSetting = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.chkMessageEcho = new System.Windows.Forms.CheckBox();
@@ -235,7 +248,6 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.chkRepairRod = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -277,6 +289,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridHistorySummary)).BeginInit();
             this.tabMainHarakiri.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridHarakiri)).BeginInit();
+            this.tabDB.SuspendLayout();
+            this.tabFishedList.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabMainSetting.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -296,7 +311,7 @@
             this.lstFish.FormattingEnabled = true;
             this.lstFish.Location = new System.Drawing.Point(0, 70);
             this.lstFish.Name = "lstFish";
-            this.lstFish.Size = new System.Drawing.Size(127, 244);
+            this.lstFish.Size = new System.Drawing.Size(127, 260);
             this.lstFish.TabIndex = 8;
             this.lstFish.SelectedIndexChanged += new System.EventHandler(this.lstFish_SelectedIndexChanged);
             // 
@@ -332,7 +347,7 @@
             this.statusStrip.Location = new System.Drawing.Point(0, 365);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.ShowItemToolTips = true;
-            this.statusStrip.Size = new System.Drawing.Size(569, 22);
+            this.statusStrip.Size = new System.Drawing.Size(561, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -370,7 +385,7 @@
             // lblMessage
             // 
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(99, 17);
+            this.lblMessage.Size = new System.Drawing.Size(91, 17);
             this.lblMessage.Spring = true;
             this.lblMessage.Text = "メッセージ";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -776,6 +791,18 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "動作";
             // 
+            // chkRepairRod
+            // 
+            this.chkRepairRod.AutoSize = true;
+            this.chkRepairRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkRepairRod.Location = new System.Drawing.Point(6, 113);
+            this.chkRepairRod.Name = "chkRepairRod";
+            this.chkRepairRod.Size = new System.Drawing.Size(68, 18);
+            this.chkRepairRod.TabIndex = 21;
+            this.chkRepairRod.Text = "竿の修理";
+            this.chkRepairRod.UseVisualStyleBackColor = true;
+            this.chkRepairRod.CheckedChanged += new System.EventHandler(this.chkRepairRod_CheckedChanged);
+            // 
             // txtHP0Max
             // 
             this.txtHP0Max.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -1121,7 +1148,7 @@
             this.tabFishingMain.Name = "tabFishingMain";
             this.tabFishingMain.Padding = new System.Drawing.Point(0, 0);
             this.tabFishingMain.SelectedIndex = 0;
-            this.tabFishingMain.Size = new System.Drawing.Size(421, 332);
+            this.tabFishingMain.Size = new System.Drawing.Size(413, 332);
             this.tabFishingMain.TabIndex = 9;
             // 
             // tabFishingMainSetting
@@ -1133,7 +1160,7 @@
             this.tabFishingMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainSetting.Name = "tabFishingMainSetting";
             this.tabFishingMainSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainSetting.Size = new System.Drawing.Size(413, 305);
+            this.tabFishingMainSetting.Size = new System.Drawing.Size(405, 305);
             this.tabFishingMainSetting.TabIndex = 0;
             this.tabFishingMainSetting.Text = "釣り設定";
             this.tabFishingMainSetting.UseVisualStyleBackColor = true;
@@ -1340,7 +1367,7 @@
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipRod);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
-            this.tabFishingMainEquip.Size = new System.Drawing.Size(413, 291);
+            this.tabFishingMainEquip.Size = new System.Drawing.Size(405, 305);
             this.tabFishingMainEquip.TabIndex = 2;
             this.tabFishingMainEquip.Text = "装備";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
@@ -1739,7 +1766,7 @@
             this.tabFishingMainInfo.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainInfo.Name = "tabFishingMainInfo";
             this.tabFishingMainInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainInfo.Size = new System.Drawing.Size(413, 291);
+            this.tabFishingMainInfo.Size = new System.Drawing.Size(405, 305);
             this.tabFishingMainInfo.TabIndex = 1;
             this.tabFishingMainInfo.Text = "情報";
             this.tabFishingMainInfo.UseVisualStyleBackColor = true;
@@ -1875,7 +1902,7 @@
             this.gridFishingInfo.Location = new System.Drawing.Point(-1, 46);
             this.gridFishingInfo.Name = "gridFishingInfo";
             this.gridFishingInfo.RowTemplate.Height = 21;
-            this.gridFishingInfo.Size = new System.Drawing.Size(413, 245);
+            this.gridFishingInfo.Size = new System.Drawing.Size(405, 259);
             this.gridFishingInfo.TabIndex = 8;
             this.gridFishingInfo.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -2077,7 +2104,7 @@
             this.gridHistory.Location = new System.Drawing.Point(3, 3);
             this.gridHistory.Name = "gridHistory";
             this.gridHistory.RowTemplate.Height = 21;
-            this.gridHistory.Size = new System.Drawing.Size(538, 266);
+            this.gridHistory.Size = new System.Drawing.Size(539, 284);
             this.gridHistory.TabIndex = 0;
             this.gridHistory.Sorted += new System.EventHandler(this.gridHistory_Sorted);
             // 
@@ -2113,7 +2140,7 @@
             // splitMain.Panel2
             // 
             this.splitMain.Panel2.Controls.Add(this.tabFishingMain);
-            this.splitMain.Size = new System.Drawing.Size(555, 332);
+            this.splitMain.Size = new System.Drawing.Size(547, 332);
             this.splitMain.SplitterDistance = 130;
             this.splitMain.TabIndex = 8;
             // 
@@ -2206,13 +2233,15 @@
             this.tabMain.Controls.Add(this.tabMainFishing);
             this.tabMain.Controls.Add(this.tabMainHistory);
             this.tabMain.Controls.Add(this.tabMainHarakiri);
+            this.tabMain.Controls.Add(this.tabDB);
+            this.tabMain.Controls.Add(this.tabFishedList);
             this.tabMain.Controls.Add(this.tabMainSetting);
             this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabMain.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(569, 365);
+            this.tabMain.Size = new System.Drawing.Size(561, 365);
             this.tabMain.TabIndex = 0;
             // 
             // tabMainFishing
@@ -2221,7 +2250,7 @@
             this.tabMainFishing.Location = new System.Drawing.Point(4, 23);
             this.tabMainFishing.Name = "tabMainFishing";
             this.tabMainFishing.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainFishing.Size = new System.Drawing.Size(561, 338);
+            this.tabMainFishing.Size = new System.Drawing.Size(553, 338);
             this.tabMainFishing.TabIndex = 0;
             this.tabMainFishing.Text = "釣り";
             this.tabMainFishing.UseVisualStyleBackColor = true;
@@ -2236,7 +2265,7 @@
             this.tabMainHistory.Location = new System.Drawing.Point(4, 23);
             this.tabMainHistory.Name = "tabMainHistory";
             this.tabMainHistory.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainHistory.Size = new System.Drawing.Size(561, 324);
+            this.tabMainHistory.Size = new System.Drawing.Size(553, 338);
             this.tabMainHistory.TabIndex = 1;
             this.tabMainHistory.Text = "履歴";
             this.tabMainHistory.UseVisualStyleBackColor = true;
@@ -2251,7 +2280,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 25);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(552, 299);
+            this.tabControl1.Size = new System.Drawing.Size(553, 317);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -2260,7 +2289,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 23);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(544, 272);
+            this.tabPage1.Size = new System.Drawing.Size(545, 290);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "詳細";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -2271,7 +2300,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 23);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(544, 272);
+            this.tabPage2.Size = new System.Drawing.Size(545, 290);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "合計";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -2283,7 +2312,7 @@
             this.gridHistorySummary.Location = new System.Drawing.Point(3, 3);
             this.gridHistorySummary.Name = "gridHistorySummary";
             this.gridHistorySummary.RowTemplate.Height = 21;
-            this.gridHistorySummary.Size = new System.Drawing.Size(538, 266);
+            this.gridHistorySummary.Size = new System.Drawing.Size(539, 284);
             this.gridHistorySummary.TabIndex = 0;
             this.gridHistorySummary.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -2319,7 +2348,7 @@
             this.tabMainHarakiri.Controls.Add(this.btnExecHarakiri);
             this.tabMainHarakiri.Location = new System.Drawing.Point(4, 23);
             this.tabMainHarakiri.Name = "tabMainHarakiri";
-            this.tabMainHarakiri.Size = new System.Drawing.Size(561, 324);
+            this.tabMainHarakiri.Size = new System.Drawing.Size(553, 338);
             this.tabMainHarakiri.TabIndex = 3;
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
@@ -2384,7 +2413,7 @@
             this.gridHarakiri.Location = new System.Drawing.Point(3, 35);
             this.gridHarakiri.Name = "gridHarakiri";
             this.gridHarakiri.RowTemplate.Height = 21;
-            this.gridHarakiri.Size = new System.Drawing.Size(546, 289);
+            this.gridHarakiri.Size = new System.Drawing.Size(547, 300);
             this.gridHarakiri.TabIndex = 6;
             this.gridHarakiri.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridHarakiri_CellFormatting);
             // 
@@ -2409,6 +2438,150 @@
             this.btnExecHarakiri.UseVisualStyleBackColor = true;
             this.btnExecHarakiri.Click += new System.EventHandler(this.btnExecHarakiri_Click);
             // 
+            // tabDB
+            // 
+            this.tabDB.Controls.Add(this.chkUpdateDBEnable);
+            this.tabDB.Controls.Add(this.lblUpdateDBUrl);
+            this.tabDB.Controls.Add(this.lblLastUpdate);
+            this.tabDB.Controls.Add(this.label35);
+            this.tabDB.Controls.Add(this.txtUpdateDBLog);
+            this.tabDB.Controls.Add(this.chkUpdateDBAutoUpdate);
+            this.tabDB.Controls.Add(this.btnExecUpdateDB);
+            this.tabDB.Location = new System.Drawing.Point(4, 23);
+            this.tabDB.Name = "tabDB";
+            this.tabDB.Size = new System.Drawing.Size(553, 338);
+            this.tabDB.TabIndex = 4;
+            this.tabDB.Text = "DB更新";
+            this.tabDB.UseVisualStyleBackColor = true;
+            // 
+            // chkUpdateDBEnable
+            // 
+            this.chkUpdateDBEnable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkUpdateDBEnable.AutoSize = true;
+            this.chkUpdateDBEnable.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkUpdateDBEnable.Location = new System.Drawing.Point(364, 10);
+            this.chkUpdateDBEnable.Name = "chkUpdateDBEnable";
+            this.chkUpdateDBEnable.Size = new System.Drawing.Size(72, 18);
+            this.chkUpdateDBEnable.TabIndex = 6;
+            this.chkUpdateDBEnable.Text = "ネット有効";
+            this.chkUpdateDBEnable.UseVisualStyleBackColor = true;
+            this.chkUpdateDBEnable.CheckedChanged += new System.EventHandler(this.chkUpdateDBEnable_CheckedChanged);
+            // 
+            // lblUpdateDBUrl
+            // 
+            this.lblUpdateDBUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblUpdateDBUrl.AutoSize = true;
+            this.lblUpdateDBUrl.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblUpdateDBUrl.Font = new System.Drawing.Font("Meiryo UI", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblUpdateDBUrl.ForeColor = System.Drawing.Color.Blue;
+            this.lblUpdateDBUrl.Location = new System.Drawing.Point(303, 11);
+            this.lblUpdateDBUrl.Name = "lblUpdateDBUrl";
+            this.lblUpdateDBUrl.Size = new System.Drawing.Size(51, 14);
+            this.lblUpdateDBUrl.TabIndex = 5;
+            this.lblUpdateDBUrl.Text = "統計情報";
+            this.lblUpdateDBUrl.Click += new System.EventHandler(this.lblUpdateDBUrl_Click);
+            // 
+            // lblLastUpdate
+            // 
+            this.lblLastUpdate.AutoSize = true;
+            this.lblLastUpdate.Location = new System.Drawing.Point(139, 11);
+            this.lblLastUpdate.Name = "lblLastUpdate";
+            this.lblLastUpdate.Size = new System.Drawing.Size(129, 14);
+            this.lblLastUpdate.TabIndex = 4;
+            this.lblLastUpdate.Text = "9999/99/99 99:99:99";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label35.Location = new System.Drawing.Point(84, 11);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(62, 14);
+            this.label35.TabIndex = 3;
+            this.label35.Text = "最終確認：";
+            // 
+            // txtUpdateDBLog
+            // 
+            this.txtUpdateDBLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtUpdateDBLog.BackColor = System.Drawing.Color.Black;
+            this.txtUpdateDBLog.ForeColor = System.Drawing.Color.White;
+            this.txtUpdateDBLog.Location = new System.Drawing.Point(3, 34);
+            this.txtUpdateDBLog.Name = "txtUpdateDBLog";
+            this.txtUpdateDBLog.ReadOnly = true;
+            this.txtUpdateDBLog.Size = new System.Drawing.Size(547, 301);
+            this.txtUpdateDBLog.TabIndex = 2;
+            this.txtUpdateDBLog.Text = "[2000/01/01 00:00:00]: メッセージ";
+            // 
+            // chkUpdateDBAutoUpdate
+            // 
+            this.chkUpdateDBAutoUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkUpdateDBAutoUpdate.AutoSize = true;
+            this.chkUpdateDBAutoUpdate.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkUpdateDBAutoUpdate.Location = new System.Drawing.Point(438, 10);
+            this.chkUpdateDBAutoUpdate.Name = "chkUpdateDBAutoUpdate";
+            this.chkUpdateDBAutoUpdate.Size = new System.Drawing.Size(112, 18);
+            this.chkUpdateDBAutoUpdate.TabIndex = 1;
+            this.chkUpdateDBAutoUpdate.Text = "起動時に自動更新";
+            this.chkUpdateDBAutoUpdate.UseVisualStyleBackColor = true;
+            this.chkUpdateDBAutoUpdate.CheckedChanged += new System.EventHandler(this.chkAutoDBUpdate_CheckedChanged);
+            // 
+            // btnExecUpdateDB
+            // 
+            this.btnExecUpdateDB.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnExecUpdateDB.Location = new System.Drawing.Point(3, 7);
+            this.btnExecUpdateDB.Name = "btnExecUpdateDB";
+            this.btnExecUpdateDB.Size = new System.Drawing.Size(75, 23);
+            this.btnExecUpdateDB.TabIndex = 0;
+            this.btnExecUpdateDB.Text = "開　始";
+            this.btnExecUpdateDB.UseVisualStyleBackColor = true;
+            this.btnExecUpdateDB.Click += new System.EventHandler(this.btnExecUpdateDB_Click);
+            // 
+            // tabFishedList
+            // 
+            this.tabFishedList.Controls.Add(this.btnUpdateIsana);
+            this.tabFishedList.Controls.Add(this.btnResetIsana);
+            this.tabFishedList.Controls.Add(this.dataGridView1);
+            this.tabFishedList.Location = new System.Drawing.Point(4, 23);
+            this.tabFishedList.Name = "tabFishedList";
+            this.tabFishedList.Size = new System.Drawing.Size(553, 338);
+            this.tabFishedList.TabIndex = 5;
+            this.tabFishedList.Text = "釣った魚";
+            this.tabFishedList.UseVisualStyleBackColor = true;
+            // 
+            // btnUpdateIsana
+            // 
+            this.btnUpdateIsana.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnUpdateIsana.Location = new System.Drawing.Point(0, 7);
+            this.btnUpdateIsana.Name = "btnUpdateIsana";
+            this.btnUpdateIsana.Size = new System.Drawing.Size(75, 23);
+            this.btnUpdateIsana.TabIndex = 1;
+            this.btnUpdateIsana.Text = "更　新";
+            this.btnUpdateIsana.UseVisualStyleBackColor = true;
+            // 
+            // btnResetIsana
+            // 
+            this.btnResetIsana.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnResetIsana.Location = new System.Drawing.Point(475, 7);
+            this.btnResetIsana.Name = "btnResetIsana";
+            this.btnResetIsana.Size = new System.Drawing.Size(75, 23);
+            this.btnResetIsana.TabIndex = 1;
+            this.btnResetIsana.Text = "リセット";
+            this.btnResetIsana.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 32);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowTemplate.Height = 21;
+            this.dataGridView1.Size = new System.Drawing.Size(550, 306);
+            this.dataGridView1.TabIndex = 0;
+            // 
             // tabMainSetting
             // 
             this.tabMainSetting.Controls.Add(this.groupBox2);
@@ -2416,7 +2589,7 @@
             this.tabMainSetting.Controls.Add(this.groupBox7);
             this.tabMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabMainSetting.Name = "tabMainSetting";
-            this.tabMainSetting.Size = new System.Drawing.Size(561, 338);
+            this.tabMainSetting.Size = new System.Drawing.Size(553, 338);
             this.tabMainSetting.TabIndex = 2;
             this.tabMainSetting.Text = "設定";
             this.tabMainSetting.UseVisualStyleBackColor = true;
@@ -2819,24 +2992,12 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // chkRepairRod
-            // 
-            this.chkRepairRod.AutoSize = true;
-            this.chkRepairRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkRepairRod.Location = new System.Drawing.Point(6, 113);
-            this.chkRepairRod.Name = "chkRepairRod";
-            this.chkRepairRod.Size = new System.Drawing.Size(68, 18);
-            this.chkRepairRod.TabIndex = 21;
-            this.chkRepairRod.Text = "竿の修理";
-            this.chkRepairRod.UseVisualStyleBackColor = true;
-            this.chkRepairRod.CheckedChanged += new System.EventHandler(this.chkRepairRod_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(569, 387);
+            this.ClientSize = new System.Drawing.Size(561, 387);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -2846,6 +3007,7 @@
             this.Text = "MainForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -2896,6 +3058,10 @@
             this.tabMainHarakiri.ResumeLayout(false);
             this.tabMainHarakiri.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridHarakiri)).EndInit();
+            this.tabDB.ResumeLayout(false);
+            this.tabDB.PerformLayout();
+            this.tabFishedList.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tabMainSetting.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -3119,5 +3285,17 @@
         private System.Windows.Forms.CheckBox chkEnemyAttackCmd;
         private System.Windows.Forms.TextBox txtEnemyAttackCmdLine;
         private System.Windows.Forms.CheckBox chkRepairRod;
+        private System.Windows.Forms.TabPage tabDB;
+        private System.Windows.Forms.RichTextBox txtUpdateDBLog;
+        private System.Windows.Forms.CheckBox chkUpdateDBAutoUpdate;
+        private System.Windows.Forms.Button btnExecUpdateDB;
+        private System.Windows.Forms.TabPage tabFishedList;
+        private System.Windows.Forms.Button btnUpdateIsana;
+        private System.Windows.Forms.Button btnResetIsana;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Label lblLastUpdate;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label lblUpdateDBUrl;
+        private System.Windows.Forms.CheckBox chkUpdateDBEnable;
     }
 }
