@@ -383,6 +383,7 @@ namespace EnjoyFishing
                 txtEarthTimeFrom.Value = settings.Fishing.EarthTimeFrom;
                 txtEarthTimeTo.Value = settings.Fishing.EarthTimeTo;
                 chkRepairRod.Checked = settings.Fishing.RepairRod;
+                chkWaitTimeout.Checked = settings.Fishing.WaitTimeout;
                 //釣り設定・停止条件
                 chkMaxCatch.Checked = settings.Fishing.MaxCatch;
                 txtMaxCatchCount.Value = settings.Fishing.MaxCatchCount;
@@ -1811,6 +1812,7 @@ namespace EnjoyFishing
                 settings.Fishing.EarthTimeFrom = (int)txtEarthTimeFrom.Value;
                 settings.Fishing.EarthTimeTo = (int)txtEarthTimeTo.Value;
                 settings.Fishing.RepairRod = chkRepairRod.Checked;
+                settings.Fishing.WaitTimeout = chkWaitTimeout.Checked;
                 //釣り設定・停止条件
                 settings.Fishing.IgnoreSmallFish = chkIgnoreSmallFish.Checked;
                 settings.Fishing.IgnoreLargeFish = chkIgnoreLargeFish.Checked;
@@ -2234,6 +2236,11 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.RepairRod = chkRepairRod.Checked;
+        }
+        private void chkWaitTimeout_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.WaitTimeout = chkWaitTimeout.Checked;
         }
         #endregion
         #region 釣り設定・停止条件
@@ -2971,11 +2978,6 @@ namespace EnjoyFishing
             }
         }
         #endregion
-
-
-
-
-
 
 
     }

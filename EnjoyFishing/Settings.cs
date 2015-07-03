@@ -427,6 +427,7 @@ namespace EnjoyFishing
         public int EarthTimeFrom { get; set; }
         public int EarthTimeTo { get; set; }
         public bool RepairRod { get; set; }
+        public bool WaitTimeout { get; set; }
         public bool MaxCatch { get; set; }
         public int MaxCatchCount { get; set; }
         public bool MaxNoCatch { get; set; }
@@ -499,6 +500,7 @@ namespace EnjoyFishing
             this.EarthTimeFrom = 0;
             this.EarthTimeTo = 6;
             this.RepairRod = false;
+            this.WaitTimeout = false;
             this.MaxCatch = false;
             this.MaxCatchCount = 200;
             this.MaxNoCatch = true;

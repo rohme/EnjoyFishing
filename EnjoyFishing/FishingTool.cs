@@ -34,6 +34,7 @@ namespace EnjoyFishing
             {ChatKbnKind.CatchTempItem, "テンポラリアイテム:(.*)を手にいれた！"},
             {ChatKbnKind.LineBreak, "釣り糸が切れてしまった。"},
             {ChatKbnKind.RodBreak, "釣り竿が折れてしまった。"},
+            {ChatKbnKind.Timeout, "そろそろ逃げられそうだ……！"},
             {ChatKbnKind.InventoryFull, "{0}は見事に(.*)を釣り上げたが、これ以上持てないので、仕方なくリリースした。"},
             {ChatKbnKind.NoBait, "何も釣れなかった。"},
             {ChatKbnKind.Release, "あきらめて仕掛けをたぐり寄せた。"},
@@ -87,6 +88,7 @@ namespace EnjoyFishing
             CatchKeyItem,
             LineBreak,
             RodBreak,
+            Timeout,
             InventoryFull,
             NoBait,
             Release,
@@ -1331,6 +1333,32 @@ namespace EnjoyFishing
                         //        oFish.Critical = true;
                         //    }
                         //}
+                        //時間切れのログが表示されるまで待機
+                        if (settings.Fishing.WaitTimeout)
+                        {
+                            logger.Output(LogLevelKind.DEBUG, "時間切れ待機中");
+                            setMessage(string.Format("時間切れ待機中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
+                            for (int i = 0; i < 1200; i++)//2分間チャットを監視
+                            {
+                                if (chat.GetNextChatLine(out cl))
+                                {
+                                    List<string> chatKbnTimeoutArgs = new List<string>();
+                                    ChatKbnKind chatKbnTimeout = getChatKbnFromChatline(cl, out chatKbnArgs);
+                                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                                    if (chatKbnTimeout == ChatKbnKind.Timeout ||
+                                        chatKbnTimeout == ChatKbnKind.NoCatch)
+                                    {
+                                        //反応時間待機
+                                        if (settings.Fishing.ReactionTime)
+                                        {
+                                            wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
+                                        }
+                                        break;
+                                    }
+                                }
+                                Thread.Sleep(100);//wait
+                            }
+                        }
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
                         while (this.PlayerStatus == FFACETools.Status.FishBite)

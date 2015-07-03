@@ -248,6 +248,7 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
+            this.chkWaitTimeout = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -760,6 +761,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.chkWaitTimeout);
             this.groupBox3.Controls.Add(this.chkRepairRod);
             this.groupBox3.Controls.Add(this.txtHP0Max);
             this.groupBox3.Controls.Add(this.txtHP0Min);
@@ -2992,6 +2994,18 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
+            // chkWaitTimeout
+            // 
+            this.chkWaitTimeout.AutoSize = true;
+            this.chkWaitTimeout.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkWaitTimeout.Location = new System.Drawing.Point(89, 113);
+            this.chkWaitTimeout.Name = "chkWaitTimeout";
+            this.chkWaitTimeout.Size = new System.Drawing.Size(108, 18);
+            this.chkWaitTimeout.TabIndex = 22;
+            this.chkWaitTimeout.Text = "時間切れまで待機";
+            this.chkWaitTimeout.UseVisualStyleBackColor = true;
+            this.chkWaitTimeout.CheckedChanged += new System.EventHandler(this.chkWaitTimeout_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3297,5 +3311,6 @@
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.Label lblUpdateDBUrl;
         private System.Windows.Forms.CheckBox chkUpdateDBEnable;
+        private System.Windows.Forms.CheckBox chkWaitTimeout;
     }
 }
