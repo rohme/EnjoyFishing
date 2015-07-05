@@ -34,6 +34,7 @@ namespace EnjoyFishing
             {ChatKbnKind.CatchTempItem, "テンポラリアイテム:(.*)を手にいれた！"},
             {ChatKbnKind.LineBreak, "釣り糸が切れてしまった。"},
             {ChatKbnKind.RodBreak, "釣り竿が折れてしまった。"},
+            {ChatKbnKind.Timeout, "そろそろ逃げられそうだ……！"},
             {ChatKbnKind.InventoryFull, "{0}は見事に(.*)を釣り上げたが、これ以上持てないので、仕方なくリリースした。"},
             {ChatKbnKind.NoBait, "何も釣れなかった。"},
             {ChatKbnKind.Release, "あきらめて仕掛けをたぐり寄せた。"},
@@ -87,6 +88,7 @@ namespace EnjoyFishing
             CatchKeyItem,
             LineBreak,
             RodBreak,
+            Timeout,
             InventoryFull,
             NoBait,
             Release,
@@ -149,6 +151,12 @@ namespace EnjoyFishing
             }
         }
         #endregion
+
+        //釣った魚
+        private const int NPCID_KATSUNAGA = 37;
+        private const string REGEX_FISHEDLIST_DIALOG = @"釣りあげた獲物の種類【([0-9]*)】\(ページ：([0-9]*)/([0-9]*)\)";
+        private const string REGEX_FISHEDLIST_OPTIONS = "【(.*)】：{(.*)}";
+        
 
         private PolTool pol;
         private FFACE fface;
@@ -738,6 +746,57 @@ namespace EnjoyFishing
             OnChangeStatus(e);
         }
         #endregion
+        #region CaughtFishesUpdate
+        /// <summary>
+        /// CaughtFishesUpdateイベントで返されるデータ
+        /// </summary>
+        public class CaughtFishesUpdateEventArgs : EventArgs
+        {
+            public string FishName;
+        }
+        public delegate void CaughtFishesUpdateEventHandler(object sender, CaughtFishesUpdateEventArgs e);
+        public event CaughtFishesUpdateEventHandler CaughtFishesUpdate;
+        protected virtual void OnCaughtFishesUpdate(CaughtFishesUpdateEventArgs e)
+        {
+            if (CaughtFishesUpdate != null)
+            {
+                CaughtFishesUpdate(this, e);
+            }
+        }
+        private void EventCaughtFishesUpdate(string iFishName)
+        {
+            //返すデータの設定
+            CaughtFishesUpdateEventArgs e = new CaughtFishesUpdateEventArgs();
+            e.FishName = iFishName;
+            //イベントの発生
+            OnCaughtFishesUpdate(e);
+        }
+        #endregion
+        /// <summary>
+        /// PolTool ChangeStatusイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PolTool_ChangeStatus(object sender, PolTool.ChangeStatusEventArgs e)
+        {
+            if (e.PolStatus == PolTool.PolStatusKind.LoggedIn)
+            {
+                setMessage(string.Format("{0}でログインしました", this.PlayerName));
+            }
+            else
+            {
+                FishingAbort();
+                setFishingStatus(FishingStatusKind.Error);
+                if (e.PolStatus == PolTool.PolStatusKind.CharacterLoginScreen)
+                {
+                    setMessage("キャラクターを選択してください");
+                }
+                else if (e.PolStatus == PolTool.PolStatusKind.Unknown)
+                {
+                    setMessage("FF11が終了しました、再起動してください");
+                }
+            }
+        }
         #endregion
 
         #region コンストラクタ
@@ -1284,10 +1343,14 @@ namespace EnjoyFishing
                         //HP0の設定
                         int waitHP0 = MiscTool.GetRandomNumber(settings.Fishing.HP0Min, settings.Fishing.HP0Max);
                         //反応時間待機
-                        Thread.Sleep(settings.Global.WaitChat); //wait
-                        if (settings.Fishing.ReactionTime)
+                        if (settings.Fishing.ReactionTime && !settings.Fishing.WaitTimeout)
                         {
                             wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
+                        }
+                        else
+                        {
+                            //HP0になった瞬間釣り上げると、HP残ったように表示されてしまうので、ウェイトを入れる
+                            Thread.Sleep(settings.Global.WaitChat); //wait
                         }
                         //リリース判定
                         if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, oFish.FishType))
@@ -1331,6 +1394,58 @@ namespace EnjoyFishing
                         //        oFish.Critical = true;
                         //    }
                         //}
+                        //時間切れのログが表示されるまで待機
+                        if (settings.Fishing.WaitTimeout)
+                        {
+                            logger.Output(LogLevelKind.DEBUG, "時間切れ待機中");
+                            setMessage(string.Format("時間切れ待機中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
+                            int startIndex = chat.CurrentIndex;
+                            bool timeUpOkFlg = false;
+                            for (int i = 0; i < 1200; i++)//2分間チャットを監視
+                            {
+                                if (timeUpOkFlg) break;
+                                //釣りが中止された場合、待機処理を中止する
+                                if (this.PlayerStatus != FFACETools.Status.FishBite) break;
+                                //チャット監視
+                                var cl2 = chat.GetChatLine(startIndex, false);
+                                foreach (var c in cl2)
+                                {
+                                    List<string> chatKbnTimeoutArgs = new List<string>();
+                                    ChatKbnKind chatKbnTimeout = getChatKbnFromChatline(c, out chatKbnTimeoutArgs);
+                                    //logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", c.Text, chatKbn));
+                                    if (chatKbnTimeout == ChatKbnKind.Timeout ||
+                                        chatKbnTimeout == ChatKbnKind.NoCatch)
+                                    {
+                                        //反応時間待機
+                                        if (settings.Fishing.ReactionTime)
+                                        {
+                                            float reactionTimeFrom = (settings.Fishing.ReactionTimeMin <= 4.0f) ? settings.Fishing.ReactionTimeMin : 4.0f;
+                                            float reactionTimeTo = (settings.Fishing.ReactionTimeMax <= 4.0f) ? settings.Fishing.ReactionTimeMax : 4.0f;
+                                            wait(reactionTimeFrom, reactionTimeTo, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
+                                        }
+                                        timeUpOkFlg = true;
+                                        break;
+                                    } 
+                                    else if ( chatKbnTimeout == ChatKbnKind.CatchSingle ||  //{0}は(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchMultiple ||//{0}は(.*)を([0-9]*)尾手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchMonster || //{0}はモンスターを釣り上げた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchKeyItem || //だいじなもの:(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchTempItem ||//テンポラリアイテム:(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.LineBreak ||    //釣り糸が切れてしまった。"
+                                              chatKbnTimeout == ChatKbnKind.RodBreak ||     //釣り竿が折れてしまった。"
+                                              chatKbnTimeout == ChatKbnKind.Timeout ||      //そろそろ逃げられそうだ……！"
+                                              chatKbnTimeout == ChatKbnKind.InventoryFull ||//{0}は見事に(.*)を釣り上げたが、これ以上持てないので、仕方なくリリースした。"
+                                              chatKbnTimeout == ChatKbnKind.NoBait ||       //何も釣れなかった。"
+                                              chatKbnTimeout == ChatKbnKind.Release ||      //あきらめて仕掛けをたぐり寄せた。"
+                                              chatKbnTimeout == ChatKbnKind.NoCatch)        //獲物に逃げられてしまった。"
+                                    {
+                                        timeUpOkFlg = true;
+                                        break;
+                                    }
+                                }
+                                Thread.Sleep(100);//wait
+                            }
+                        }
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
                         while (this.PlayerStatus == FFACETools.Status.FishBite)
@@ -1576,6 +1691,11 @@ namespace EnjoyFishing
             {
                 setMessage("FishHistoryDBデータベースへの登録に失敗");
                 return false;
+            }
+            //釣れた魚を登録
+            if(iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish){
+                settings.CaughtFishesUpdate(iFish.FishName, (iFish.Result == FishResultStatusKind.Catch));
+                EventCaughtFishesUpdate(iFish.FishName);
             }
             return true;
         }
@@ -2311,6 +2431,81 @@ namespace EnjoyFishing
         }
         #endregion
 
+        #region 釣った魚
+        public List<SettingsPlayerCaughtFishModel> GetCaughtFishes()
+        {
+            List<SettingsPlayerCaughtFishModel> ret = new List<SettingsPlayerCaughtFishModel>();
+
+            setMessage("釣った魚の初期化中");
+            setFishingStatus(FishingStatusKind.Normal);
+            setRunningStatus(RunningStatusKind.Running);
+
+            //Katsunagaの近くかチェック
+            if (fface.Player.Zone != Zone.Mhaura ||
+                (fface.NPC.Distance(NPCID_KATSUNAGA) != 0f && fface.NPC.Distance(NPCID_KATSUNAGA) > 6))
+            {
+                setMessage("マウラのKatsunagaの近くで実行してください");
+                setFishingStatus(FishingStatusKind.Error);
+                setRunningStatus(RunningStatusKind.Stop);
+                return ret;
+            }
+            //メニュー開いていたら閉じる
+            if (!control.CloseDialog(10))
+            {
+                setMessage("エラー：会話を終了させてから実行してください");
+                setFishingStatus(FishingStatusKind.Error);
+                setRunningStatus(RunningStatusKind.Stop);
+                return ret;
+            }
+            //メニューを開く
+            while (!fface.Menu.IsOpen)
+            {
+                //ターゲット設定
+                control.SetTargetFromId(NPCID_KATSUNAGA);
+                Thread.Sleep(settings.Global.WaitBase);//Wait
+                fface.Windower.SendKeyPress(KeyCode.EnterKey);
+            }
+            control.WaitOpenDialog("何を教えてもらおう？", false);
+            control.SetDialogOptionIndex(0, true);
+            control.WaitOpenDialog(REGEX_FISHEDLIST_DIALOG, false);
+            if (fface.Menu.IsOpen &&
+                MiscTool.IsRegexString(fface.Menu.GetDialogText().Question, REGEX_FISHEDLIST_DIALOG))
+            {
+                int pageCurrent = 0;
+                int pageMax = 99;
+                for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+                {
+                    control.WaitOpenDialog(REGEX_FISHEDLIST_DIALOG, false);
+                    List<string> oArgs = MiscTool.GetRegexString(fface.Menu.GetDialogText().Question, REGEX_FISHEDLIST_DIALOG);
+                    pageCurrent = int.Parse(oArgs[1]);
+                    pageMax = int.Parse(oArgs[2]);
+                    string[] options = fface.Menu.GetDialogText().Options;
+                    foreach (string option in options)
+                    {
+                        if (MiscTool.IsRegexString(option, REGEX_FISHEDLIST_OPTIONS))
+                        {
+                            List<string> oArgs2 = MiscTool.GetRegexString(option, REGEX_FISHEDLIST_OPTIONS);
+                            SettingsPlayerCaughtFishModel fished = new SettingsPlayerCaughtFishModel();
+                            fished.Caught = (oArgs2[0] == "★");
+                            fished.FishName = oArgs2[1];
+                            ret.Add(fished);
+                        }
+                    }
+                    if (pageCurrent == pageMax) break;
+                    //改ページ
+                    control.SetDialogOptionIndex(18, true);
+                    Thread.Sleep(settings.Global.WaitBase);
+                }
+            }
+            //メニュー閉じる
+            control.CloseDialog(10);
+
+            setFishingStatus(FishingStatusKind.Normal);
+            setRunningStatus(RunningStatusKind.Stop);
+            return ret;
+        }
+        #endregion
+
         #region 装備アイテム
         /// <summary>
         /// 竿を装備する
@@ -2597,25 +2792,5 @@ namespace EnjoyFishing
         }
         #endregion
 
-        private void PolTool_ChangeStatus(object sender, PolTool.ChangeStatusEventArgs e)
-        {
-            if (e.PolStatus == PolTool.PolStatusKind.LoggedIn)
-            {
-                setMessage(string.Format("{0}でログインしました", this.PlayerName));
-            }
-            else
-            {
-                FishingAbort();
-                setFishingStatus(FishingStatusKind.Error);
-                if (e.PolStatus == PolTool.PolStatusKind.CharacterLoginScreen)
-                {
-                    setMessage("キャラクターを選択してください");
-                }
-                else if (e.PolStatus == PolTool.PolStatusKind.Unknown)
-                {
-                    setMessage("FF11が終了しました、再起動してください");
-                }
-            }
-        }
     }
 }

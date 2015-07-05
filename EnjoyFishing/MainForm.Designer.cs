@@ -68,6 +68,8 @@
             this.chkIgnoreItem = new System.Windows.Forms.CheckBox();
             this.chkIgnoreMonster = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chkWaitTimeout = new System.Windows.Forms.CheckBox();
+            this.chkRepairRod = new System.Windows.Forms.CheckBox();
             this.txtHP0Max = new System.Windows.Forms.NumericUpDown();
             this.txtHP0Min = new System.Windows.Forms.NumericUpDown();
             this.chkHP0 = new System.Windows.Forms.CheckBox();
@@ -201,6 +203,20 @@
             this.gridHarakiri = new System.Windows.Forms.DataGridView();
             this.cmbHarakiriFishname = new System.Windows.Forms.ComboBox();
             this.btnExecHarakiri = new System.Windows.Forms.Button();
+            this.tabCaughtFishes = new System.Windows.Forms.TabPage();
+            this.chkViewNotCaughtOnly = new System.Windows.Forms.CheckBox();
+            this.lblCaughtFishesCount = new System.Windows.Forms.Label();
+            this.btnUpdateCaughtFishes = new System.Windows.Forms.Button();
+            this.btnResetCaughtFishes = new System.Windows.Forms.Button();
+            this.gridCaughtFishes = new System.Windows.Forms.DataGridView();
+            this.tabDB = new System.Windows.Forms.TabPage();
+            this.chkUpdateDBEnable = new System.Windows.Forms.CheckBox();
+            this.lblUpdateDBUrl = new System.Windows.Forms.Label();
+            this.lblLastUpdate = new System.Windows.Forms.Label();
+            this.label35 = new System.Windows.Forms.Label();
+            this.txtUpdateDBLog = new System.Windows.Forms.RichTextBox();
+            this.chkUpdateDBAutoUpdate = new System.Windows.Forms.CheckBox();
+            this.btnExecUpdateDB = new System.Windows.Forms.Button();
             this.tabMainSetting = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.chkMessageEcho = new System.Windows.Forms.CheckBox();
@@ -235,7 +251,6 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.chkRepairRod = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -277,6 +292,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridHistorySummary)).BeginInit();
             this.tabMainHarakiri.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridHarakiri)).BeginInit();
+            this.tabCaughtFishes.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridCaughtFishes)).BeginInit();
+            this.tabDB.SuspendLayout();
             this.tabMainSetting.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -296,8 +314,8 @@
             this.lstFish.FormattingEnabled = true;
             this.lstFish.Location = new System.Drawing.Point(0, 70);
             this.lstFish.Name = "lstFish";
-            this.lstFish.Size = new System.Drawing.Size(127, 244);
-            this.lstFish.TabIndex = 8;
+            this.lstFish.Size = new System.Drawing.Size(127, 260);
+            this.lstFish.TabIndex = 6;
             this.lstFish.SelectedIndexChanged += new System.EventHandler(this.lstFish_SelectedIndexChanged);
             // 
             // btnExecFishing
@@ -332,7 +350,7 @@
             this.statusStrip.Location = new System.Drawing.Point(0, 365);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.ShowItemToolTips = true;
-            this.statusStrip.Size = new System.Drawing.Size(569, 22);
+            this.statusStrip.Size = new System.Drawing.Size(561, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -370,7 +388,7 @@
             // lblMessage
             // 
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(99, 17);
+            this.lblMessage.Size = new System.Drawing.Size(91, 17);
             this.lblMessage.Spring = true;
             this.lblMessage.Text = "メッセージ";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -420,7 +438,7 @@
             this.chkIgnoreSmallFish.Location = new System.Drawing.Point(6, 41);
             this.chkIgnoreSmallFish.Name = "chkIgnoreSmallFish";
             this.chkIgnoreSmallFish.Size = new System.Drawing.Size(84, 18);
-            this.chkIgnoreSmallFish.TabIndex = 5;
+            this.chkIgnoreSmallFish.TabIndex = 6;
             this.chkIgnoreSmallFish.Text = "小型(!)除外";
             this.chkIgnoreSmallFish.UseVisualStyleBackColor = true;
             this.chkIgnoreSmallFish.CheckedChanged += new System.EventHandler(this.chkIgnoreSmallFish_CheckedChanged);
@@ -432,7 +450,7 @@
             this.chkIgnoreLargeFish.Location = new System.Drawing.Point(90, 41);
             this.chkIgnoreLargeFish.Name = "chkIgnoreLargeFish";
             this.chkIgnoreLargeFish.Size = new System.Drawing.Size(92, 18);
-            this.chkIgnoreLargeFish.TabIndex = 6;
+            this.chkIgnoreLargeFish.TabIndex = 7;
             this.chkIgnoreLargeFish.Text = "大型(!!!)除外";
             this.chkIgnoreLargeFish.UseVisualStyleBackColor = true;
             this.chkIgnoreLargeFish.CheckedChanged += new System.EventHandler(this.chkIgnoreLargeFish_CheckedChanged);
@@ -482,7 +500,7 @@
             this.chkEnemyAttackCmd.Location = new System.Drawing.Point(92, 70);
             this.chkEnemyAttackCmd.Name = "chkEnemyAttackCmd";
             this.chkEnemyAttackCmd.Size = new System.Drawing.Size(77, 18);
-            this.chkEnemyAttackCmd.TabIndex = 16;
+            this.chkEnemyAttackCmd.TabIndex = 15;
             this.chkEnemyAttackCmd.Text = "攻撃受けた";
             this.chkEnemyAttackCmd.UseVisualStyleBackColor = true;
             this.chkEnemyAttackCmd.CheckedChanged += new System.EventHandler(this.chkEnemyAttack_CheckedChanged);
@@ -503,7 +521,7 @@
             0});
             this.txtChatRestartMinute.Name = "txtChatRestartMinute";
             this.txtChatRestartMinute.Size = new System.Drawing.Size(35, 21);
-            this.txtChatRestartMinute.TabIndex = 12;
+            this.txtChatRestartMinute.TabIndex = 13;
             this.txtChatRestartMinute.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtChatRestartMinute.Value = new decimal(new int[] {
             99,
@@ -519,7 +537,7 @@
             this.chkChatRestart.Location = new System.Drawing.Point(285, 46);
             this.chkChatRestart.Name = "chkChatRestart";
             this.chkChatRestart.Size = new System.Drawing.Size(59, 18);
-            this.chkChatRestart.TabIndex = 11;
+            this.chkChatRestart.TabIndex = 12;
             this.chkChatRestart.Text = "再始動";
             this.chkChatRestart.UseVisualStyleBackColor = true;
             this.chkChatRestart.CheckedChanged += new System.EventHandler(this.chkChatRestart_CheckedChanged);
@@ -531,7 +549,7 @@
             this.chkChatEmote.Location = new System.Drawing.Point(236, 46);
             this.chkChatEmote.Name = "chkChatEmote";
             this.chkChatEmote.Size = new System.Drawing.Size(51, 18);
-            this.chkChatEmote.TabIndex = 15;
+            this.chkChatEmote.TabIndex = 11;
             this.chkChatEmote.Text = "Emo";
             this.chkChatEmote.UseVisualStyleBackColor = true;
             this.chkChatEmote.CheckedChanged += new System.EventHandler(this.chkChatEmote_CheckedChanged);
@@ -725,7 +743,7 @@
             this.chkIgnoreItem.Location = new System.Drawing.Point(196, 41);
             this.chkIgnoreItem.Name = "chkIgnoreItem";
             this.chkIgnoreItem.Size = new System.Drawing.Size(70, 18);
-            this.chkIgnoreItem.TabIndex = 7;
+            this.chkIgnoreItem.TabIndex = 8;
             this.chkIgnoreItem.Text = "外道除外";
             this.chkIgnoreItem.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.chkIgnoreItem.UseVisualStyleBackColor = true;
@@ -738,13 +756,14 @@
             this.chkIgnoreMonster.Location = new System.Drawing.Point(272, 41);
             this.chkIgnoreMonster.Name = "chkIgnoreMonster";
             this.chkIgnoreMonster.Size = new System.Drawing.Size(89, 18);
-            this.chkIgnoreMonster.TabIndex = 8;
+            this.chkIgnoreMonster.TabIndex = 9;
             this.chkIgnoreMonster.Text = "モンスター除外";
             this.chkIgnoreMonster.UseVisualStyleBackColor = true;
             this.chkIgnoreMonster.CheckedChanged += new System.EventHandler(this.chkIgnoreMonster_CheckedChanged);
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.chkWaitTimeout);
             this.groupBox3.Controls.Add(this.chkRepairRod);
             this.groupBox3.Controls.Add(this.txtHP0Max);
             this.groupBox3.Controls.Add(this.txtHP0Min);
@@ -776,6 +795,30 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "動作";
             // 
+            // chkWaitTimeout
+            // 
+            this.chkWaitTimeout.AutoSize = true;
+            this.chkWaitTimeout.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkWaitTimeout.Location = new System.Drawing.Point(89, 113);
+            this.chkWaitTimeout.Name = "chkWaitTimeout";
+            this.chkWaitTimeout.Size = new System.Drawing.Size(108, 18);
+            this.chkWaitTimeout.TabIndex = 23;
+            this.chkWaitTimeout.Text = "時間切れまで待機";
+            this.chkWaitTimeout.UseVisualStyleBackColor = true;
+            this.chkWaitTimeout.CheckedChanged += new System.EventHandler(this.chkWaitTimeout_CheckedChanged);
+            // 
+            // chkRepairRod
+            // 
+            this.chkRepairRod.AutoSize = true;
+            this.chkRepairRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkRepairRod.Location = new System.Drawing.Point(6, 113);
+            this.chkRepairRod.Name = "chkRepairRod";
+            this.chkRepairRod.Size = new System.Drawing.Size(68, 18);
+            this.chkRepairRod.TabIndex = 22;
+            this.chkRepairRod.Text = "竿の修理";
+            this.chkRepairRod.UseVisualStyleBackColor = true;
+            this.chkRepairRod.CheckedChanged += new System.EventHandler(this.chkRepairRod_CheckedChanged);
+            // 
             // txtHP0Max
             // 
             this.txtHP0Max.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -787,7 +830,7 @@
             0});
             this.txtHP0Max.Name = "txtHP0Max";
             this.txtHP0Max.Size = new System.Drawing.Size(41, 21);
-            this.txtHP0Max.TabIndex = 4;
+            this.txtHP0Max.TabIndex = 5;
             this.txtHP0Max.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtHP0Max.Value = new decimal(new int[] {
             99,
@@ -807,7 +850,7 @@
             0});
             this.txtHP0Min.Name = "txtHP0Min";
             this.txtHP0Min.Size = new System.Drawing.Size(41, 21);
-            this.txtHP0Min.TabIndex = 3;
+            this.txtHP0Min.TabIndex = 4;
             this.txtHP0Min.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtHP0Min.Value = new decimal(new int[] {
             99,
@@ -823,7 +866,7 @@
             this.chkHP0.Location = new System.Drawing.Point(196, 17);
             this.chkHP0.Name = "chkHP0";
             this.chkHP0.Size = new System.Drawing.Size(70, 18);
-            this.chkHP0.TabIndex = 2;
+            this.chkHP0.TabIndex = 3;
             this.chkHP0.Text = "強制HP0";
             this.chkHP0.UseVisualStyleBackColor = true;
             this.chkHP0.CheckedChanged += new System.EventHandler(this.chkHP0_CheckedChanged);
@@ -851,7 +894,7 @@
             0});
             this.txtEarthTimeTo.Name = "txtEarthTimeTo";
             this.txtEarthTimeTo.Size = new System.Drawing.Size(41, 21);
-            this.txtEarthTimeTo.TabIndex = 20;
+            this.txtEarthTimeTo.TabIndex = 21;
             this.txtEarthTimeTo.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtEarthTimeTo.Value = new decimal(new int[] {
             23,
@@ -871,7 +914,7 @@
             0});
             this.txtVanaTimeTo.Name = "txtVanaTimeTo";
             this.txtVanaTimeTo.Size = new System.Drawing.Size(41, 21);
-            this.txtVanaTimeTo.TabIndex = 14;
+            this.txtVanaTimeTo.TabIndex = 15;
             this.txtVanaTimeTo.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtVanaTimeTo.Value = new decimal(new int[] {
             23,
@@ -891,7 +934,7 @@
             0});
             this.txtEarthTimeFrom.Name = "txtEarthTimeFrom";
             this.txtEarthTimeFrom.Size = new System.Drawing.Size(41, 21);
-            this.txtEarthTimeFrom.TabIndex = 19;
+            this.txtEarthTimeFrom.TabIndex = 20;
             this.txtEarthTimeFrom.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtEarthTimeFrom.Value = new decimal(new int[] {
             23,
@@ -911,7 +954,7 @@
             0});
             this.txtVanaTimeFrom.Name = "txtVanaTimeFrom";
             this.txtVanaTimeFrom.Size = new System.Drawing.Size(41, 21);
-            this.txtVanaTimeFrom.TabIndex = 13;
+            this.txtVanaTimeFrom.TabIndex = 14;
             this.txtVanaTimeFrom.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtVanaTimeFrom.Value = new decimal(new int[] {
             23,
@@ -937,7 +980,7 @@
             65536});
             this.txtRecastTimeMax.Name = "txtRecastTimeMax";
             this.txtRecastTimeMax.Size = new System.Drawing.Size(41, 21);
-            this.txtRecastTimeMax.TabIndex = 17;
+            this.txtRecastTimeMax.TabIndex = 18;
             this.txtRecastTimeMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtRecastTimeMax.Value = new decimal(new int[] {
             90,
@@ -963,7 +1006,7 @@
             65536});
             this.txtRecastTimeMin.Name = "txtRecastTimeMin";
             this.txtRecastTimeMin.Size = new System.Drawing.Size(41, 21);
-            this.txtRecastTimeMin.TabIndex = 16;
+            this.txtRecastTimeMin.TabIndex = 17;
             this.txtRecastTimeMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtRecastTimeMin.Value = new decimal(new int[] {
             90,
@@ -989,7 +1032,7 @@
             65536});
             this.txtSneakFishingRemain.Name = "txtSneakFishingRemain";
             this.txtSneakFishingRemain.Size = new System.Drawing.Size(41, 21);
-            this.txtSneakFishingRemain.TabIndex = 11;
+            this.txtSneakFishingRemain.TabIndex = 2;
             this.txtSneakFishingRemain.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtSneakFishingRemain.Value = new decimal(new int[] {
             90,
@@ -1015,7 +1058,7 @@
             65536});
             this.txtReactionTimeMax.Name = "txtReactionTimeMax";
             this.txtReactionTimeMax.Size = new System.Drawing.Size(41, 21);
-            this.txtReactionTimeMax.TabIndex = 11;
+            this.txtReactionTimeMax.TabIndex = 12;
             this.txtReactionTimeMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtReactionTimeMax.Value = new decimal(new int[] {
             90,
@@ -1043,7 +1086,7 @@
             this.chkRecastTime.Location = new System.Drawing.Point(6, 89);
             this.chkRecastTime.Name = "chkRecastTime";
             this.chkRecastTime.Size = new System.Drawing.Size(86, 18);
-            this.chkRecastTime.TabIndex = 15;
+            this.chkRecastTime.TabIndex = 16;
             this.chkRecastTime.Text = "リキャスト時間";
             this.chkRecastTime.UseVisualStyleBackColor = true;
             this.chkRecastTime.CheckedChanged += new System.EventHandler(this.chkRecastTime_CheckedChanged);
@@ -1055,7 +1098,7 @@
             this.chkEarthTime.Location = new System.Drawing.Point(196, 89);
             this.chkEarthTime.Name = "chkEarthTime";
             this.chkEarthTime.Size = new System.Drawing.Size(70, 18);
-            this.chkEarthTime.TabIndex = 18;
+            this.chkEarthTime.TabIndex = 19;
             this.chkEarthTime.Text = "地球時間";
             this.chkEarthTime.UseVisualStyleBackColor = true;
             this.chkEarthTime.CheckedChanged += new System.EventHandler(this.chkEarthTime_CheckedChanged);
@@ -1067,7 +1110,7 @@
             this.chkVanaTime.Location = new System.Drawing.Point(196, 65);
             this.chkVanaTime.Name = "chkVanaTime";
             this.chkVanaTime.Size = new System.Drawing.Size(72, 18);
-            this.chkVanaTime.TabIndex = 12;
+            this.chkVanaTime.TabIndex = 13;
             this.chkVanaTime.Text = "ヴァナ時間";
             this.chkVanaTime.UseVisualStyleBackColor = true;
             this.chkVanaTime.CheckedChanged += new System.EventHandler(this.chkVanaTime_CheckedChanged);
@@ -1089,7 +1132,7 @@
             65536});
             this.txtReactionTimeMin.Name = "txtReactionTimeMin";
             this.txtReactionTimeMin.Size = new System.Drawing.Size(41, 21);
-            this.txtReactionTimeMin.TabIndex = 10;
+            this.txtReactionTimeMin.TabIndex = 11;
             this.txtReactionTimeMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.txtReactionTimeMin.Value = new decimal(new int[] {
             90,
@@ -1105,7 +1148,7 @@
             this.chkReactionTime.Location = new System.Drawing.Point(6, 65);
             this.chkReactionTime.Name = "chkReactionTime";
             this.chkReactionTime.Size = new System.Drawing.Size(70, 18);
-            this.chkReactionTime.TabIndex = 9;
+            this.chkReactionTime.TabIndex = 10;
             this.chkReactionTime.Text = "反応時間";
             this.chkReactionTime.UseVisualStyleBackColor = true;
             this.chkReactionTime.CheckedChanged += new System.EventHandler(this.chkReactionTime_CheckedChanged);
@@ -1121,7 +1164,7 @@
             this.tabFishingMain.Name = "tabFishingMain";
             this.tabFishingMain.Padding = new System.Drawing.Point(0, 0);
             this.tabFishingMain.SelectedIndex = 0;
-            this.tabFishingMain.Size = new System.Drawing.Size(421, 332);
+            this.tabFishingMain.Size = new System.Drawing.Size(413, 332);
             this.tabFishingMain.TabIndex = 9;
             // 
             // tabFishingMainSetting
@@ -1133,7 +1176,7 @@
             this.tabFishingMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainSetting.Name = "tabFishingMainSetting";
             this.tabFishingMainSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainSetting.Size = new System.Drawing.Size(413, 305);
+            this.tabFishingMainSetting.Size = new System.Drawing.Size(405, 305);
             this.tabFishingMainSetting.TabIndex = 0;
             this.tabFishingMainSetting.Text = "釣り設定";
             this.tabFishingMainSetting.UseVisualStyleBackColor = true;
@@ -1340,7 +1383,7 @@
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipRod);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
-            this.tabFishingMainEquip.Size = new System.Drawing.Size(413, 291);
+            this.tabFishingMainEquip.Size = new System.Drawing.Size(405, 305);
             this.tabFishingMainEquip.TabIndex = 2;
             this.tabFishingMainEquip.Text = "装備";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
@@ -1351,7 +1394,7 @@
             this.chkEquipEnable.Location = new System.Drawing.Point(3, 6);
             this.chkEquipEnable.Name = "chkEquipEnable";
             this.chkEquipEnable.Size = new System.Drawing.Size(125, 18);
-            this.chkEquipEnable.TabIndex = 3;
+            this.chkEquipEnable.TabIndex = 0;
             this.chkEquipEnable.Text = "開始時に着替えを行う";
             this.chkEquipEnable.UseVisualStyleBackColor = true;
             this.chkEquipEnable.CheckedChanged += new System.EventHandler(this.chkEquipEnable_CheckedChanged);
@@ -1362,7 +1405,7 @@
             this.chkUseRingRight.Location = new System.Drawing.Point(335, 153);
             this.chkUseRingRight.Name = "chkUseRingRight";
             this.chkUseRingRight.Size = new System.Drawing.Size(48, 18);
-            this.chkUseRingRight.TabIndex = 2;
+            this.chkUseRingRight.TabIndex = 19;
             this.chkUseRingRight.Text = "使用";
             this.chkUseRingRight.UseVisualStyleBackColor = true;
             this.chkUseRingRight.CheckedChanged += new System.EventHandler(this.chkUseRingRight_CheckedChanged);
@@ -1373,7 +1416,7 @@
             this.chkUseRingLeft.Location = new System.Drawing.Point(335, 128);
             this.chkUseRingLeft.Name = "chkUseRingLeft";
             this.chkUseRingLeft.Size = new System.Drawing.Size(48, 18);
-            this.chkUseRingLeft.TabIndex = 2;
+            this.chkUseRingLeft.TabIndex = 17;
             this.chkUseRingLeft.Text = "使用";
             this.chkUseRingLeft.UseVisualStyleBackColor = true;
             this.chkUseRingLeft.CheckedChanged += new System.EventHandler(this.chkUseRingLeft_CheckedChanged);
@@ -1384,7 +1427,7 @@
             this.chkUseWaist.Location = new System.Drawing.Point(159, 225);
             this.chkUseWaist.Name = "chkUseWaist";
             this.chkUseWaist.Size = new System.Drawing.Size(48, 18);
-            this.chkUseWaist.TabIndex = 2;
+            this.chkUseWaist.TabIndex = 10;
             this.chkUseWaist.Text = "使用";
             this.chkUseWaist.UseVisualStyleBackColor = true;
             this.chkUseWaist.CheckedChanged += new System.EventHandler(this.chkUseWaist_CheckedChanged);
@@ -1541,7 +1584,7 @@
             this.cmbEquipRingRight.Location = new System.Drawing.Point(208, 150);
             this.cmbEquipRingRight.Name = "cmbEquipRingRight";
             this.cmbEquipRingRight.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipRingRight.TabIndex = 0;
+            this.cmbEquipRingRight.TabIndex = 18;
             this.cmbEquipRingRight.SelectedIndexChanged += new System.EventHandler(this.cmbEquipRingRight_SelectedIndexChanged);
             // 
             // cmbEquipNeck
@@ -1552,7 +1595,7 @@
             this.cmbEquipNeck.Location = new System.Drawing.Point(32, 198);
             this.cmbEquipNeck.Name = "cmbEquipNeck";
             this.cmbEquipNeck.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipNeck.TabIndex = 0;
+            this.cmbEquipNeck.TabIndex = 8;
             this.cmbEquipNeck.SelectedIndexChanged += new System.EventHandler(this.cmbEquipNeck_SelectedIndexChanged);
             // 
             // cmbEquipRingLeft
@@ -1563,7 +1606,7 @@
             this.cmbEquipRingLeft.Location = new System.Drawing.Point(208, 126);
             this.cmbEquipRingLeft.Name = "cmbEquipRingLeft";
             this.cmbEquipRingLeft.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipRingLeft.TabIndex = 0;
+            this.cmbEquipRingLeft.TabIndex = 16;
             this.cmbEquipRingLeft.SelectedIndexChanged += new System.EventHandler(this.cmbEquipRingLeft_SelectedIndexChanged);
             // 
             // cmbEquipFeet
@@ -1574,7 +1617,7 @@
             this.cmbEquipFeet.Location = new System.Drawing.Point(32, 174);
             this.cmbEquipFeet.Name = "cmbEquipFeet";
             this.cmbEquipFeet.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipFeet.TabIndex = 0;
+            this.cmbEquipFeet.TabIndex = 7;
             this.cmbEquipFeet.SelectedIndexChanged += new System.EventHandler(this.cmbEquipFeet_SelectedIndexChanged);
             // 
             // cmbEquipEarRight
@@ -1585,7 +1628,7 @@
             this.cmbEquipEarRight.Location = new System.Drawing.Point(208, 102);
             this.cmbEquipEarRight.Name = "cmbEquipEarRight";
             this.cmbEquipEarRight.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipEarRight.TabIndex = 0;
+            this.cmbEquipEarRight.TabIndex = 15;
             this.cmbEquipEarRight.SelectedIndexChanged += new System.EventHandler(this.cmbEquipEarRight_SelectedIndexChanged);
             // 
             // cmbEquipLegs
@@ -1596,7 +1639,7 @@
             this.cmbEquipLegs.Location = new System.Drawing.Point(32, 150);
             this.cmbEquipLegs.Name = "cmbEquipLegs";
             this.cmbEquipLegs.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipLegs.TabIndex = 0;
+            this.cmbEquipLegs.TabIndex = 6;
             this.cmbEquipLegs.SelectedIndexChanged += new System.EventHandler(this.cmbEquipLegs_SelectedIndexChanged);
             // 
             // cmbEquipEarLeft
@@ -1607,7 +1650,7 @@
             this.cmbEquipEarLeft.Location = new System.Drawing.Point(208, 78);
             this.cmbEquipEarLeft.Name = "cmbEquipEarLeft";
             this.cmbEquipEarLeft.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipEarLeft.TabIndex = 0;
+            this.cmbEquipEarLeft.TabIndex = 14;
             this.cmbEquipEarLeft.SelectedIndexChanged += new System.EventHandler(this.cmbEquipEarLeft_SelectedIndexChanged);
             // 
             // cmbEquipHands
@@ -1618,7 +1661,7 @@
             this.cmbEquipHands.Location = new System.Drawing.Point(32, 126);
             this.cmbEquipHands.Name = "cmbEquipHands";
             this.cmbEquipHands.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipHands.TabIndex = 0;
+            this.cmbEquipHands.TabIndex = 5;
             this.cmbEquipHands.SelectedIndexChanged += new System.EventHandler(this.cmbEquipHands_SelectedIndexChanged);
             // 
             // cmbEquipBack
@@ -1629,7 +1672,7 @@
             this.cmbEquipBack.Location = new System.Drawing.Point(32, 247);
             this.cmbEquipBack.Name = "cmbEquipBack";
             this.cmbEquipBack.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipBack.TabIndex = 0;
+            this.cmbEquipBack.TabIndex = 11;
             this.cmbEquipBack.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBack_SelectedIndexChanged);
             // 
             // cmbEquipBody
@@ -1640,7 +1683,7 @@
             this.cmbEquipBody.Location = new System.Drawing.Point(32, 102);
             this.cmbEquipBody.Name = "cmbEquipBody";
             this.cmbEquipBody.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipBody.TabIndex = 0;
+            this.cmbEquipBody.TabIndex = 4;
             this.cmbEquipBody.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBody_SelectedIndexChanged);
             // 
             // cmbEquipWaist
@@ -1651,7 +1694,7 @@
             this.cmbEquipWaist.Location = new System.Drawing.Point(32, 222);
             this.cmbEquipWaist.Name = "cmbEquipWaist";
             this.cmbEquipWaist.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipWaist.TabIndex = 0;
+            this.cmbEquipWaist.TabIndex = 9;
             this.cmbEquipWaist.SelectedIndexChanged += new System.EventHandler(this.cmbEquipWaist_SelectedIndexChanged);
             // 
             // cmbEquipHead
@@ -1662,7 +1705,7 @@
             this.cmbEquipHead.Location = new System.Drawing.Point(32, 78);
             this.cmbEquipHead.Name = "cmbEquipHead";
             this.cmbEquipHead.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipHead.TabIndex = 0;
+            this.cmbEquipHead.TabIndex = 3;
             this.cmbEquipHead.SelectedIndexChanged += new System.EventHandler(this.cmbEquipHead_SelectedIndexChanged);
             // 
             // cmbEquipSub
@@ -1673,7 +1716,7 @@
             this.cmbEquipSub.Location = new System.Drawing.Point(208, 54);
             this.cmbEquipSub.Name = "cmbEquipSub";
             this.cmbEquipSub.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipSub.TabIndex = 0;
+            this.cmbEquipSub.TabIndex = 13;
             this.cmbEquipSub.SelectedIndexChanged += new System.EventHandler(this.cmbEquipSub_SelectedIndexChanged);
             // 
             // cmbEquipBait
@@ -1684,7 +1727,7 @@
             this.cmbEquipBait.Location = new System.Drawing.Point(32, 54);
             this.cmbEquipBait.Name = "cmbEquipBait";
             this.cmbEquipBait.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipBait.TabIndex = 0;
+            this.cmbEquipBait.TabIndex = 2;
             this.cmbEquipBait.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBait_SelectedIndexChanged);
             // 
             // cmbEquipMain
@@ -1695,7 +1738,7 @@
             this.cmbEquipMain.Location = new System.Drawing.Point(208, 30);
             this.cmbEquipMain.Name = "cmbEquipMain";
             this.cmbEquipMain.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipMain.TabIndex = 0;
+            this.cmbEquipMain.TabIndex = 12;
             this.cmbEquipMain.SelectedIndexChanged += new System.EventHandler(this.cmbEquipMain_SelectedIndexChanged);
             // 
             // cmbEquipRod
@@ -1706,7 +1749,7 @@
             this.cmbEquipRod.Location = new System.Drawing.Point(32, 30);
             this.cmbEquipRod.Name = "cmbEquipRod";
             this.cmbEquipRod.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipRod.TabIndex = 0;
+            this.cmbEquipRod.TabIndex = 1;
             this.cmbEquipRod.SelectedIndexChanged += new System.EventHandler(this.cmbEquipRod_SelectedIndexChanged);
             // 
             // tabFishingMainInfo
@@ -1739,7 +1782,7 @@
             this.tabFishingMainInfo.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainInfo.Name = "tabFishingMainInfo";
             this.tabFishingMainInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainInfo.Size = new System.Drawing.Size(413, 291);
+            this.tabFishingMainInfo.Size = new System.Drawing.Size(405, 305);
             this.tabFishingMainInfo.TabIndex = 1;
             this.tabFishingMainInfo.Text = "情報";
             this.tabFishingMainInfo.UseVisualStyleBackColor = true;
@@ -1875,8 +1918,8 @@
             this.gridFishingInfo.Location = new System.Drawing.Point(-1, 46);
             this.gridFishingInfo.Name = "gridFishingInfo";
             this.gridFishingInfo.RowTemplate.Height = 21;
-            this.gridFishingInfo.Size = new System.Drawing.Size(413, 245);
-            this.gridFishingInfo.TabIndex = 8;
+            this.gridFishingInfo.Size = new System.Drawing.Size(405, 259);
+            this.gridFishingInfo.TabIndex = 0;
             this.gridFishingInfo.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
             // label16
@@ -2077,7 +2120,7 @@
             this.gridHistory.Location = new System.Drawing.Point(3, 3);
             this.gridHistory.Name = "gridHistory";
             this.gridHistory.RowTemplate.Height = 21;
-            this.gridHistory.Size = new System.Drawing.Size(538, 266);
+            this.gridHistory.Size = new System.Drawing.Size(539, 284);
             this.gridHistory.TabIndex = 0;
             this.gridHistory.Sorted += new System.EventHandler(this.gridHistory_Sorted);
             // 
@@ -2113,7 +2156,7 @@
             // splitMain.Panel2
             // 
             this.splitMain.Panel2.Controls.Add(this.tabFishingMain);
-            this.splitMain.Size = new System.Drawing.Size(555, 332);
+            this.splitMain.Size = new System.Drawing.Size(547, 332);
             this.splitMain.SplitterDistance = 130;
             this.splitMain.TabIndex = 8;
             // 
@@ -2125,7 +2168,7 @@
             this.rdoFishListModeName.Location = new System.Drawing.Point(74, 36);
             this.rdoFishListModeName.Name = "rdoFishListModeName";
             this.rdoFishListModeName.Size = new System.Drawing.Size(47, 18);
-            this.rdoFishListModeName.TabIndex = 4;
+            this.rdoFishListModeName.TabIndex = 3;
             this.rdoFishListModeName.TabStop = true;
             this.rdoFishListModeName.Text = "名前";
             this.rdoFishListModeName.UseVisualStyleBackColor = true;
@@ -2138,7 +2181,7 @@
             this.chkFIshListNarrowBait.Location = new System.Drawing.Point(84, 52);
             this.chkFIshListNarrowBait.Name = "chkFIshListNarrowBait";
             this.chkFIshListNarrowBait.Size = new System.Drawing.Size(43, 18);
-            this.chkFIshListNarrowBait.TabIndex = 7;
+            this.chkFIshListNarrowBait.TabIndex = 5;
             this.chkFIshListNarrowBait.Text = "エサ";
             this.chkFIshListNarrowBait.UseVisualStyleBackColor = true;
             this.chkFIshListNarrowBait.CheckedChanged += new System.EventHandler(this.chkFIshListViewBait_CheckedChanged);
@@ -2151,7 +2194,7 @@
             this.rdoFishListModeID.Location = new System.Drawing.Point(36, 36);
             this.rdoFishListModeID.Name = "rdoFishListModeID";
             this.rdoFishListModeID.Size = new System.Drawing.Size(37, 18);
-            this.rdoFishListModeID.TabIndex = 3;
+            this.rdoFishListModeID.TabIndex = 2;
             this.rdoFishListModeID.TabStop = true;
             this.rdoFishListModeID.Text = "ID";
             this.rdoFishListModeID.UseVisualStyleBackColor = true;
@@ -2164,7 +2207,7 @@
             this.chkFIshListNarrowArea.Location = new System.Drawing.Point(36, 52);
             this.chkFIshListNarrowArea.Name = "chkFIshListNarrowArea";
             this.chkFIshListNarrowArea.Size = new System.Drawing.Size(48, 18);
-            this.chkFIshListNarrowArea.TabIndex = 6;
+            this.chkFIshListNarrowArea.TabIndex = 4;
             this.chkFIshListNarrowArea.Text = "エリア";
             this.chkFIshListNarrowArea.UseVisualStyleBackColor = true;
             this.chkFIshListNarrowArea.CheckedChanged += new System.EventHandler(this.chkFIshListViewArea_CheckedChanged);
@@ -2206,13 +2249,15 @@
             this.tabMain.Controls.Add(this.tabMainFishing);
             this.tabMain.Controls.Add(this.tabMainHistory);
             this.tabMain.Controls.Add(this.tabMainHarakiri);
+            this.tabMain.Controls.Add(this.tabCaughtFishes);
+            this.tabMain.Controls.Add(this.tabDB);
             this.tabMain.Controls.Add(this.tabMainSetting);
             this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabMain.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(569, 365);
+            this.tabMain.Size = new System.Drawing.Size(561, 365);
             this.tabMain.TabIndex = 0;
             // 
             // tabMainFishing
@@ -2221,7 +2266,7 @@
             this.tabMainFishing.Location = new System.Drawing.Point(4, 23);
             this.tabMainFishing.Name = "tabMainFishing";
             this.tabMainFishing.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainFishing.Size = new System.Drawing.Size(561, 338);
+            this.tabMainFishing.Size = new System.Drawing.Size(553, 338);
             this.tabMainFishing.TabIndex = 0;
             this.tabMainFishing.Text = "釣り";
             this.tabMainFishing.UseVisualStyleBackColor = true;
@@ -2236,7 +2281,7 @@
             this.tabMainHistory.Location = new System.Drawing.Point(4, 23);
             this.tabMainHistory.Name = "tabMainHistory";
             this.tabMainHistory.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainHistory.Size = new System.Drawing.Size(561, 324);
+            this.tabMainHistory.Size = new System.Drawing.Size(553, 338);
             this.tabMainHistory.TabIndex = 1;
             this.tabMainHistory.Text = "履歴";
             this.tabMainHistory.UseVisualStyleBackColor = true;
@@ -2251,7 +2296,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 25);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(552, 299);
+            this.tabControl1.Size = new System.Drawing.Size(553, 317);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -2260,7 +2305,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 23);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(544, 272);
+            this.tabPage1.Size = new System.Drawing.Size(545, 290);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "詳細";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -2271,7 +2316,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 23);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(544, 272);
+            this.tabPage2.Size = new System.Drawing.Size(545, 290);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "合計";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -2283,7 +2328,7 @@
             this.gridHistorySummary.Location = new System.Drawing.Point(3, 3);
             this.gridHistorySummary.Name = "gridHistorySummary";
             this.gridHistorySummary.RowTemplate.Height = 21;
-            this.gridHistorySummary.Size = new System.Drawing.Size(538, 266);
+            this.gridHistorySummary.Size = new System.Drawing.Size(539, 284);
             this.gridHistorySummary.TabIndex = 0;
             this.gridHistorySummary.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -2319,7 +2364,7 @@
             this.tabMainHarakiri.Controls.Add(this.btnExecHarakiri);
             this.tabMainHarakiri.Location = new System.Drawing.Point(4, 23);
             this.tabMainHarakiri.Name = "tabMainHarakiri";
-            this.tabMainHarakiri.Size = new System.Drawing.Size(561, 324);
+            this.tabMainHarakiri.Size = new System.Drawing.Size(553, 338);
             this.tabMainHarakiri.TabIndex = 3;
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
@@ -2330,7 +2375,7 @@
             this.chkHarakiriStopFound.Location = new System.Drawing.Point(440, 10);
             this.chkHarakiriStopFound.Name = "chkHarakiriStopFound";
             this.chkHarakiriStopFound.Size = new System.Drawing.Size(95, 18);
-            this.chkHarakiriStopFound.TabIndex = 7;
+            this.chkHarakiriStopFound.TabIndex = 6;
             this.chkHarakiriStopFound.Text = "発見したら停止";
             this.chkHarakiriStopFound.UseVisualStyleBackColor = true;
             this.chkHarakiriStopFound.CheckedChanged += new System.EventHandler(this.chkHarakiriStopFound_CheckedChanged);
@@ -2340,7 +2385,7 @@
             this.btnHarakiriUpdate.Location = new System.Drawing.Point(228, 7);
             this.btnHarakiriUpdate.Name = "btnHarakiriUpdate";
             this.btnHarakiriUpdate.Size = new System.Drawing.Size(42, 23);
-            this.btnHarakiriUpdate.TabIndex = 2;
+            this.btnHarakiriUpdate.TabIndex = 3;
             this.btnHarakiriUpdate.Text = "更新";
             this.btnHarakiriUpdate.UseVisualStyleBackColor = true;
             this.btnHarakiriUpdate.Click += new System.EventHandler(this.btnHarakiriUpdate_Click);
@@ -2350,7 +2395,7 @@
             this.txtHarakiriFishname.Location = new System.Drawing.Point(303, 7);
             this.txtHarakiriFishname.Name = "txtHarakiriFishname";
             this.txtHarakiriFishname.Size = new System.Drawing.Size(121, 21);
-            this.txtHarakiriFishname.TabIndex = 4;
+            this.txtHarakiriFishname.TabIndex = 5;
             this.txtHarakiriFishname.TextChanged += new System.EventHandler(this.txtHarakiriFishname_TextChanged);
             // 
             // rdoHarakiriInputTypeInput
@@ -2359,7 +2404,7 @@
             this.rdoHarakiriInputTypeInput.Location = new System.Drawing.Point(286, 11);
             this.rdoHarakiriInputTypeInput.Name = "rdoHarakiriInputTypeInput";
             this.rdoHarakiriInputTypeInput.Size = new System.Drawing.Size(14, 13);
-            this.rdoHarakiriInputTypeInput.TabIndex = 3;
+            this.rdoHarakiriInputTypeInput.TabIndex = 4;
             this.rdoHarakiriInputTypeInput.UseVisualStyleBackColor = true;
             this.rdoHarakiriInputTypeInput.CheckedChanged += new System.EventHandler(this.rdoHarakiriInputTypeInput_CheckedChanged);
             // 
@@ -2370,7 +2415,7 @@
             this.rdoHarakiriInputTypeSelect.Location = new System.Drawing.Point(90, 11);
             this.rdoHarakiriInputTypeSelect.Name = "rdoHarakiriInputTypeSelect";
             this.rdoHarakiriInputTypeSelect.Size = new System.Drawing.Size(14, 13);
-            this.rdoHarakiriInputTypeSelect.TabIndex = 0;
+            this.rdoHarakiriInputTypeSelect.TabIndex = 1;
             this.rdoHarakiriInputTypeSelect.TabStop = true;
             this.rdoHarakiriInputTypeSelect.UseVisualStyleBackColor = true;
             this.rdoHarakiriInputTypeSelect.CheckedChanged += new System.EventHandler(this.rdoHarakiriInputTypeSelect_CheckedChanged);
@@ -2384,8 +2429,8 @@
             this.gridHarakiri.Location = new System.Drawing.Point(3, 35);
             this.gridHarakiri.Name = "gridHarakiri";
             this.gridHarakiri.RowTemplate.Height = 21;
-            this.gridHarakiri.Size = new System.Drawing.Size(546, 289);
-            this.gridHarakiri.TabIndex = 6;
+            this.gridHarakiri.Size = new System.Drawing.Size(547, 300);
+            this.gridHarakiri.TabIndex = 7;
             this.gridHarakiri.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridHarakiri_CellFormatting);
             // 
             // cmbHarakiriFishname
@@ -2395,7 +2440,7 @@
             this.cmbHarakiriFishname.Location = new System.Drawing.Point(107, 7);
             this.cmbHarakiriFishname.Name = "cmbHarakiriFishname";
             this.cmbHarakiriFishname.Size = new System.Drawing.Size(121, 22);
-            this.cmbHarakiriFishname.TabIndex = 1;
+            this.cmbHarakiriFishname.TabIndex = 2;
             this.cmbHarakiriFishname.SelectedIndexChanged += new System.EventHandler(this.cmbHarakiriFishname_SelectedIndexChanged);
             // 
             // btnExecHarakiri
@@ -2404,10 +2449,182 @@
             this.btnExecHarakiri.Location = new System.Drawing.Point(3, 7);
             this.btnExecHarakiri.Name = "btnExecHarakiri";
             this.btnExecHarakiri.Size = new System.Drawing.Size(75, 23);
-            this.btnExecHarakiri.TabIndex = 5;
+            this.btnExecHarakiri.TabIndex = 0;
             this.btnExecHarakiri.Text = "開　始";
             this.btnExecHarakiri.UseVisualStyleBackColor = true;
             this.btnExecHarakiri.Click += new System.EventHandler(this.btnExecHarakiri_Click);
+            // 
+            // tabCaughtFishes
+            // 
+            this.tabCaughtFishes.Controls.Add(this.chkViewNotCaughtOnly);
+            this.tabCaughtFishes.Controls.Add(this.lblCaughtFishesCount);
+            this.tabCaughtFishes.Controls.Add(this.btnUpdateCaughtFishes);
+            this.tabCaughtFishes.Controls.Add(this.btnResetCaughtFishes);
+            this.tabCaughtFishes.Controls.Add(this.gridCaughtFishes);
+            this.tabCaughtFishes.Location = new System.Drawing.Point(4, 23);
+            this.tabCaughtFishes.Name = "tabCaughtFishes";
+            this.tabCaughtFishes.Size = new System.Drawing.Size(553, 338);
+            this.tabCaughtFishes.TabIndex = 5;
+            this.tabCaughtFishes.Text = "釣った魚";
+            this.tabCaughtFishes.UseVisualStyleBackColor = true;
+            // 
+            // chkViewNotCaughtOnly
+            // 
+            this.chkViewNotCaughtOnly.AutoSize = true;
+            this.chkViewNotCaughtOnly.Location = new System.Drawing.Point(101, 10);
+            this.chkViewNotCaughtOnly.Name = "chkViewNotCaughtOnly";
+            this.chkViewNotCaughtOnly.Size = new System.Drawing.Size(123, 18);
+            this.chkViewNotCaughtOnly.TabIndex = 0;
+            this.chkViewNotCaughtOnly.Text = "釣ってない魚のみ表示";
+            this.chkViewNotCaughtOnly.UseVisualStyleBackColor = true;
+            this.chkViewNotCaughtOnly.CheckedChanged += new System.EventHandler(this.chkViewCaughtOnly_CheckedChanged);
+            // 
+            // lblCaughtFishesCount
+            // 
+            this.lblCaughtFishesCount.AutoSize = true;
+            this.lblCaughtFishesCount.Font = new System.Drawing.Font("Meiryo UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblCaughtFishesCount.Location = new System.Drawing.Point(3, 9);
+            this.lblCaughtFishesCount.Name = "lblCaughtFishesCount";
+            this.lblCaughtFishesCount.Size = new System.Drawing.Size(83, 17);
+            this.lblCaughtFishesCount.TabIndex = 0;
+            this.lblCaughtFishesCount.Text = "999/999匹";
+            // 
+            // btnUpdateCaughtFishes
+            // 
+            this.btnUpdateCaughtFishes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUpdateCaughtFishes.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnUpdateCaughtFishes.Location = new System.Drawing.Point(400, 7);
+            this.btnUpdateCaughtFishes.Name = "btnUpdateCaughtFishes";
+            this.btnUpdateCaughtFishes.Size = new System.Drawing.Size(75, 23);
+            this.btnUpdateCaughtFishes.TabIndex = 1;
+            this.btnUpdateCaughtFishes.Text = "初期化";
+            this.btnUpdateCaughtFishes.UseVisualStyleBackColor = true;
+            this.btnUpdateCaughtFishes.Click += new System.EventHandler(this.btnUpdateCaughtFishes_Click);
+            // 
+            // btnResetCaughtFishes
+            // 
+            this.btnResetCaughtFishes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnResetCaughtFishes.Location = new System.Drawing.Point(475, 7);
+            this.btnResetCaughtFishes.Name = "btnResetCaughtFishes";
+            this.btnResetCaughtFishes.Size = new System.Drawing.Size(75, 23);
+            this.btnResetCaughtFishes.TabIndex = 2;
+            this.btnResetCaughtFishes.Text = "リセット";
+            this.btnResetCaughtFishes.UseVisualStyleBackColor = true;
+            this.btnResetCaughtFishes.Click += new System.EventHandler(this.btnResetCaughtFishes_Click);
+            // 
+            // gridCaughtFishes
+            // 
+            this.gridCaughtFishes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridCaughtFishes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridCaughtFishes.Location = new System.Drawing.Point(0, 32);
+            this.gridCaughtFishes.Name = "gridCaughtFishes";
+            this.gridCaughtFishes.RowTemplate.Height = 21;
+            this.gridCaughtFishes.Size = new System.Drawing.Size(550, 306);
+            this.gridCaughtFishes.TabIndex = 3;
+            this.gridCaughtFishes.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridCaughtFishes_CellFormatting);
+            // 
+            // tabDB
+            // 
+            this.tabDB.Controls.Add(this.chkUpdateDBEnable);
+            this.tabDB.Controls.Add(this.lblUpdateDBUrl);
+            this.tabDB.Controls.Add(this.lblLastUpdate);
+            this.tabDB.Controls.Add(this.label35);
+            this.tabDB.Controls.Add(this.txtUpdateDBLog);
+            this.tabDB.Controls.Add(this.chkUpdateDBAutoUpdate);
+            this.tabDB.Controls.Add(this.btnExecUpdateDB);
+            this.tabDB.Location = new System.Drawing.Point(4, 23);
+            this.tabDB.Name = "tabDB";
+            this.tabDB.Size = new System.Drawing.Size(553, 338);
+            this.tabDB.TabIndex = 4;
+            this.tabDB.Text = "DB更新";
+            this.tabDB.UseVisualStyleBackColor = true;
+            // 
+            // chkUpdateDBEnable
+            // 
+            this.chkUpdateDBEnable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkUpdateDBEnable.AutoSize = true;
+            this.chkUpdateDBEnable.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkUpdateDBEnable.Location = new System.Drawing.Point(364, 10);
+            this.chkUpdateDBEnable.Name = "chkUpdateDBEnable";
+            this.chkUpdateDBEnable.Size = new System.Drawing.Size(72, 18);
+            this.chkUpdateDBEnable.TabIndex = 1;
+            this.chkUpdateDBEnable.Text = "ネット有効";
+            this.chkUpdateDBEnable.UseVisualStyleBackColor = true;
+            this.chkUpdateDBEnable.CheckedChanged += new System.EventHandler(this.chkUpdateDBEnable_CheckedChanged);
+            // 
+            // lblUpdateDBUrl
+            // 
+            this.lblUpdateDBUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblUpdateDBUrl.AutoSize = true;
+            this.lblUpdateDBUrl.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblUpdateDBUrl.Font = new System.Drawing.Font("Meiryo UI", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblUpdateDBUrl.ForeColor = System.Drawing.Color.Blue;
+            this.lblUpdateDBUrl.Location = new System.Drawing.Point(303, 11);
+            this.lblUpdateDBUrl.Name = "lblUpdateDBUrl";
+            this.lblUpdateDBUrl.Size = new System.Drawing.Size(51, 14);
+            this.lblUpdateDBUrl.TabIndex = 5;
+            this.lblUpdateDBUrl.Text = "統計情報";
+            this.lblUpdateDBUrl.Visible = false;
+            this.lblUpdateDBUrl.Click += new System.EventHandler(this.lblUpdateDBUrl_Click);
+            // 
+            // lblLastUpdate
+            // 
+            this.lblLastUpdate.AutoSize = true;
+            this.lblLastUpdate.Location = new System.Drawing.Point(139, 11);
+            this.lblLastUpdate.Name = "lblLastUpdate";
+            this.lblLastUpdate.Size = new System.Drawing.Size(129, 14);
+            this.lblLastUpdate.TabIndex = 4;
+            this.lblLastUpdate.Text = "9999/99/99 99:99:99";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label35.Location = new System.Drawing.Point(84, 11);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(62, 14);
+            this.label35.TabIndex = 3;
+            this.label35.Text = "最終確認：";
+            // 
+            // txtUpdateDBLog
+            // 
+            this.txtUpdateDBLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtUpdateDBLog.BackColor = System.Drawing.Color.Black;
+            this.txtUpdateDBLog.ForeColor = System.Drawing.Color.White;
+            this.txtUpdateDBLog.Location = new System.Drawing.Point(3, 34);
+            this.txtUpdateDBLog.Name = "txtUpdateDBLog";
+            this.txtUpdateDBLog.ReadOnly = true;
+            this.txtUpdateDBLog.Size = new System.Drawing.Size(547, 301);
+            this.txtUpdateDBLog.TabIndex = 3;
+            this.txtUpdateDBLog.Text = "[2000/01/01 00:00:00]: メッセージ";
+            // 
+            // chkUpdateDBAutoUpdate
+            // 
+            this.chkUpdateDBAutoUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkUpdateDBAutoUpdate.AutoSize = true;
+            this.chkUpdateDBAutoUpdate.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkUpdateDBAutoUpdate.Location = new System.Drawing.Point(438, 10);
+            this.chkUpdateDBAutoUpdate.Name = "chkUpdateDBAutoUpdate";
+            this.chkUpdateDBAutoUpdate.Size = new System.Drawing.Size(112, 18);
+            this.chkUpdateDBAutoUpdate.TabIndex = 2;
+            this.chkUpdateDBAutoUpdate.Text = "起動時に自動更新";
+            this.chkUpdateDBAutoUpdate.UseVisualStyleBackColor = true;
+            this.chkUpdateDBAutoUpdate.CheckedChanged += new System.EventHandler(this.chkAutoDBUpdate_CheckedChanged);
+            // 
+            // btnExecUpdateDB
+            // 
+            this.btnExecUpdateDB.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnExecUpdateDB.Location = new System.Drawing.Point(3, 7);
+            this.btnExecUpdateDB.Name = "btnExecUpdateDB";
+            this.btnExecUpdateDB.Size = new System.Drawing.Size(75, 23);
+            this.btnExecUpdateDB.TabIndex = 0;
+            this.btnExecUpdateDB.Text = "更　新";
+            this.btnExecUpdateDB.UseVisualStyleBackColor = true;
+            this.btnExecUpdateDB.Click += new System.EventHandler(this.btnExecUpdateDB_Click);
             // 
             // tabMainSetting
             // 
@@ -2416,7 +2633,7 @@
             this.tabMainSetting.Controls.Add(this.groupBox7);
             this.tabMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabMainSetting.Name = "tabMainSetting";
-            this.tabMainSetting.Size = new System.Drawing.Size(561, 338);
+            this.tabMainSetting.Size = new System.Drawing.Size(553, 338);
             this.tabMainSetting.TabIndex = 2;
             this.tabMainSetting.Text = "設定";
             this.tabMainSetting.UseVisualStyleBackColor = true;
@@ -2450,7 +2667,7 @@
             this.chkMessageEcho.Location = new System.Drawing.Point(258, 44);
             this.chkMessageEcho.Name = "chkMessageEcho";
             this.chkMessageEcho.Size = new System.Drawing.Size(118, 18);
-            this.chkMessageEcho.TabIndex = 8;
+            this.chkMessageEcho.TabIndex = 5;
             this.chkMessageEcho.Text = "メッセージをFFに表示";
             this.chkMessageEcho.UseVisualStyleBackColor = true;
             this.chkMessageEcho.CheckedChanged += new System.EventHandler(this.chkMessageEcho_CheckedChanged);
@@ -2462,7 +2679,7 @@
             this.chkWindowActivate.Location = new System.Drawing.Point(167, 44);
             this.chkWindowActivate.Name = "chkWindowActivate";
             this.chkWindowActivate.Size = new System.Drawing.Size(86, 18);
-            this.chkWindowActivate.TabIndex = 7;
+            this.chkWindowActivate.TabIndex = 4;
             this.chkWindowActivate.Text = "画面アクティブ";
             this.chkWindowActivate.UseVisualStyleBackColor = true;
             this.chkWindowActivate.CheckedChanged += new System.EventHandler(this.chkActivateAtFinished_CheckedChanged);
@@ -2474,7 +2691,7 @@
             this.chkWindowFlash.Location = new System.Drawing.Point(91, 44);
             this.chkWindowFlash.Name = "chkWindowFlash";
             this.chkWindowFlash.Size = new System.Drawing.Size(70, 18);
-            this.chkWindowFlash.TabIndex = 7;
+            this.chkWindowFlash.TabIndex = 3;
             this.chkWindowFlash.Text = "画面点滅";
             this.chkWindowFlash.UseVisualStyleBackColor = true;
             this.chkWindowFlash.CheckedChanged += new System.EventHandler(this.chkFlashAtFinished_CheckedChanged);
@@ -2486,7 +2703,7 @@
             this.chkWindowTopMost.Location = new System.Drawing.Point(6, 44);
             this.chkWindowTopMost.Name = "chkWindowTopMost";
             this.chkWindowTopMost.Size = new System.Drawing.Size(79, 18);
-            this.chkWindowTopMost.TabIndex = 7;
+            this.chkWindowTopMost.TabIndex = 2;
             this.chkWindowTopMost.Text = "常に最前面";
             this.chkWindowTopMost.UseVisualStyleBackColor = true;
             this.chkWindowTopMost.CheckedChanged += new System.EventHandler(this.chkTopMost_CheckedChanged);
@@ -2509,7 +2726,7 @@
             this.rdoSaveModeByPlayer.Location = new System.Drawing.Point(117, 20);
             this.rdoSaveModeByPlayer.Name = "rdoSaveModeByPlayer";
             this.rdoSaveModeByPlayer.Size = new System.Drawing.Size(78, 18);
-            this.rdoSaveModeByPlayer.TabIndex = 2;
+            this.rdoSaveModeByPlayer.TabIndex = 1;
             this.rdoSaveModeByPlayer.TabStop = true;
             this.rdoSaveModeByPlayer.Text = "プレイヤー別";
             this.rdoSaveModeByPlayer.UseVisualStyleBackColor = true;
@@ -2542,7 +2759,7 @@
             this.rdoSaveModeShared.Location = new System.Drawing.Point(70, 20);
             this.rdoSaveModeShared.Name = "rdoSaveModeShared";
             this.rdoSaveModeShared.Size = new System.Drawing.Size(47, 18);
-            this.rdoSaveModeShared.TabIndex = 1;
+            this.rdoSaveModeShared.TabIndex = 0;
             this.rdoSaveModeShared.TabStop = true;
             this.rdoSaveModeShared.Text = "共通";
             this.rdoSaveModeShared.UseVisualStyleBackColor = true;
@@ -2819,24 +3036,12 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // chkRepairRod
-            // 
-            this.chkRepairRod.AutoSize = true;
-            this.chkRepairRod.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkRepairRod.Location = new System.Drawing.Point(6, 113);
-            this.chkRepairRod.Name = "chkRepairRod";
-            this.chkRepairRod.Size = new System.Drawing.Size(68, 18);
-            this.chkRepairRod.TabIndex = 21;
-            this.chkRepairRod.Text = "竿の修理";
-            this.chkRepairRod.UseVisualStyleBackColor = true;
-            this.chkRepairRod.CheckedChanged += new System.EventHandler(this.chkRepairRod_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(569, 387);
+            this.ClientSize = new System.Drawing.Size(561, 387);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -2846,6 +3051,7 @@
             this.Text = "MainForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -2896,6 +3102,11 @@
             this.tabMainHarakiri.ResumeLayout(false);
             this.tabMainHarakiri.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridHarakiri)).EndInit();
+            this.tabCaughtFishes.ResumeLayout(false);
+            this.tabCaughtFishes.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridCaughtFishes)).EndInit();
+            this.tabDB.ResumeLayout(false);
+            this.tabDB.PerformLayout();
             this.tabMainSetting.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -3119,5 +3330,20 @@
         private System.Windows.Forms.CheckBox chkEnemyAttackCmd;
         private System.Windows.Forms.TextBox txtEnemyAttackCmdLine;
         private System.Windows.Forms.CheckBox chkRepairRod;
+        private System.Windows.Forms.TabPage tabDB;
+        private System.Windows.Forms.RichTextBox txtUpdateDBLog;
+        private System.Windows.Forms.CheckBox chkUpdateDBAutoUpdate;
+        private System.Windows.Forms.Button btnExecUpdateDB;
+        private System.Windows.Forms.TabPage tabCaughtFishes;
+        private System.Windows.Forms.Button btnUpdateCaughtFishes;
+        private System.Windows.Forms.Button btnResetCaughtFishes;
+        private System.Windows.Forms.DataGridView gridCaughtFishes;
+        private System.Windows.Forms.Label lblLastUpdate;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label lblUpdateDBUrl;
+        private System.Windows.Forms.CheckBox chkUpdateDBEnable;
+        private System.Windows.Forms.CheckBox chkWaitTimeout;
+        private System.Windows.Forms.CheckBox chkViewNotCaughtOnly;
+        private System.Windows.Forms.Label lblCaughtFishesCount;
     }
 }

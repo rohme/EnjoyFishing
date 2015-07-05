@@ -131,14 +131,14 @@ namespace MiscTools
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public List<FFACE.ChatTools.ChatLine> GetChatLine(int index)
+        public List<FFACE.ChatTools.ChatLine> GetChatLine(int index, bool iAddIndex = true)
         {
             List<FFACE.ChatTools.ChatLine> ret = new List<FFACE.ChatTools.ChatLine>();
             for (int i = 0; i < chatLines.Count; i++)
             {
                 if (chatLines[i].Index > index)
                 {
-                    this.currentIndex = chatLines[i].Index;
+                    if (iAddIndex) this.currentIndex = chatLines[i].Index;
                     ret.Add(chatLines[i]);
                 }
             }

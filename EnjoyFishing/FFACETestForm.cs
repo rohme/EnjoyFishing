@@ -72,6 +72,7 @@ namespace EnjoyFishing
             dicStatus.Add("魚-現在HP", fface.Fish.HPCurrent.ToString());
             dicStatus.Add("魚-残り時間", fface.Fish.Timeout.ToString());
             //Item
+            dicStatus.Add("選択中アイテム", string.Format("{0}({1})", fface.Item.SelectedItemID, FFACE.ParseResources.GetItemName(fface.Item.SelectedItemID)));
             dicStatus.Add("鞄", string.Format("{0}/{1}", fface.Item.InventoryCount, fface.Item.InventoryMax));
             //dicStatus.Add("金庫", string.Format("{0}/{1}", fface.Item.SafeCount, fface.Item.SafeMax));
             //dicStatus.Add("家具", string.Format("{0}/{1}", fface.Item.StorageCount, fface.Item.StorageMax));
@@ -81,7 +82,7 @@ namespace EnjoyFishing
             //dicStatus.Add("テンポラリ", string.Format("{0}/{1}", fface.Item.TemporaryCount, fface.Item.TemporaryMax));
             dicStatus.Add("ケース", string.Format("{0}/{1}", fface.Item.CaseCount, fface.Item.CaseMax));
             dicStatus.Add("ワードローブ", string.Format("{0}/{1}", fface.Item.WardrobeCount, fface.Item.WardrobeMax));
-            dicStatus.Add("装備-竿", string.Format("{0}({1})", FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range)), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range))));
+            dicStatus.Add("装備-竿", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Range), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Range))));
             dicStatus.Add("装備-竿-鞄残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Inventory).ToString());
             dicStatus.Add("装備-竿-ワードローブ残数", fface.Item.GetItemCount(fface.Item.GetEquippedItemID(EquipSlot.Range), InventoryType.Wardrobe).ToString());
             dicStatus.Add("装備-エサ", string.Format("{0}({1})", fface.Item.GetEquippedItemID(EquipSlot.Ammo), FFACE.ParseResources.GetItemName(fface.Item.GetEquippedItemID(EquipSlot.Ammo))));
