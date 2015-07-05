@@ -236,6 +236,7 @@ namespace EnjoyFishing
             {
                 if (this.CaughtFishes.Fishes[i].FishName == iFishName)
                 {
+                    foundFlg = true;
                     this.CaughtFishes.Fishes[i].Caught = iCaught;
                     break;
                 }
