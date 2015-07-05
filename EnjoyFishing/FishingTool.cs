@@ -1343,8 +1343,8 @@ namespace EnjoyFishing
                         //HP0の設定
                         int waitHP0 = MiscTool.GetRandomNumber(settings.Fishing.HP0Min, settings.Fishing.HP0Max);
                         //反応時間待機
-                        Thread.Sleep(settings.Global.WaitChat); //wait
-                        if (settings.Fishing.ReactionTime)
+                        //Thread.Sleep(settings.Global.WaitChat); //wait
+                        if (settings.Fishing.ReactionTime && !settings.Fishing.WaitTimeout)
                         {
                             wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
                         }
@@ -1395,22 +1395,48 @@ namespace EnjoyFishing
                         {
                             logger.Output(LogLevelKind.DEBUG, "時間切れ待機中");
                             setMessage(string.Format("時間切れ待機中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
+                            int startIndex = chat.CurrentIndex;
+                            bool timeUpOkFlg = false;
                             for (int i = 0; i < 1200; i++)//2分間チャットを監視
                             {
-                                if (chat.GetNextChatLine(out cl))
+                                if (timeUpOkFlg) break;
+                                //釣りが中止された場合、待機処理を中止する
+                                if (this.PlayerStatus != FFACETools.Status.FishBite) break;
+                                //チャット監視
+                                var cl2 = chat.GetChatLine(startIndex, false);
+                                foreach (var c in cl2)
                                 {
                                     List<string> chatKbnTimeoutArgs = new List<string>();
-                                    ChatKbnKind chatKbnTimeout = getChatKbnFromChatline(cl, out chatKbnArgs);
-                                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                                    ChatKbnKind chatKbnTimeout = getChatKbnFromChatline(c, out chatKbnTimeoutArgs);
+                                    //logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", c.Text, chatKbn));
                                     if (chatKbnTimeout == ChatKbnKind.Timeout ||
                                         chatKbnTimeout == ChatKbnKind.NoCatch)
                                     {
                                         //反応時間待機
                                         if (settings.Fishing.ReactionTime)
                                         {
-                                            wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
+                                            float reactionTimeFrom = (settings.Fishing.ReactionTimeMin <= 4.0f) ? settings.Fishing.ReactionTimeMin : 4.0f;
+                                            float reactionTimeTo = (settings.Fishing.ReactionTimeMax <= 4.0f) ? settings.Fishing.ReactionTimeMax : 4.0f;
+                                            wait(reactionTimeFrom, reactionTimeTo, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
                                         }
+                                        timeUpOkFlg = true;
                                         break;
+                                    }
+                                    else if ( chatKbnTimeout == ChatKbnKind.CatchSingle ||  //{0}は(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchMultiple ||//{0}は(.*)を([0-9]*)尾手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchMonster || //{0}はモンスターを釣り上げた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchKeyItem || //だいじなもの:(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchTempItem ||//テンポラリアイテム:(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.LineBreak ||    //釣り糸が切れてしまった。"
+                                              chatKbnTimeout == ChatKbnKind.RodBreak ||     //釣り竿が折れてしまった。"
+                                              chatKbnTimeout == ChatKbnKind.Timeout ||      //そろそろ逃げられそうだ……！"
+                                              chatKbnTimeout == ChatKbnKind.InventoryFull ||//{0}は見事に(.*)を釣り上げたが、これ以上持てないので、仕方なくリリースした。"
+                                              chatKbnTimeout == ChatKbnKind.NoBait ||       //何も釣れなかった。"
+                                              chatKbnTimeout == ChatKbnKind.Release ||      //あきらめて仕掛けをたぐり寄せた。"
+                                              chatKbnTimeout == ChatKbnKind.NoCatch)        //獲物に逃げられてしまった。"
+                                    {
+                                        break;
+                                        timeUpOkFlg = true;
                                     }
                                 }
                                 Thread.Sleep(100);//wait
