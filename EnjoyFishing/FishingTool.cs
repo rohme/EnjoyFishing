@@ -46,13 +46,13 @@ namespace EnjoyFishing
             {ChatKbnKind.SneakWarning2, "{0}は、スニークの効果がきれた。"},
             {ChatKbnKind.ShipWarning1, "まもなく(.*)へ到着します。"},//汽船航路・外洋航路・銀海航路
             {ChatKbnKind.ShipWarning2, "(.*)に入港いたします。"},//汽船航路・外洋航路・銀海航路
-            {ChatKbnKind.ShipWarning3, "もうすぐ夕照桟橋に着いちまうぜ。"},//マナクリッパー マリヤカレヤリーフ遊覧
-            {ChatKbnKind.ShipWarning4, "Khots Chalahko : そろそろ到着だ。"},//マナクリッパー 夕照桟橋→プルゴノルゴ島
-            {ChatKbnKind.ShipWarning5, "ブブリム半島が見えてきたぜ！！"},//マナクリッパー プルゴノルゴ島→夕照桟橋
-            {ChatKbnKind.ShipWarning6, "Ineuteniace : そろそろ北桟橋ですな。"},//バージ 主水路(南桟橋→北桟橋)
-            {ChatKbnKind.ShipWarning7, "Eunirange : そろそろ中桟橋かな？"},//バージ 主水路(北桟橋→中桟橋)
-            {ChatKbnKind.ShipWarning8, "Ineuteniace : そろそろ南桟橋じゃな。"},//バージ 井守ヶ淵(中桟橋→南桟橋)
-            {ChatKbnKind.ShipWarning9, "Eunirange : そろそろ中桟橋かな。"},//バージ エメフィ支水路(南桟橋→中桟橋)
+            {ChatKbnKind.ShipWarning3, "(.*)もうすぐ夕照桟橋に着いちまうぜ。(.*)"},//マナクリッパー マリヤカレヤリーフ遊覧
+            {ChatKbnKind.ShipWarning4, "(.*)Khots Chalahko : そろそろ到着だ。(.*)"},//マナクリッパー 夕照桟橋→プルゴノルゴ島
+            {ChatKbnKind.ShipWarning5, "(.*)ブブリム半島が見えてきたぜ！！(.*)"},//マナクリッパー プルゴノルゴ島→夕照桟橋
+            {ChatKbnKind.ShipWarning6, "(.*)Ineuteniace : そろそろ北桟橋ですな。(.*)"},//バージ 主水路(南桟橋→北桟橋)
+            {ChatKbnKind.ShipWarning7, "(.*)Eunirange : そろそろ中桟橋かな？(.*)"},//バージ 主水路(北桟橋→中桟橋)
+            {ChatKbnKind.ShipWarning8, "(.*)Ineuteniace : そろそろ南桟橋じゃな。(.*)"},//バージ 井守ヶ淵(中桟橋→南桟橋)
+            {ChatKbnKind.ShipWarning9, "(.*)Eunirange : そろそろ中桟橋かな。(.*)"},//バージ エメフィ支水路(南桟橋→中桟橋)
             {ChatKbnKind.SkillUp, "{0}の釣りスキルが、(.*)アップ！"},
             {ChatKbnKind.SkillLvUp, "{0}の釣りスキルは、(.*)になった。"},
             {ChatKbnKind.SynthSuccess, "(.*)が([0-9]*)個、合成できた！"},
@@ -1693,9 +1693,10 @@ namespace EnjoyFishing
                 return false;
             }
             //釣れた魚を登録
-            if(iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish){
-                settings.CaughtFishesUpdate(iFish.FishName, (iFish.Result == FishResultStatusKind.Catch));
-                EventCaughtFishesUpdate(iFish.FishName);
+            if(iFish.Result== FishResultStatusKind.Catch &&
+               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish)){
+                   settings.CaughtFishesUpdate(iFish.FishName, true);
+                   EventCaughtFishesUpdate(iFish.FishName);
             }
             return true;
         }
