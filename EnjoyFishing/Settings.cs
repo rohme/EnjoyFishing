@@ -27,6 +27,7 @@ namespace EnjoyFishing
         public SettingsPlayerEtcModel Etc { get; set; }
         public SettingsPlayerHistoryModel History { get; set; }
         public SettingsPlayerHarakiriModel Harakiri { get; set; }
+        public SettingsPlayerCaughtFishesModel CaughtFishes { get; set; }
 
         public enum FishListModeKind
         {
@@ -72,6 +73,7 @@ namespace EnjoyFishing
                 this.Etc = new SettingsPlayerEtcModel();
                 this.History = new SettingsPlayerHistoryModel();
                 this.Harakiri = new SettingsPlayerHarakiriModel();
+                this.CaughtFishes = new SettingsPlayerCaughtFishesModel();
             }
         }
         /// <summary>
@@ -125,6 +127,7 @@ namespace EnjoyFishing
                     this.Etc = v.Etc;
                     this.History = v.History;
                     this.Harakiri = v.Harakiri;
+                    this.CaughtFishes = v.CaughtFishes;
                 }
             }
             if (!foundFlg)
@@ -136,6 +139,7 @@ namespace EnjoyFishing
                 this.Etc = player.Etc;
                 this.History = player.History;
                 this.Harakiri = player.Harakiri;
+                this.CaughtFishes = player.CaughtFishes;
             }
 
             return true;
@@ -170,6 +174,7 @@ namespace EnjoyFishing
                     v.Etc = this.Etc;
                     v.History = this.History;
                     v.Harakiri = this.Harakiri;
+                    v.CaughtFishes = this.CaughtFishes;
                 }
             }
             if (!foundFlg)
@@ -182,6 +187,7 @@ namespace EnjoyFishing
                 player.Etc = this.Etc;
                 player.History = this.History;
                 player.Harakiri = this.Harakiri;
+                player.CaughtFishes = this.CaughtFishes;
 
                 xmlSettings.Player.Add(player);
             }
@@ -217,6 +223,48 @@ namespace EnjoyFishing
             }
             return true;
         }
+        #region CaughtFishes
+        /// <summary>
+        /// 釣った魚の更新
+        /// </summary>
+        /// <param name="iFishName">魚名</param>
+        /// <param name="iCaught">釣ったか否か</param>
+        public void CaughtFishesUpdate(string iFishName, bool iCaught)
+        {
+            bool foundFlg = false;
+            for (int i = 0; i < this.CaughtFishes.Fishes.Count; i++)
+            {
+                if (this.CaughtFishes.Fishes[i].FishName == iFishName)
+                {
+                    this.CaughtFishes.Fishes[i].Caught = iCaught;
+                    break;
+                }
+            }
+            if (!foundFlg)
+            {
+                SettingsPlayerCaughtFishModel fish = new SettingsPlayerCaughtFishModel();
+                fish.FishName = iFishName;
+                fish.Caught = iCaught;
+                this.CaughtFishes.Fishes.Add(fish);
+            }
+        }
+        public int GetCoughtFishesCount()
+        {
+            int cnt = 0;
+            for (int i = 0; i < this.CaughtFishes.Fishes.Count; i++)
+            {
+                if (this.CaughtFishes.Fishes[i].Caught) cnt++;
+            }
+            return cnt;
+        }
+        /// <summary>
+        /// 釣った魚のリセット
+        /// </summary>
+        public void CoughtFishesReset()
+        {
+            this.CaughtFishes.Fishes = new List<SettingsPlayerCaughtFishModel>();
+        }
+        #endregion
     }
 
     [XmlRoot("EnjoyFishing")]
@@ -275,6 +323,7 @@ namespace EnjoyFishing
         public SettingsPlayerEtcModel Etc { get; set; }
         public SettingsPlayerHistoryModel History { get; set; }
         public SettingsPlayerHarakiriModel Harakiri { get; set; }
+        public SettingsPlayerCaughtFishesModel CaughtFishes { get; set; }
 
         public SettingsPlayerModel()
         {
@@ -285,6 +334,7 @@ namespace EnjoyFishing
             this.Etc = new SettingsPlayerEtcModel();
             this.History = new SettingsPlayerHistoryModel();
             this.Harakiri = new SettingsPlayerHarakiriModel();
+            this.CaughtFishes = new SettingsPlayerCaughtFishesModel();
         }
     }
     public class SettingsPlayerFormModel
@@ -653,6 +703,31 @@ namespace EnjoyFishing
             this.FishNameSelect = string.Empty;
             this.FishNameInput = string.Empty;
             this.StopFound = false;
+        }
+    }
+    public class SettingsPlayerCaughtFishesModel
+    {
+        public bool ViewNotCaughtOnly { get; set; }
+        [XmlArray("Fishes")]
+        [XmlArrayItem("Fish")]
+        public List<SettingsPlayerCaughtFishModel> Fishes { get; set; }
+        public SettingsPlayerCaughtFishesModel()
+        {
+            this.ViewNotCaughtOnly = false;
+            this.Fishes = new List<SettingsPlayerCaughtFishModel>();
+        }
+
+    }
+    public class SettingsPlayerCaughtFishModel
+    {
+        [XmlAttribute("fishname")]
+        public string FishName { get; set; }
+        [XmlAttribute("caught")]
+        public bool Caught { get; set; }
+        public SettingsPlayerCaughtFishModel()
+        {
+            this.FishName = string.Empty;
+            this.Caught = false;
         }
     }
     public class SettingsArgsModel

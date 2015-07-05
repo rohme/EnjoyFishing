@@ -15,7 +15,7 @@ namespace EnjoyFishing
 {
     public class UpdateDBTool
     {
-        public const string SERVER_NAME = "http://localhost";
+        public const string SERVER_NAME = "http://ff11.rohme.net";
 
         private const string DUMMY_PLAYER_NAME = "DUMMY";
         private const string PATH_TEMP = "Temp";
@@ -206,34 +206,14 @@ namespace EnjoyFishing
                             //イベント発生
                             EventReceiveMessage(string.Format("{0}", response), 0xFFFF0000);
                         }
+                        //テンポラリファイル削除
+                        if (File.Exists(uploadFileName))
+                        {
+                            File.Delete(uploadFileName);
+                        }
                     }
                 }
             }
-            UpdateDBApiRodModel rr = new UpdateDBApiRodModel();
-            rr.Result.Success = "true";
-            rr.Result.Message = "メッセージ";
-            rr.Rod.RodName = "竿名";
-            rr.Rod.Version = "1.1.1";
-            FishDBFishModel rm = new FishDBFishModel();
-            rm.FishName = "魚名";
-            rm.FishType = FishDBFishTypeKind.SmallFish;
-            rm.ZoneNames.Add("エリア名");
-            rm.BaitNames.Add("エサ名");
-            rm.IDs.Add(new FishDBIdModel(1,2,3,4,5,true, FishDBItemTypeKind.Common));
-            rr.Rod.Fishes.Add(rm);
-            using (FileStream fs = new FileStream(@"c:\test.xml", FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
-            {
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
-                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                ns.Add(String.Empty, String.Empty);
-                XmlSerializer serializer = new XmlSerializer(typeof(UpdateDBApiRodModel));
-                serializer.Serialize(sw, rr, ns);
-                //書き込み
-                sw.Flush();
-                sw.Close();
-                sw = null;
-            }
-
 
             //魚情報を取得
             EventReceiveMessage("== 魚情報を取得  ==", 0xFFFFFFFF, true);
