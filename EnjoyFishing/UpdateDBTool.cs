@@ -81,42 +81,11 @@ namespace EnjoyFishing
         }
         #endregion
 
-        #region スレッド操作など
-        /// <summary>
-        /// システム終了処理
-        /// </summary>
-        public void SystemAbort()
-        {
-            if (this.thUpdateDB != null && this.thUpdateDB.IsAlive) this.thUpdateDB.Abort();
-        }
-        /// <summary>
-        /// DB更新開始
-        /// </summary>
-        /// <returns></returns>
-        public bool UpdateDBStart()
-        {
-            //スレッド開始
-            thUpdateDB = new Thread(threadUpdateDB);
-            thUpdateDB.Start();
-            thUpdateDB.Join();
-            return true;
-        }
-        /// <summary>
-        /// DB更新中止
-        /// </summary>
-        /// <returns></returns>
-        public void UpdateDBAbort()
-        {
-            //スレッド停止
-            if (thUpdateDB != null && thUpdateDB.IsAlive) thUpdateDB.Abort();
-        }
-        #endregion
-
         #region DB更新
         /// <summary>
-        /// メインスレッド
+        /// データベース更新処理
         /// </summary>
-        private void threadUpdateDB()
+        public bool UpdateDB()
         {
             logger.Output(LogLevelKind.INFO, "DB更新開始");
             string response = string.Empty;
@@ -131,7 +100,7 @@ namespace EnjoyFishing
             if (!retCheckVersion)
             {
                 EventReceiveMessage(responseCheckVersion, 0xFFFF0000);
-                return;
+                return false;
             }
             XmlSerializer seriApiCheckVersion = new XmlSerializer(typeof(UpdateDBApiCheckVersionModel));
             MemoryStream msApiCheckVersion = new MemoryStream(Encoding.UTF8.GetBytes(responseCheckVersion));
@@ -145,13 +114,13 @@ namespace EnjoyFishing
                 else
                 {
                     EventReceiveMessage(resCheckVersion.Message, 0xFFFF0000);
-                    return;
+                    return false;
                 }
             }
             else
             {
-                EventReceiveMessage(resCheckVersion.Message, 0xFFFF0000);
-                return;
+                EventReceiveMessage(resCheckVersion.Result.Message, 0xFFFF0000);
+                return false;
             }
             //履歴データの送信
             EventReceiveMessage("== 履歴データの送信 ==", 0xFFFFFFFF, true);
@@ -301,6 +270,8 @@ namespace EnjoyFishing
 
             logger.Output(LogLevelKind.INFO, "DB更新終了");
             EventReceiveMessage("データベースの更新が完了しました", 0xFFFFFFFF, true);
+
+            return true;
         }
         #endregion
 

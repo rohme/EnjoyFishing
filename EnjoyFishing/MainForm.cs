@@ -341,9 +341,8 @@ namespace EnjoyFishing
                 settings.Global.UpdateDB.Enable = (ret == DialogResult.Yes);
                 settings.Global.UpdateDB.LastUpdate = "2000/01/01 00:00:00";
                 chkUpdateDBEnable.Checked = settings.Global.UpdateDB.Enable;
-                //btnExecUpdateDB.Enabled = settings.Global.UpdateDB.Enable;
             }
-            //自動更新
+            //起動時に更新
             if (settings.Global.UpdateDB.Enable && settings.Global.UpdateDB.AutoUpdate)
             {
                 btnExecUpdateDB_Click(this,new EventArgs());
@@ -920,7 +919,7 @@ namespace EnjoyFishing
             thFishing = null;
             logger.Output(LogLevelKind.DEBUG, "メインスレッド停止");
             //DB更新スレッド停止
-            if (updatedb != null) updatedb.SystemAbort();
+            if (thUpdateDB != null && thUpdateDB.IsAlive) thUpdateDB.Abort();
             //監視スレッド停止
             if (thMonitor != null && thMonitor.IsAlive) thMonitor.Abort();
             thMonitor = null;
@@ -1463,6 +1462,9 @@ namespace EnjoyFishing
         /// </summary>
         private void startUpdateDB()
         {
+            //ネットワーク有効チェック
+            if (!settings.Global.UpdateDB.Enable) return;
+
             if (InvokeRequired)
             {
                 Invoke(new StartUpdateDBDelegate(startUpdateDB), null);
@@ -1492,10 +1494,18 @@ namespace EnjoyFishing
             {
                 logger.Output(LogLevelKind.INFO, "DB更新停止");
                 updatedbFlg = false;
-                btnExecUpdateDB.Text = "開　始";
-                updatedb.UpdateDBAbort();
-                //if (iShowStopMessage) setMessage("データベースの更新を停止しました");
+                btnExecUpdateDB.Text = "更　新";
 
+                if (thUpdateDB != null && thUpdateDB.IsAlive) thUpdateDB.Abort();
+                if (iShowStopMessage)
+                {
+                    UpdateDBTool.ReceiveMessageEventArgs args = new UpdateDBTool.ReceiveMessageEventArgs();
+                    args.Message = "データベースの更新をキャンセルしました";
+                    uint color = 0xFFFFFFFF;
+                    args.Color = Color.FromArgb((int)color);
+                    args.Bold = true;
+                    UpdateDBTool_ReceiveMessage(this, args);
+                }
                 //最終更新日の画面表示更新
                 lblLastUpdate.Text = settings.Global.UpdateDB.LastUpdate;
                 //設定保存
@@ -1508,20 +1518,12 @@ namespace EnjoyFishing
         private void threadUpdateDB()
         {
 
-            bool ret = updatedb.UpdateDBStart();
+            bool ret = updatedb.UpdateDB();
+            if (!ret)
+            {
+                SystemSounds.Hand.Play();
+            }
             stopUpdateDB(false);
-            //if (ret)
-            //{
-            //    //正常終了
-            //    setMessage("データベースの更新が正常終了しました"); 
-            //    SystemSounds.Asterisk.Play();
-            //}
-            //else
-            //{
-            //    //エラー
-            //    setMessage("データベースの更新が以上終了しました");
-            //    SystemSounds.Hand.Play();
-            //}
         }
         /// <summary>
         /// 統計情報 Clickイベント

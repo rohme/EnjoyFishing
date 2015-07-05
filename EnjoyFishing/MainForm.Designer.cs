@@ -204,6 +204,8 @@
             this.cmbHarakiriFishname = new System.Windows.Forms.ComboBox();
             this.btnExecHarakiri = new System.Windows.Forms.Button();
             this.tabCaughtFishes = new System.Windows.Forms.TabPage();
+            this.chkViewNotCaughtOnly = new System.Windows.Forms.CheckBox();
+            this.lblCaughtFishesCount = new System.Windows.Forms.Label();
             this.btnUpdateCaughtFishes = new System.Windows.Forms.Button();
             this.btnResetCaughtFishes = new System.Windows.Forms.Button();
             this.gridCaughtFishes = new System.Windows.Forms.DataGridView();
@@ -249,8 +251,6 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.lblCaughtFishesCount = new System.Windows.Forms.Label();
-            this.chkViewNotCaughtOnly = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -2468,6 +2468,27 @@
             this.tabCaughtFishes.Text = "釣った魚";
             this.tabCaughtFishes.UseVisualStyleBackColor = true;
             // 
+            // chkViewNotCaughtOnly
+            // 
+            this.chkViewNotCaughtOnly.AutoSize = true;
+            this.chkViewNotCaughtOnly.Location = new System.Drawing.Point(101, 10);
+            this.chkViewNotCaughtOnly.Name = "chkViewNotCaughtOnly";
+            this.chkViewNotCaughtOnly.Size = new System.Drawing.Size(123, 18);
+            this.chkViewNotCaughtOnly.TabIndex = 0;
+            this.chkViewNotCaughtOnly.Text = "釣ってない魚のみ表示";
+            this.chkViewNotCaughtOnly.UseVisualStyleBackColor = true;
+            this.chkViewNotCaughtOnly.CheckedChanged += new System.EventHandler(this.chkViewCaughtOnly_CheckedChanged);
+            // 
+            // lblCaughtFishesCount
+            // 
+            this.lblCaughtFishesCount.AutoSize = true;
+            this.lblCaughtFishesCount.Font = new System.Drawing.Font("Meiryo UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblCaughtFishesCount.Location = new System.Drawing.Point(3, 9);
+            this.lblCaughtFishesCount.Name = "lblCaughtFishesCount";
+            this.lblCaughtFishesCount.Size = new System.Drawing.Size(83, 17);
+            this.lblCaughtFishesCount.TabIndex = 0;
+            this.lblCaughtFishesCount.Text = "999/999匹";
+            // 
             // btnUpdateCaughtFishes
             // 
             this.btnUpdateCaughtFishes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -2601,7 +2622,7 @@
             this.btnExecUpdateDB.Name = "btnExecUpdateDB";
             this.btnExecUpdateDB.Size = new System.Drawing.Size(75, 23);
             this.btnExecUpdateDB.TabIndex = 0;
-            this.btnExecUpdateDB.Text = "開　始";
+            this.btnExecUpdateDB.Text = "更　新";
             this.btnExecUpdateDB.UseVisualStyleBackColor = true;
             this.btnExecUpdateDB.Click += new System.EventHandler(this.btnExecUpdateDB_Click);
             // 
@@ -3014,27 +3035,6 @@
             this.chkStatusBarVisibleRemainTime.Text = "残り時間";
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
-            // 
-            // lblCaughtFishesCount
-            // 
-            this.lblCaughtFishesCount.AutoSize = true;
-            this.lblCaughtFishesCount.Font = new System.Drawing.Font("Meiryo UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblCaughtFishesCount.Location = new System.Drawing.Point(3, 9);
-            this.lblCaughtFishesCount.Name = "lblCaughtFishesCount";
-            this.lblCaughtFishesCount.Size = new System.Drawing.Size(83, 17);
-            this.lblCaughtFishesCount.TabIndex = 0;
-            this.lblCaughtFishesCount.Text = "999/999匹";
-            // 
-            // chkViewNotCaughtOnly
-            // 
-            this.chkViewNotCaughtOnly.AutoSize = true;
-            this.chkViewNotCaughtOnly.Location = new System.Drawing.Point(101, 10);
-            this.chkViewNotCaughtOnly.Name = "chkViewNotCaughtOnly";
-            this.chkViewNotCaughtOnly.Size = new System.Drawing.Size(123, 18);
-            this.chkViewNotCaughtOnly.TabIndex = 0;
-            this.chkViewNotCaughtOnly.Text = "釣ってない魚のみ表示";
-            this.chkViewNotCaughtOnly.UseVisualStyleBackColor = true;
-            this.chkViewNotCaughtOnly.CheckedChanged += new System.EventHandler(this.chkViewCaughtOnly_CheckedChanged);
             // 
             // MainForm
             // 

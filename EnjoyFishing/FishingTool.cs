@@ -1343,10 +1343,14 @@ namespace EnjoyFishing
                         //HP0の設定
                         int waitHP0 = MiscTool.GetRandomNumber(settings.Fishing.HP0Min, settings.Fishing.HP0Max);
                         //反応時間待機
-                        //Thread.Sleep(settings.Global.WaitChat); //wait
                         if (settings.Fishing.ReactionTime && !settings.Fishing.WaitTimeout)
                         {
                             wait(settings.Fishing.ReactionTimeMin, settings.Fishing.ReactionTimeMax, "反応待機中：{0:0.0}s " + GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
+                        }
+                        else
+                        {
+                            //HP0になった瞬間釣り上げると、HP残ったように表示されてしまうので、ウェイトを入れる
+                            Thread.Sleep(settings.Global.WaitChat); //wait
                         }
                         //リリース判定
                         if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, oFish.FishType))
@@ -1421,7 +1425,7 @@ namespace EnjoyFishing
                                         }
                                         timeUpOkFlg = true;
                                         break;
-                                    }
+                                    } 
                                     else if ( chatKbnTimeout == ChatKbnKind.CatchSingle ||  //{0}は(.*)を手にいれた！"
                                               chatKbnTimeout == ChatKbnKind.CatchMultiple ||//{0}は(.*)を([0-9]*)尾手にいれた！"
                                               chatKbnTimeout == ChatKbnKind.CatchMonster || //{0}はモンスターを釣り上げた！"
@@ -1435,8 +1439,8 @@ namespace EnjoyFishing
                                               chatKbnTimeout == ChatKbnKind.Release ||      //あきらめて仕掛けをたぐり寄せた。"
                                               chatKbnTimeout == ChatKbnKind.NoCatch)        //獲物に逃げられてしまった。"
                                     {
-                                        break;
                                         timeUpOkFlg = true;
+                                        break;
                                     }
                                 }
                                 Thread.Sleep(100);//wait
