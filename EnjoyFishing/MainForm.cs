@@ -713,13 +713,7 @@ namespace EnjoyFishing
                     addGridImageColumns(iGrid, col);
                 }
             }
-            //ソート無効
-            for (int i = 0; i < iGrid.Columns.Count; i++)
-            {
-                iGrid.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
-            }
         }
-
         /// <summary>
         /// 装備コンボボックスを初期化する
         /// </summary>
@@ -1909,7 +1903,7 @@ namespace EnjoyFishing
                 this.Cursor = Cursors.WaitCursor;
                 logger.Output(LogLevelKind.DEBUG, "釣った魚情報の更新");
                 DataTable tbl = new DataTable();
-                tbl.Columns.Add("No", typeof(string));
+                tbl.Columns.Add("No", typeof(int));
                 tbl.Columns.Add("Caught", typeof(string));
                 tbl.Columns.Add("FishName", typeof(string));
                 int no = 0;
@@ -3242,9 +3236,5 @@ namespace EnjoyFishing
             }
         }
         #endregion
-
-
-
-
     }
 }
