@@ -20,13 +20,13 @@ namespace EnjoyFishing
         private const string DUMMY_PLAYER_NAME = "DUMMY";
         private const string PATH_TEMP = "Temp";
         private const string URL_API_CHECK_VERSION = SERVER_NAME + "/api/enjoyfishing/checkversion";
+        private const string URL_API_ENABLE_NAME = SERVER_NAME + "/api/enjoyfishing/enablename";
         private const string URL_API_STATUS = SERVER_NAME + "/api/enjoyfishing/status";
         private const string URL_API_ROD = SERVER_NAME + "/api/enjoyfishing/rod";
         private const string URL_API_UPLOAD_HISTORY = SERVER_NAME + "/api/enjoyfishing/uploadhistory";
 
         private Settings settings;
         private LoggerTool logger;
-        private Thread thUpdateDB;
         private FishDB fishDB;
         private FishHistoryDB historyDB;
  
@@ -62,6 +62,34 @@ namespace EnjoyFishing
             e.Bold = iBold;
             //イベントの発生
             OnReceiveMessage(e);
+        }
+        #endregion
+        #region NewerVersion
+        /// <summary>
+        /// NewerVersionイベントで返されるデータ
+        /// </summary>
+        public class NewerVersionEventArgs : EventArgs
+        {
+            public string Message;
+            public string Url;
+        }
+        public delegate void NewerVersionEventHandler(object sender, NewerVersionEventArgs e);
+        public event NewerVersionEventHandler NewerVersion;
+        protected virtual void OnNewerVersion(NewerVersionEventArgs e)
+        {
+            if (NewerVersion != null)
+            {
+                NewerVersion(this, e);
+            }
+        }
+        private void EventNewerVersion(string iMessage, string iUrl)
+        {
+            //返すデータの設定
+            NewerVersionEventArgs e = new NewerVersionEventArgs();
+            e.Message = iMessage;
+            e.Url = iUrl;
+            //イベントの発生
+            OnNewerVersion(e);
         }
         #endregion
         #endregion
@@ -107,9 +135,22 @@ namespace EnjoyFishing
             var resCheckVersion = (UpdateDBApiCheckVersionModel)seriApiCheckVersion.Deserialize(msApiCheckVersion);
             if (resCheckVersion.Result.Success == "true")
             {
-                if (resCheckVersion.NewVersionExists != "true")
+                //有効バージョンか？
+                if (resCheckVersion.VersionEnable == "true")
                 {
-                    EventReceiveMessage(resCheckVersion.Message);
+                    //新しいバージョンがリリースされているか？
+                    if (resCheckVersion.NewVersionExists != "true")
+                    {
+                        //最新バージョンを使用
+                        EventReceiveMessage(resCheckVersion.Message);
+                    }
+                    else
+                    {
+                        //新しいバージョンがある
+                        EventReceiveMessage(resCheckVersion.Message, 0xFFFF0000);
+                        //イベント発生
+                        EventNewerVersion(resCheckVersion.Message, resCheckVersion.NewVersionUrl);
+                    }
                 }
                 else
                 {
@@ -122,6 +163,31 @@ namespace EnjoyFishing
                 EventReceiveMessage(resCheckVersion.Result.Message, 0xFFFF0000);
                 return false;
             }
+            //有効名称データの取得
+            EventReceiveMessage("== チェック用データを取得  ==", 0xFFFFFFFF, true);
+            //有効名称データの受信
+            response = string.Empty;
+            httpRet = Http(URL_API_ENABLE_NAME, out response);
+            UpdateDBApiEnableNameModel enablename = new UpdateDBApiEnableNameModel();
+            if (httpRet)
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(UpdateDBApiEnableNameModel));
+                MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(response));
+                enablename = (UpdateDBApiEnableNameModel)serializer.Deserialize(ms);
+                if (enablename.Result.Success != "true")
+                {
+                    //イベント発生
+                    EventReceiveMessage(string.Format("{0}", enablename.Result.Message), 0xFFFF0000);
+                    return false;
+                }
+            }
+            else
+            {
+                //イベント発生
+                EventReceiveMessage(string.Format("{0}", response), 0xFFFF0000);
+                return false;
+            }
+            
             //履歴データの送信
             EventReceiveMessage("== 履歴データの送信 ==", 0xFFFFFFFF, true);
             string[] xmlFileNames = Directory.GetFiles(FishHistoryDB.PATH_FISHHISTORYDB);
@@ -137,9 +203,34 @@ namespace EnjoyFishing
                     FishHistoryDBModel history = historyDB.GetHistoryDB(playerName, ymd);
                     if (!history.Uploaded)
                     {
-                        //XMLからプレイヤー情報を消去し、一時ディレクトリにXMLファイルを保存
+                        //XMLからプレイヤー情報を消去する
                         history = historyDB.GetHistoryDB(playerName, ymd);
                         history.PlayerName = DUMMY_PLAYER_NAME;
+                        //名称チェック 魚
+                        var uploadFishes = new List<FishHistoryDBFishModel>();
+                        foreach (var fish in history.Fishes)
+                        {
+                            if (enablename.Rods.Contains(new UpdateDBApiEnableNameRodModel(fish.RodName)) &&
+                                (fish.FishName.Length == 0 | enablename.Fishes.Contains(new UpdateDBApiEnableNameFishModel(fish.FishName))) &&
+                                enablename.Zones.Contains(new UpdateDBApiEnableNameZoneModel(fish.ZoneName)) &&
+                                enablename.Baits.Contains(new UpdateDBApiEnableNameBaitModel(fish.BaitName)))
+                            {
+                                uploadFishes.Add(fish);
+                            }
+                        }
+                        history.Fishes = uploadFishes;
+                        //名称チェック ハラキリ
+                        var uploadHarakiri = new List<FishHistoryDBHarakiriModel>();
+                        foreach (var harakiri in history.Harakiri)
+                        {
+                            if (enablename.Fishes.Contains(new UpdateDBApiEnableNameFishModel(harakiri.FishName)) &&
+                                (harakiri.ItemName.Length == 0 | enablename.HarakiriItems.Contains(new UpdateDBApiEnableNameHarakiriItemModel(harakiri.ItemName))))
+                            {
+                                uploadHarakiri.Add(harakiri);
+                            }
+                        }
+                        history.Harakiri = uploadHarakiri;
+                        //一時ディレクトリにXMLファイルを保存
                         historyDB.PutHistoryDB(DUMMY_PLAYER_NAME, history, PATH_TEMP);
                         //ファイルアップロード
                         string uploadFileName = historyDB.GetXmlName(DUMMY_PLAYER_NAME, ymd, PATH_TEMP);
@@ -263,6 +354,7 @@ namespace EnjoyFishing
             {
                 //イベント発生
                 EventReceiveMessage(string.Format("{0}", response), 0xFFFF0000);
+                return false;
             }
 
             //最終更新日の設定
@@ -416,14 +508,155 @@ namespace EnjoyFishing
     [XmlRoot("Response")]
     public class UpdateDBApiCheckVersionModel
     {
+        public string VersionEnable { get; set; }
         public string NewVersionExists { get; set; }
+        public string NewVersionUrl { get; set; }
         public string Message { get; set; }
         public UpdateDBApiResultModel Result { get; set; }
         public UpdateDBApiCheckVersionModel()
         {
             this.NewVersionExists = string.Empty;
+            this.NewVersionUrl = string.Empty;
             this.Message = string.Empty;
             this.Result = new UpdateDBApiResultModel();
+        }
+    }
+    /// <summary>
+    /// API EnableName レスポンス
+    /// </summary>
+    [XmlRoot("Response")]
+    public class UpdateDBApiEnableNameModel
+    {
+        [XmlArray("Rods")]
+        [XmlArrayItem("Rod")]
+        public List<UpdateDBApiEnableNameRodModel> Rods { get; set; }
+        [XmlArray("Fishes")]
+        [XmlArrayItem("Fish")]
+        public List<UpdateDBApiEnableNameFishModel> Fishes { get; set; }
+        [XmlArray("Zones")]
+        [XmlArrayItem("Zone")]
+        public List<UpdateDBApiEnableNameZoneModel> Zones { get; set; }
+        [XmlArray("Baits")]
+        [XmlArrayItem("Bait")]
+        public List<UpdateDBApiEnableNameBaitModel> Baits { get; set; }
+        [XmlArray("HarakiriItems")]
+        [XmlArrayItem("HarakiriItem")]
+        public List<UpdateDBApiEnableNameHarakiriItemModel> HarakiriItems { get; set; }
+        public UpdateDBApiResultModel Result { get; set; }
+        public UpdateDBApiEnableNameModel()
+        {
+            this.Rods = new List<UpdateDBApiEnableNameRodModel>();
+            this.Fishes = new List<UpdateDBApiEnableNameFishModel>();
+            this.Zones = new List<UpdateDBApiEnableNameZoneModel>();
+            this.Baits = new List<UpdateDBApiEnableNameBaitModel>();
+            this.HarakiriItems = new List<UpdateDBApiEnableNameHarakiriItemModel>();
+            this.Result = new UpdateDBApiResultModel();
+        }
+    }
+    public class UpdateDBApiEnableNameRodModel : IEquatable<UpdateDBApiEnableNameRodModel>
+    {
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+        public UpdateDBApiEnableNameRodModel(): this(string.Empty)
+        {
+        }
+        public UpdateDBApiEnableNameRodModel(string iName)
+        {
+            this.Name = iName;
+        }
+        public override string ToString()
+        {
+            return this.Name;
+        }
+        bool IEquatable<UpdateDBApiEnableNameRodModel>.Equals(UpdateDBApiEnableNameRodModel other)
+        {
+            if (other == null) return false;
+            return (this.Name == other.Name);
+        }
+
+    }
+    public class UpdateDBApiEnableNameFishModel : IEquatable<UpdateDBApiEnableNameFishModel>
+    {
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+        public UpdateDBApiEnableNameFishModel(): this(string.Empty)
+        {
+        }
+        public UpdateDBApiEnableNameFishModel(string iName)
+        {
+            this.Name = iName;
+        }
+        public override string ToString()
+        {
+            return this.Name;
+        }
+        bool IEquatable<UpdateDBApiEnableNameFishModel>.Equals(UpdateDBApiEnableNameFishModel other)
+        {
+            if (other == null) return false;
+            return (this.Name == other.Name);
+        }
+    }
+    public class UpdateDBApiEnableNameBaitModel : IEquatable<UpdateDBApiEnableNameBaitModel>
+    {
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+        public UpdateDBApiEnableNameBaitModel(): this(string.Empty)
+        {
+        }
+        public UpdateDBApiEnableNameBaitModel(string iName)
+        {
+            this.Name = iName;
+        }
+        public override string ToString()
+        {
+            return this.Name;
+        }
+        bool IEquatable<UpdateDBApiEnableNameBaitModel>.Equals(UpdateDBApiEnableNameBaitModel other)
+        {
+            if (other == null) return false;
+            return (this.Name == other.Name);
+        }
+    }
+    public class UpdateDBApiEnableNameZoneModel : IEquatable<UpdateDBApiEnableNameZoneModel>
+    {
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+        public UpdateDBApiEnableNameZoneModel(): this(string.Empty)
+        {
+        }
+        public UpdateDBApiEnableNameZoneModel(string iName)
+        {
+            this.Name = iName;
+        }
+        public override string ToString()
+        {
+            return this.Name;
+        }
+        bool IEquatable<UpdateDBApiEnableNameZoneModel>.Equals(UpdateDBApiEnableNameZoneModel other)
+        {
+            if (other == null) return false;
+            return (this.Name == other.Name);
+        }
+    }
+    public class UpdateDBApiEnableNameHarakiriItemModel : IEquatable<UpdateDBApiEnableNameHarakiriItemModel>
+    {
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+        public UpdateDBApiEnableNameHarakiriItemModel(): this(string.Empty)
+        {
+        }
+        public UpdateDBApiEnableNameHarakiriItemModel(string iName)
+        {
+            this.Name = iName;
+        }
+        public override string ToString()
+        {
+            return this.Name;
+        }
+        bool IEquatable<UpdateDBApiEnableNameHarakiriItemModel>.Equals(UpdateDBApiEnableNameHarakiriItemModel other)
+        {
+            if (other == null) return false;
+            return (this.Name == other.Name);
         }
     }
     /// <summary>

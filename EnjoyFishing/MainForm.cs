@@ -179,6 +179,7 @@ namespace EnjoyFishing
         delegate void HarakiriTool_ChangeStatusDelegate(object sender, HarakiriTool.ChangeStatusEventArgs e);
         delegate void HarakiriTool_ChangeMessageDelegate(object sender, HarakiriTool.ChangeMessageEventArgs e);
         delegate void UpdateDBTool_ReceiveMessageDelegate(object sender, UpdateDBTool.ReceiveMessageEventArgs e);
+        delegate void UpdateDBTool_NewerVersionDelegate(object sender, UpdateDBTool.NewerVersionEventArgs e);
         delegate void SaveSettingsDelegate();
         delegate void LockControlDelegate(bool iLock);
         delegate void ThreadHarakiriDelegate();
@@ -295,6 +296,7 @@ namespace EnjoyFishing
             //DB更新
             updatedb = new UpdateDBTool(settings, logger);
             updatedb.ReceiveMessage += new UpdateDBTool.ReceiveMessageEventHandler(this.UpdateDBTool_ReceiveMessage);
+            updatedb.NewerVersion += new UpdateDBTool.NewerVersionEventHandler(this.UpdateDBTool_NewerVersion);
         }
         #endregion
 
@@ -337,7 +339,7 @@ namespace EnjoyFishing
             {
                 SystemSounds.Asterisk.Play();
                 string message = "ネットワーク接続を有効にしますか？\nネットワーク接続を有効にすると、釣りの履歴データがサーバーへアップロードされ、\n最新の魚情報を取得する事ができます。\n\nキャラクターを特定するような情報は全て削除されてアップロードされます。";
-                DialogResult ret = MessageBox.Show(message, "EnjoyFishing ネットワーク接続の確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult ret = MessageBox.Show(message, MiscTool.GetAppTitle() + " ネットワーク接続の確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 settings.Global.UpdateDB.Enable = (ret == DialogResult.Yes);
                 settings.Global.UpdateDB.LastUpdate = "2000/01/01 00:00:00";
                 chkUpdateDBEnable.Checked = settings.Global.UpdateDB.Enable;
@@ -3233,6 +3235,38 @@ namespace EnjoyFishing
                 txtUpdateDBLog.SelectedText = e.Message;
                 //最終行へスクロール
                 txtUpdateDBLog.ScrollToCaret();
+            }
+        }
+        /// <summary>
+        /// UpdateDBTool NewerVersionイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateDBTool_NewerVersion(object sender, UpdateDBTool.NewerVersionEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new UpdateDBTool_NewerVersionDelegate(UpdateDBTool_NewerVersion), sender, e);
+            }
+            else
+            {
+                new Thread(new ParameterizedThreadStart(this.threadNewerVersion))
+                {
+                    IsBackground = true
+                }.Start(e.Url);
+            }
+        }
+        /// <summary>
+        /// UpdateDBTool NewerVersionメインスレッド
+        /// </summary>
+        /// <param name="iUrl"></param>
+        private void threadNewerVersion(object iUrl)
+        {
+            string url = (string)iUrl;
+            DialogResult res = MessageBox.Show("新しいバージョンがリリースされています。\nダウンロードページを表示しますか？", MiscTool.GetAppTitle() + " 新バージョンのリリース", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (res == DialogResult.Yes)
+            {
+                System.Diagnostics.Process.Start(url);
             }
         }
         #endregion
