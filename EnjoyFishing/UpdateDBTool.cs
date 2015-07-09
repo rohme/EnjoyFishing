@@ -15,20 +15,19 @@ namespace EnjoyFishing
 {
     public class UpdateDBTool
     {
-        public const string SERVER_NAME = "http://ff11.rohme.net";
-
         private const string DUMMY_PLAYER_NAME = "DUMMY";
         private const string PATH_TEMP = "Temp";
-        private const string URL_API_CHECK_VERSION = SERVER_NAME + "/api/enjoyfishing/checkversion";
-        private const string URL_API_ENABLE_NAME = SERVER_NAME + "/api/enjoyfishing/enablename";
-        private const string URL_API_STATUS = SERVER_NAME + "/api/enjoyfishing/status";
-        private const string URL_API_ROD = SERVER_NAME + "/api/enjoyfishing/rod";
-        private const string URL_API_UPLOAD_HISTORY = SERVER_NAME + "/api/enjoyfishing/uploadhistory";
+        private const string URL_API_CHECK_VERSION = "/api/enjoyfishing/checkversion";
+        private const string URL_API_ENABLE_NAME = "/api/enjoyfishing/enablename";
+        private const string URL_API_STATUS = "/api/enjoyfishing/status";
+        private const string URL_API_ROD =  "/api/enjoyfishing/rod";
+        private const string URL_API_UPLOAD_HISTORY = "/api/enjoyfishing/uploadhistory";
 
         private Settings settings;
         private LoggerTool logger;
         private FishDB fishDB;
         private FishHistoryDB historyDB;
+        private string serverName = string.Empty;
  
         #region メンバ
         #endregion
@@ -106,6 +105,8 @@ namespace EnjoyFishing
             logger = iLogger;
             fishDB = new FishDB(logger);
             historyDB = new FishHistoryDB(DUMMY_PLAYER_NAME, DateTime.Today, logger);
+
+            serverName = "http://" + settings.Global.UpdateDB.ServerName;
         }
         #endregion
 
@@ -124,7 +125,7 @@ namespace EnjoyFishing
             NameValueCollection postCheckVersion = new NameValueCollection();
             postCheckVersion.Add("version", MiscTool.GetAppVersion());
             string responseCheckVersion = string.Empty;
-            bool retCheckVersion = HttpPost(URL_API_CHECK_VERSION, postCheckVersion, out responseCheckVersion);
+            bool retCheckVersion = HttpPost(serverName + URL_API_CHECK_VERSION, postCheckVersion, out responseCheckVersion);
             if (!retCheckVersion)
             {
                 EventReceiveMessage(responseCheckVersion, 0xFFFF0000);
@@ -164,10 +165,10 @@ namespace EnjoyFishing
                 return false;
             }
             //有効名称データの取得
-            EventReceiveMessage("== チェック用データを取得  ==", 0xFFFFFFFF, true);
+            EventReceiveMessage("== チェックデータを取得  ==", 0xFFFFFFFF, true);
             //有効名称データの受信
             response = string.Empty;
-            httpRet = Http(URL_API_ENABLE_NAME, out response);
+            httpRet = Http(serverName + URL_API_ENABLE_NAME, out response);
             UpdateDBApiEnableNameModel enablename = new UpdateDBApiEnableNameModel();
             if (httpRet)
             {
@@ -249,7 +250,7 @@ namespace EnjoyFishing
                         EventReceiveMessage(string.Format("{0}をアップロード", filename));
                         NameValueCollection nvc = new NameValueCollection();
                         response = string.Empty;
-                        httpRet = HttpUploadFile(URL_API_UPLOAD_HISTORY, uploadFileName, "upfile", "application/xml", nvc, out response);
+                        httpRet = HttpUploadFile(serverName + URL_API_UPLOAD_HISTORY, uploadFileName, "upfile", "application/xml", nvc, out response);
                         logger.Output(LogLevelKind.DEBUG, string.Format("Response:\r{0}", response));
                         if (httpRet)
                         {
@@ -287,7 +288,7 @@ namespace EnjoyFishing
             EventReceiveMessage("== 魚情報を取得  ==", 0xFFFFFFFF, true);
             //ステータスの受信
             response = string.Empty;
-            httpRet = Http(URL_API_STATUS, out response);
+            httpRet = Http(serverName + URL_API_STATUS, out response);
             UpdateDBApiStatusModel status = new UpdateDBApiStatusModel();
             if (httpRet)
             {
@@ -303,7 +304,7 @@ namespace EnjoyFishing
                         {
                             //竿魚情報取得
                             EventReceiveMessage(string.Format("{0}のダウンロード", rod.RodName));
-                            string url = URL_API_ROD + "/" + WebUtility.HtmlEncode(rod.RodName);
+                            string url = serverName + URL_API_ROD + "/" + WebUtility.HtmlEncode(rod.RodName);
                             string response2 = string.Empty;
                             logger.Output(LogLevelKind.DEBUG, string.Format("HTTP:{0}", url));
                             bool httpRet2 = Http(url, out response2);

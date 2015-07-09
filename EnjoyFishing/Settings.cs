@@ -307,11 +307,13 @@ namespace EnjoyFishing
         public bool Enable { get; set; }
         public bool AutoUpdate { get; set; }
         public string LastUpdate { get; set; }
+        public string ServerName { get; set; }
         public SettingsGlobalUpdateDBModel()
         {
             this.Enable = true;
             this.AutoUpdate = true;
             this.LastUpdate = string.Empty;
+            this.ServerName = "ff11.rohme.net";
         }
     }
     public class SettingsPlayerModel

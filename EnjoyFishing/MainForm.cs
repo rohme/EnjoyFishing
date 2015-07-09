@@ -1528,7 +1528,7 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void lblUpdateDBUrl_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(UpdateDBTool.SERVER_NAME);
+            System.Diagnostics.Process.Start("http://" + settings.Global.UpdateDB.ServerName);
         }
         #endregion
 
