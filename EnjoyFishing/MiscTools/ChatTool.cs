@@ -11,12 +11,17 @@ namespace MiscTools
     {
         private const int MAX_CHATLINE_INDEX = 100;//保持するチャット行数
         private const int CHAT_INTERVAL = 100;//チャット取得インターバル
+        private const string REGEX_EMINENCE1 = "エミネンス・レコード：『(.*)』……";
+        private const string REGEX_EMINENCE2 = "進行度：([0-9]*)/([0-9]*)";
 
         private List<FFACE.ChatTools.ChatLine> chatLines = new List<FFACE.ChatTools.ChatLine>();
         private int maxIndex = 0;
         private int currentIndex = 0;
         private Thread thChat;
         private FFACE fface;
+        private string lastIndex = ""; //一行目か判定用
+        private ChatMode lastype = ChatMode.Generic; //一行目か判定用
+        private int lastEminenceIndex = -1;
 
         #region コンストラクタ
         public ChatTool(FFACE iFFACE)
@@ -187,7 +192,6 @@ namespace MiscTools
             try
             {
                 int currChatLineIndex = 0;
-                string lastIndex = "";
                 if (fface != null && fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
                 {
                     if (fface.Chat.IsNewLine)
@@ -210,16 +214,36 @@ namespace MiscTools
                             }
                             //チャットが複数行に渡ってある場合、一行にまとめる処理
                             string[] stArrayData = cl.RawString[12].Split(',');
-                            if (cl.RawString[4] != lastIndex)//1行目か否か
+                            if (cl.RawString[4] != lastIndex || cl.Type != lastype) //1行目か否か
                             {
-                                chatLines.Add(cl);
-                                currChatLineIndex = chatLines.Count - 1;
+                                //エミネンス
+                                if (lastEminenceIndex > 0)
+                                {
+                                    if (MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
+                                    {
+                                        chatLines[lastEminenceIndex].Text = chatLines[lastEminenceIndex].Text + cl.Text;
+                                    }
+                                }
+                                else
+                                {
+                                    chatLines.Add(cl);
+                                    currChatLineIndex = chatLines.Count - 1;
+                                }
+                                if (MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE1))
+                                {
+                                    lastEminenceIndex = currChatLineIndex;
+                                }
+                                else
+                                {
+                                    lastEminenceIndex = -1;
+                                }
                             }
                             else
                             {
                                 chatLines[currChatLineIndex].Text = chatLines[currChatLineIndex].Text + cl.Text;
                             }
                             lastIndex = cl.RawString[4];
+                            lastype = cl.Type;
                             maxIndex = cl.Index;
                             cl = fface.Chat.GetNextLine();
                         }

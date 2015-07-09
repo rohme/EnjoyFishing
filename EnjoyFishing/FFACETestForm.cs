@@ -151,7 +151,8 @@ namespace EnjoyFishing
                     gridChat.Rows[gridChat.Rows.Count - 1].Cells[1].Value = cl.NowDate.ToString("hh:mm:ss");
                     gridChat.Rows[gridChat.Rows.Count - 1].Cells[2].Value = cl.Type;
                     gridChat.Rows[gridChat.Rows.Count - 1].Cells[3].Value = cl.RawString[4];
-                    gridChat.Rows[gridChat.Rows.Count - 1].Cells[4].Value = cl.Text;
+                    gridChat.Rows[gridChat.Rows.Count - 1].Cells[4].Value = cl.RawString[5];
+                    gridChat.Rows[gridChat.Rows.Count - 1].Cells[5].Value = cl.Text;
                     cl = fface.Chat.GetNextLine();
                     gridChat.FirstDisplayedScrollingRowIndex = gridChat.RowCount-1;
                 }

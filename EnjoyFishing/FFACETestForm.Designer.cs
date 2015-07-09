@@ -33,6 +33,7 @@
             this.timRefresh = new System.Windows.Forms.Timer(this.components);
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.label1 = new System.Windows.Forms.Label();
             this.chkTopMost = new System.Windows.Forms.CheckBox();
             this.lblPlayerName = new System.Windows.Forms.Label();
             this.lblProcID = new System.Windows.Forms.Label();
@@ -44,9 +45,9 @@
             this.ChatIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChatTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChatType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FirstLine = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Idx1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Idx2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChatText = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -105,6 +106,15 @@
             this.splitContainer2.Size = new System.Drawing.Size(497, 473);
             this.splitContainer2.SplitterDistance = 25;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(206, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 14);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "透過";
             // 
             // chkTopMost
             // 
@@ -196,7 +206,8 @@
             this.ChatIndex,
             this.ChatTime,
             this.ChatType,
-            this.FirstLine,
+            this.Idx1,
+            this.Idx2,
             this.ChatText});
             this.gridChat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridChat.Location = new System.Drawing.Point(0, 0);
@@ -236,14 +247,23 @@
             this.ChatType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.ChatType.Width = 38;
             // 
-            // FirstLine
+            // Idx1
             // 
-            this.FirstLine.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.FirstLine.HeaderText = "";
-            this.FirstLine.Name = "FirstLine";
-            this.FirstLine.ReadOnly = true;
-            this.FirstLine.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.FirstLine.Width = 5;
+            this.Idx1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Idx1.HeaderText = "Idx1";
+            this.Idx1.Name = "Idx1";
+            this.Idx1.ReadOnly = true;
+            this.Idx1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Idx1.Width = 37;
+            // 
+            // Idx2
+            // 
+            this.Idx2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Idx2.HeaderText = "Idx2";
+            this.Idx2.Name = "Idx2";
+            this.Idx2.ReadOnly = true;
+            this.Idx2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Idx2.Width = 37;
             // 
             // ChatText
             // 
@@ -253,15 +273,6 @@
             this.ChatText.ReadOnly = true;
             this.ChatText.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.ChatText.Width = 37;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(206, 5);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 14);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "透過";
             // 
             // FFACETestForm
             // 
@@ -304,12 +315,13 @@
         private System.Windows.Forms.DataGridView gridStatus;
         private System.Windows.Forms.DataGridViewTextBoxColumn function;
         private System.Windows.Forms.DataGridViewTextBoxColumn value;
+        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FirstLine;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Idx1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Idx2;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatText;
-        private System.Windows.Forms.Label label1;
 
     }
 }

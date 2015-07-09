@@ -210,10 +210,18 @@ namespace EnjoyFishing
                         var uploadFishes = new List<FishHistoryDBFishModel>();
                         foreach (var fish in history.Fishes)
                         {
-                            if (enablename.Rods.Contains(new UpdateDBApiEnableNameRodModel(fish.RodName)) &&
-                                (fish.FishName.Length == 0 | enablename.Fishes.Contains(new UpdateDBApiEnableNameFishModel(fish.FishName))) &&
-                                enablename.Zones.Contains(new UpdateDBApiEnableNameZoneModel(fish.ZoneName)) &&
-                                enablename.Baits.Contains(new UpdateDBApiEnableNameBaitModel(fish.BaitName)))
+                            if (fish.Result == FishResultStatusKind.Catch)
+                            {
+                                if (
+                                    enablename.Rods.Contains(new UpdateDBApiEnableNameRodModel(fish.RodName)) &&
+                                    (fish.FishName.Length == 0 | enablename.Fishes.Contains(new UpdateDBApiEnableNameFishModel(fish.FishName))) &&
+                                    enablename.Zones.Contains(new UpdateDBApiEnableNameZoneModel(fish.ZoneName)) &&
+                                    enablename.Baits.Contains(new UpdateDBApiEnableNameBaitModel(fish.BaitName)))
+                                {
+                                    uploadFishes.Add(fish);
+                                }
+                            }
+                            else
                             {
                                 uploadFishes.Add(fish);
                             }
