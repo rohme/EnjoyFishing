@@ -419,6 +419,7 @@ namespace EnjoyFishing
                 chkEntryPort.Checked = settings.Fishing.EntryPort;
                 chkEnemyAttackCmd.Checked = settings.Fishing.EnemyAttackCmd;
                 txtEnemyAttackCmdLine.Text = settings.Fishing.EnemyAttackCmdLine;
+                chkEminenceClear.Checked = settings.Fishing.EminenceClear;
                 //釣り設定・鞄いっぱい
                 chkInventoryFullSack.Checked = settings.Fishing.InventoryFullSack;
                 chkInventoryFullSatchel.Checked = settings.Fishing.InventoryFullSatchel;
@@ -2067,6 +2068,7 @@ namespace EnjoyFishing
                 settings.Fishing.EntryPort = chkEntryPort.Checked;
                 settings.Fishing.EnemyAttackCmd = chkEnemyAttackCmd.Checked;
                 settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
+                settings.Fishing.EminenceClear = chkEminenceClear.Checked;
                 //釣り設定・鞄いっぱい
                 settings.Fishing.InventoryFullSack = chkInventoryFullSack.Checked;
                 settings.Fishing.InventoryFullSatchel = chkInventoryFullSatchel.Checked;
@@ -2562,6 +2564,11 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.EnemyAttackCmdLine = txtEnemyAttackCmdLine.Text;
+        }
+        private void chkEminenceClear_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.EminenceClear = chkEminenceClear.Checked;
         }
         #endregion
         #region 釣り設定・鞄いっぱい

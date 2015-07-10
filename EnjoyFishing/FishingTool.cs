@@ -62,6 +62,8 @@ namespace EnjoyFishing
             {ChatKbnKind.UseItemSuccess1, "{0}は、(.*)を使用。(.*)"},
             {ChatKbnKind.UseItemSuccess2, "{0}が、(.*)を使用した。(.*)"},
             {ChatKbnKind.UseItemFailure, "（コマンドでエラーがあったようです…）"},
+            {ChatKbnKind.EminenceProgress, "エミネンス・レコード：『(.*)』……進行度：([0-9]*)/([0-9]*)"},
+            {ChatKbnKind.EminenceClear, "エミネンス・レコード：『(.*)』を達成しました。"},
         };
         #endregion
 
@@ -117,6 +119,8 @@ namespace EnjoyFishing
             UseItemSuccess1,
             UseItemSuccess2,
             UseItemFailure,
+            EminenceProgress,
+            EminenceClear,
         }
         public enum RunningStatusKind
         {
@@ -142,12 +146,14 @@ namespace EnjoyFishing
             public bool EnemyAttack;
             public bool SneakWarning;
             public bool ShipWarning;
-            public FishingInterrupt(bool iChatReceive, bool iEnemyAttack, bool iSneakWarning, bool iShipWarning)
+            public bool ClearEminence;
+            public FishingInterrupt(bool iChatReceive, bool iEnemyAttack, bool iSneakWarning, bool iShipWarning, bool iClearEminence)
             {
-                this.ChatReceive = false;
-                this.EnemyAttack = false;
-                this.SneakWarning = false;
-                this.ShipWarning = false;
+                this.ChatReceive = iChatReceive;
+                this.EnemyAttack = iEnemyAttack;
+                this.SneakWarning = iSneakWarning;
+                this.ShipWarning = iShipWarning;
+                this.ClearEminence = iClearEminence;
             }
         }
         #endregion
@@ -156,7 +162,6 @@ namespace EnjoyFishing
         private const int NPCID_KATSUNAGA = 37;
         private const string REGEX_FISHEDLIST_DIALOG = @"釣りあげた獲物の種類【([0-9]*)】\(ページ：([0-9]*)/([0-9]*)\)";
         private const string REGEX_FISHEDLIST_OPTIONS = "【(.*)】：{(.*)}";
-        
 
         private PolTool pol;
         private FFACE fface;
@@ -900,7 +905,7 @@ namespace EnjoyFishing
         private void threadFishing()
         {
             bool firstTime = true;
-            interrupt = new FishingInterrupt(false, false, false, false);
+            interrupt = new FishingInterrupt(false, false, false, false, false);
             noCatchCount = 0;
             lastRodName = string.Empty;
             lastBaitName = string.Empty;
@@ -925,6 +930,13 @@ namespace EnjoyFishing
                     this.TimeElapsed = history.TimeElapsed;
                 }
                 lastCastDate = DateTime.Now.Date;
+                //チャット処理
+                FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                while (chat.GetNextChatLine(out cl))
+                {
+                    List<string> chatKbnArgs = new List<string>();
+                    ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
+                }
                 //敵からの攻撃感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (interrupt.EnemyAttack)
@@ -951,8 +963,8 @@ namespace EnjoyFishing
                         setMessage(string.Format("チャット感知：再始動待ち {0}(地球時間)まで待機", restartTime.ToString("HH:mm:ss")));
                         wait(waitSec, waitSec);
                         //チャットバッファをクリア
-                        FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
-                        while (chat.GetNextChatLine(out cl))
+                        FFACE.ChatTools.ChatLine waitCl = new FFACE.ChatTools.ChatLine();
+                        while (chat.GetNextChatLine(out waitCl))
                         {
                             Thread.Sleep(10);
                         }
@@ -977,6 +989,18 @@ namespace EnjoyFishing
                         setRunningStatus(RunningStatusKind.Stop);
                         setFishingStatus(FishingStatusKind.Normal);
                         setMessage("入港するので停止");
+                        break;
+                    }
+                }
+                //エミネンスクリア
+                if (this.RunningStatus != RunningStatusKind.Running) break;
+                if (settings.Fishing.EminenceClear)
+                {
+                    if (interrupt.ClearEminence)
+                    {
+                        setRunningStatus(RunningStatusKind.Stop);
+                        setFishingStatus(FishingStatusKind.Normal);
+                        setMessage("エミネンスをクリアしたので停止");
                         break;
                     }
                 }
@@ -1830,14 +1854,17 @@ namespace EnjoyFishing
                 if (MiscTool.IsRegexString(iCl.Text, searchStr))
                 {
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
+                    //敵から攻撃受けた
                     if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2 || v.Key == ChatKbnKind.EnemyAttack3)
                     {
                         interrupt.EnemyAttack = true;
                     }
+                    //スニーク切れそう
                     if (v.Key == ChatKbnKind.SneakWarning1/* || v.Key == ChatKbnKind.SneakWarning2*/)
                     {
                         interrupt.SneakWarning = true;
                     }
+                    //入港
                     if (v.Key == ChatKbnKind.ShipWarning1 || v.Key == ChatKbnKind.ShipWarning2 ||
                         v.Key == ChatKbnKind.ShipWarning3 || v.Key == ChatKbnKind.ShipWarning4 ||
                         v.Key == ChatKbnKind.ShipWarning5 || v.Key == ChatKbnKind.ShipWarning6 ||
@@ -1846,6 +1873,15 @@ namespace EnjoyFishing
                     {
                         interrupt.ShipWarning = true;
                     }
+                    //エミネンスクリアー
+                    if (v.Key == ChatKbnKind.EminenceClear)
+                    {
+                        if (FishDB.Eminences.Contains(new EminenceDBEminenceModel(oArgs[0], true)))
+                        {
+                            interrupt.ClearEminence = true;
+                        }
+                    }
+                    //スキルアップ
                     if (v.Key == ChatKbnKind.SkillLvUp)
                     {
                         chatFishingSkill = int.Parse(oArgs[0]);

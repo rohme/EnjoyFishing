@@ -23,11 +23,14 @@ namespace EnjoyFishing
         public const string FILENAME_RODDB = "Rod.xml";
         public const string FILENAME_BAITDB = "Bait.xml";
         public const string FILENAME_GEARDB = "Gear.xml";
+        public const string FILENAME_EMINENCEDB = "Eminence.xml";
         private const string VERSION = "1.1.0";
 
         private LoggerTool logger;
         private List<string> _Rods = new List<string>();
         private List<string> _Baits = new List<string>();
+        private List<GearDBGearModel> _Gears = new List<GearDBGearModel>();
+        private List<EminenceDBEminenceModel> _Eminences = new List<EminenceDBEminenceModel>();
 
         #region コンストラクタ
         /// <summary>
@@ -45,12 +48,16 @@ namespace EnjoyFishing
             {
                 this._Baits.Add(bait.BaitName);
             }
+            _Gears = SelectGear();
+            _Eminences = SelectEminence();
         }
         #endregion
 
         #region メンバ
         public List<string> Rods { get { return _Rods; } }
         public List<string> Baits { get { return _Baits; } }
+        public List<GearDBGearModel> Gears { get { return _Gears; } }
+        public List<EminenceDBEminenceModel> Eminences { get { return _Eminences; } }
         #endregion
         
         #region FishDB
@@ -651,6 +658,61 @@ namespace EnjoyFishing
                 fs.Close();
             }
             return gearDB;
+        }
+        #endregion
+
+        #region EminenceDB
+        /// <summary>
+        /// エミネンスを取得する（引数無し）
+        /// </summary>
+        /// <returns>装備の一覧</returns>
+        public List<EminenceDBEminenceModel> SelectEminence()
+        {
+            return SelectEminence(string.Empty);
+        }
+        /// <summary>
+        /// エミネンスを取得する
+        /// </summary>
+        /// <param name="iSearchString">エミネンス名</param>
+        /// <returns>装備の一覧</returns>
+        public List<EminenceDBEminenceModel> SelectEminence(string iSearchString)
+        {
+            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
+            List<EminenceDBEminenceModel> ret = new List<EminenceDBEminenceModel>();
+            EminenceDBModel eminenceDB = getEminenceDB();
+            if (iSearchString == string.Empty)
+            {
+                ret = eminenceDB.Eminences;
+            }
+            else
+            {
+                foreach (EminenceDBEminenceModel eminences in eminenceDB.Eminences)
+                {
+                    if (MiscTool.IsRegexString(eminences.EminenceName, iSearchString))
+                    {
+                        ret.Add(eminences);
+                    }
+                }
+            }
+            logger.VarDump(ret);
+            return ret;
+        }
+        /// <summary>
+        /// Eminence.xmlの内容を全て取得する
+        /// </summary>
+        /// <returns>GearDBModel</returns>
+        private EminenceDBModel getEminenceDB()
+        {
+            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_EMINENCEDB;
+            EminenceDBModel eminenceDB = new EminenceDBModel();
+            if (File.Exists(xmlFilename))
+            {
+                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
+                XmlSerializer serializer = new XmlSerializer(typeof(EminenceDBModel));
+                eminenceDB = (EminenceDBModel)serializer.Deserialize(fs);
+                fs.Close();
+            }
+            return eminenceDB;
         }
         #endregion
 

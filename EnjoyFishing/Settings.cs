@@ -110,7 +110,9 @@ namespace EnjoyFishing
                 }
             }
             //メンバに設定
+            //Global
             this.Global = xmlSettings.Global;
+            //Player
             bool foundFlg = false;
             if (this.Global.SaveMode == SaveModeKind.Shared)
             {
@@ -299,7 +301,6 @@ namespace EnjoyFishing
             this.WaitEquip = 1000;
             this.SaveMode = Settings.SaveModeKind.Shared;
             this.UpdateDB = new SettingsGlobalUpdateDBModel();
-
         }
     }
     public class SettingsGlobalUpdateDBModel
@@ -457,6 +458,7 @@ namespace EnjoyFishing
     }
     public class SettingsPlayerFishingModel
     {
+        //動作
         public bool Learning { get; set; }
         public bool SneakFishing { get; set; }
         public float SneakFishingRemain { get; set; }
@@ -481,6 +483,7 @@ namespace EnjoyFishing
         public int EarthTimeTo { get; set; }
         public bool RepairRod { get; set; }
         public bool WaitTimeout { get; set; }
+        //停止条件
         public bool MaxCatch { get; set; }
         public int MaxCatchCount { get; set; }
         public bool MaxNoCatch { get; set; }
@@ -498,16 +501,20 @@ namespace EnjoyFishing
         public bool EntryPort { get; set; }
         public bool EnemyAttackCmd { get; set; }
         public string EnemyAttackCmdLine { get; set; }
+        public bool EminenceClear { get; set; }
+        //鞄いっぱい
         public bool InventoryFullSack { get; set; }
         public bool InventoryFullSatchel { get; set; }
         public bool InventoryFullCase { get; set; }
         public bool InventoryFullCmd { get; set; }
         public string InventoryFullCmdLine { get; set; }
+        //竿・エサ
         public bool NoBaitNoRodSack { get; set; }
         public bool NoBaitNoRodSatchel { get; set; }
         public bool NoBaitNoRodCase { get; set; }
         public bool NoBaitNoRodCmd { get; set; }
         public string NoBaitNoRodCmdLine { get; set; }
+        //装備
         public bool EquipEnable { get; set; }
         public string EquipRod { get; set; }
         public string EquipBait { get; set; }
@@ -530,6 +537,7 @@ namespace EnjoyFishing
         public bool UseRingRight { get; set; }
         public SettingsPlayerFishingModel()
         {
+            //動作
             this.Learning = true;
             this.SneakFishing = false;
             this.SneakFishingRemain = 1.0F;
@@ -554,6 +562,7 @@ namespace EnjoyFishing
             this.EarthTimeTo = 6;
             this.RepairRod = false;
             this.WaitTimeout = false;
+            //停止条件
             this.MaxCatch = false;
             this.MaxCatchCount = 200;
             this.MaxNoCatch = true;
@@ -571,16 +580,20 @@ namespace EnjoyFishing
             this.EntryPort = true;
             this.EnemyAttackCmd = false;
             this.EnemyAttackCmdLine = "/ma デジョン <me>";
+            this.EminenceClear = false;
+            //鞄いっぱい
             this.InventoryFullSack = true;
             this.InventoryFullSatchel = true;
             this.InventoryFullCase = true;
             this.InventoryFullCmd = false;
             this.InventoryFullCmdLine = "/ma デジョン <me>";
+            //竿・エサ
             this.NoBaitNoRodSack = true;
             this.NoBaitNoRodSatchel = true;
             this.NoBaitNoRodCase = true;
             this.NoBaitNoRodCmd = false;
             this.NoBaitNoRodCmdLine = "/ma デジョン <me>";
+            //装備
             this.EquipEnable = false;
             this.EquipRod = string.Empty;
             this.EquipBait = string.Empty;

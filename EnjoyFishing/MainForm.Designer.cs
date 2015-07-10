@@ -47,6 +47,7 @@
             this.chkIgnoreSmallFish = new System.Windows.Forms.CheckBox();
             this.chkIgnoreLargeFish = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkEminenceClear = new System.Windows.Forms.CheckBox();
             this.txtEnemyAttackCmdLine = new System.Windows.Forms.TextBox();
             this.chkEnemyAttackCmd = new System.Windows.Forms.CheckBox();
             this.txtChatRestartMinute = new System.Windows.Forms.NumericUpDown();
@@ -350,7 +351,7 @@
             this.statusStrip.Location = new System.Drawing.Point(0, 365);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.ShowItemToolTips = true;
-            this.statusStrip.Size = new System.Drawing.Size(561, 22);
+            this.statusStrip.Size = new System.Drawing.Size(569, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -388,7 +389,7 @@
             // lblMessage
             // 
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(91, 17);
+            this.lblMessage.Size = new System.Drawing.Size(99, 17);
             this.lblMessage.Spring = true;
             this.lblMessage.Text = "メッセージ";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -457,6 +458,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkEminenceClear);
             this.groupBox1.Controls.Add(this.txtEnemyAttackCmdLine);
             this.groupBox1.Controls.Add(this.chkEnemyAttackCmd);
             this.groupBox1.Controls.Add(this.txtChatRestartMinute);
@@ -483,11 +485,23 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "停止条件";
             // 
+            // chkEminenceClear
+            // 
+            this.chkEminenceClear.AutoSize = true;
+            this.chkEminenceClear.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkEminenceClear.Location = new System.Drawing.Point(92, 70);
+            this.chkEminenceClear.Name = "chkEminenceClear";
+            this.chkEminenceClear.Size = new System.Drawing.Size(88, 18);
+            this.chkEminenceClear.TabIndex = 15;
+            this.chkEminenceClear.Text = "エミネンスクリア";
+            this.chkEminenceClear.UseVisualStyleBackColor = true;
+            this.chkEminenceClear.CheckedChanged += new System.EventHandler(this.chkEminenceClear_CheckedChanged);
+            // 
             // txtEnemyAttackCmdLine
             // 
             this.txtEnemyAttackCmdLine.AcceptsReturn = true;
             this.txtEnemyAttackCmdLine.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtEnemyAttackCmdLine.Location = new System.Drawing.Point(163, 68);
+            this.txtEnemyAttackCmdLine.Location = new System.Drawing.Point(251, 68);
             this.txtEnemyAttackCmdLine.Name = "txtEnemyAttackCmdLine";
             this.txtEnemyAttackCmdLine.Size = new System.Drawing.Size(124, 21);
             this.txtEnemyAttackCmdLine.TabIndex = 17;
@@ -497,10 +511,10 @@
             // 
             this.chkEnemyAttackCmd.AutoSize = true;
             this.chkEnemyAttackCmd.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkEnemyAttackCmd.Location = new System.Drawing.Point(92, 70);
+            this.chkEnemyAttackCmd.Location = new System.Drawing.Point(180, 70);
             this.chkEnemyAttackCmd.Name = "chkEnemyAttackCmd";
             this.chkEnemyAttackCmd.Size = new System.Drawing.Size(77, 18);
-            this.chkEnemyAttackCmd.TabIndex = 15;
+            this.chkEnemyAttackCmd.TabIndex = 16;
             this.chkEnemyAttackCmd.Text = "攻撃受けた";
             this.chkEnemyAttackCmd.UseVisualStyleBackColor = true;
             this.chkEnemyAttackCmd.CheckedChanged += new System.EventHandler(this.chkEnemyAttack_CheckedChanged);
@@ -619,9 +633,9 @@
             this.label1.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label1.Location = new System.Drawing.Point(377, 47);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 14);
+            this.label1.Size = new System.Drawing.Size(18, 14);
             this.label1.TabIndex = 13;
-            this.label1.Text = "分後";
+            this.label1.Text = "分";
             // 
             // txtMaxCatchCount
             // 
@@ -1164,7 +1178,7 @@
             this.tabFishingMain.Name = "tabFishingMain";
             this.tabFishingMain.Padding = new System.Drawing.Point(0, 0);
             this.tabFishingMain.SelectedIndex = 0;
-            this.tabFishingMain.Size = new System.Drawing.Size(413, 332);
+            this.tabFishingMain.Size = new System.Drawing.Size(421, 332);
             this.tabFishingMain.TabIndex = 9;
             // 
             // tabFishingMainSetting
@@ -1176,7 +1190,7 @@
             this.tabFishingMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainSetting.Name = "tabFishingMainSetting";
             this.tabFishingMainSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainSetting.Size = new System.Drawing.Size(405, 305);
+            this.tabFishingMainSetting.Size = new System.Drawing.Size(413, 305);
             this.tabFishingMainSetting.TabIndex = 0;
             this.tabFishingMainSetting.Text = "釣り設定";
             this.tabFishingMainSetting.UseVisualStyleBackColor = true;
@@ -1383,7 +1397,7 @@
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipRod);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
-            this.tabFishingMainEquip.Size = new System.Drawing.Size(405, 305);
+            this.tabFishingMainEquip.Size = new System.Drawing.Size(413, 305);
             this.tabFishingMainEquip.TabIndex = 2;
             this.tabFishingMainEquip.Text = "装備";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
@@ -1782,7 +1796,7 @@
             this.tabFishingMainInfo.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainInfo.Name = "tabFishingMainInfo";
             this.tabFishingMainInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingMainInfo.Size = new System.Drawing.Size(405, 305);
+            this.tabFishingMainInfo.Size = new System.Drawing.Size(413, 305);
             this.tabFishingMainInfo.TabIndex = 1;
             this.tabFishingMainInfo.Text = "情報";
             this.tabFishingMainInfo.UseVisualStyleBackColor = true;
@@ -1918,7 +1932,7 @@
             this.gridFishingInfo.Location = new System.Drawing.Point(-1, 46);
             this.gridFishingInfo.Name = "gridFishingInfo";
             this.gridFishingInfo.RowTemplate.Height = 21;
-            this.gridFishingInfo.Size = new System.Drawing.Size(405, 259);
+            this.gridFishingInfo.Size = new System.Drawing.Size(413, 259);
             this.gridFishingInfo.TabIndex = 0;
             this.gridFishingInfo.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
@@ -2156,7 +2170,7 @@
             // splitMain.Panel2
             // 
             this.splitMain.Panel2.Controls.Add(this.tabFishingMain);
-            this.splitMain.Size = new System.Drawing.Size(547, 332);
+            this.splitMain.Size = new System.Drawing.Size(555, 332);
             this.splitMain.SplitterDistance = 130;
             this.splitMain.TabIndex = 8;
             // 
@@ -2257,7 +2271,7 @@
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(561, 365);
+            this.tabMain.Size = new System.Drawing.Size(569, 365);
             this.tabMain.TabIndex = 0;
             // 
             // tabMainFishing
@@ -2266,7 +2280,7 @@
             this.tabMainFishing.Location = new System.Drawing.Point(4, 23);
             this.tabMainFishing.Name = "tabMainFishing";
             this.tabMainFishing.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainFishing.Size = new System.Drawing.Size(553, 338);
+            this.tabMainFishing.Size = new System.Drawing.Size(561, 338);
             this.tabMainFishing.TabIndex = 0;
             this.tabMainFishing.Text = "釣り";
             this.tabMainFishing.UseVisualStyleBackColor = true;
@@ -2281,7 +2295,7 @@
             this.tabMainHistory.Location = new System.Drawing.Point(4, 23);
             this.tabMainHistory.Name = "tabMainHistory";
             this.tabMainHistory.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMainHistory.Size = new System.Drawing.Size(553, 338);
+            this.tabMainHistory.Size = new System.Drawing.Size(561, 338);
             this.tabMainHistory.TabIndex = 1;
             this.tabMainHistory.Text = "履歴";
             this.tabMainHistory.UseVisualStyleBackColor = true;
@@ -2364,7 +2378,7 @@
             this.tabMainHarakiri.Controls.Add(this.btnExecHarakiri);
             this.tabMainHarakiri.Location = new System.Drawing.Point(4, 23);
             this.tabMainHarakiri.Name = "tabMainHarakiri";
-            this.tabMainHarakiri.Size = new System.Drawing.Size(553, 338);
+            this.tabMainHarakiri.Size = new System.Drawing.Size(561, 338);
             this.tabMainHarakiri.TabIndex = 3;
             this.tabMainHarakiri.Text = "ハラキリ";
             this.tabMainHarakiri.UseVisualStyleBackColor = true;
@@ -2463,7 +2477,7 @@
             this.tabCaughtFishes.Controls.Add(this.gridCaughtFishes);
             this.tabCaughtFishes.Location = new System.Drawing.Point(4, 23);
             this.tabCaughtFishes.Name = "tabCaughtFishes";
-            this.tabCaughtFishes.Size = new System.Drawing.Size(553, 338);
+            this.tabCaughtFishes.Size = new System.Drawing.Size(561, 338);
             this.tabCaughtFishes.TabIndex = 5;
             this.tabCaughtFishes.Text = "釣った魚";
             this.tabCaughtFishes.UseVisualStyleBackColor = true;
@@ -2536,7 +2550,7 @@
             this.tabDB.Controls.Add(this.btnExecUpdateDB);
             this.tabDB.Location = new System.Drawing.Point(4, 23);
             this.tabDB.Name = "tabDB";
-            this.tabDB.Size = new System.Drawing.Size(553, 338);
+            this.tabDB.Size = new System.Drawing.Size(561, 338);
             this.tabDB.TabIndex = 4;
             this.tabDB.Text = "DB更新";
             this.tabDB.UseVisualStyleBackColor = true;
@@ -2633,7 +2647,7 @@
             this.tabMainSetting.Controls.Add(this.groupBox7);
             this.tabMainSetting.Location = new System.Drawing.Point(4, 23);
             this.tabMainSetting.Name = "tabMainSetting";
-            this.tabMainSetting.Size = new System.Drawing.Size(553, 338);
+            this.tabMainSetting.Size = new System.Drawing.Size(561, 338);
             this.tabMainSetting.TabIndex = 2;
             this.tabMainSetting.Text = "設定";
             this.tabMainSetting.UseVisualStyleBackColor = true;
@@ -3041,7 +3055,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(561, 387);
+            this.ClientSize = new System.Drawing.Size(569, 387);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -3345,5 +3359,6 @@
         private System.Windows.Forms.CheckBox chkWaitTimeout;
         private System.Windows.Forms.CheckBox chkViewNotCaughtOnly;
         private System.Windows.Forms.Label lblCaughtFishesCount;
+        private System.Windows.Forms.CheckBox chkEminenceClear;
     }
 }

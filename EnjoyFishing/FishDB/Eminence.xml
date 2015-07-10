@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<Eminences>
+  <Eminence name="漁師ギルドマスターと話す" stop="false"/>
+  <Eminence name="獲物を1匹釣る" stop="false"/>
+  <Eminence name="小型の獲物合計1" stop="false"/>
+  <Eminence name="大型の獲物合計1" stop="false"/>
+  <Eminence name="錆びたもの合計" stop="false"/>
+  <Eminence name="モンスター合計" stop="false"/>
+  <Eminence name="フィッシュランキングに登録" stop="false"/>
+  <Eminence name="獲物合計(全域)1" stop="false"/>
+  <Eminence name="獲物合計(海水)" stop="false"/>
+  <Eminence name="獲物合計(淡水)" stop="false"/>
+  <Eminence name="ヤナギの釣竿で釣る" stop="false"/>
+  <Eminence name="イチイの釣竿で釣る" stop="false"/>
+  <Eminence name="バンブーロッドで釣る" stop="false"/>
+  <Eminence name="獲物を10種類釣る" stop="false"/>
+  <Eminence name="獲物を25種類釣る" stop="false"/>
+  <Eminence name="獲物を50種類釣る" stop="false"/>
+  <Eminence name="獲物を75種類釣る" stop="false"/>
+  <Eminence name="獲物を100種類釣る" stop="false"/>
+  <Eminence name="格闘をした時間1" stop="true" />
+  <Eminence name="格闘をした時間2" stop="true" />
+  <Eminence name="格闘をした時間3" stop="true" />
+  <Eminence name="格闘をした時間4" stop="true" />
+  <Eminence name="格闘をした時間5" stop="true" />
+  <Eminence name="格闘をした時間6" stop="true" />
+  <Eminence name="格闘をした時間7" stop="true" />
+  <Eminence name="格闘をした時間8" stop="true" />
+  <Eminence name="獲物の大きさと重さ" stop="true" />
+  <Eminence name="リージョン：ロンフォール" stop="true" />
+  <Eminence name="リージョン：グスタベルグ" stop="true" />
+  <Eminence name="リージョン：サルタバルタ" stop="true" />
+  <Eminence name="リージョン：ザルクヘイム" stop="true" />
+  <Eminence name="リージョン：コルシュシュ" stop="true" />
+  <Eminence name="リージョン：ノルバレン" stop="true" />
+  <Eminence name="リージョン：デルフラント" stop="true" />
+  <Eminence name="リージョン：アラゴーニュ" stop="true" />
+  <Eminence name="リージョン：クフィム" stop="true" />
+  <Eminence name="リージョン：フォルガンディ" stop="true" />
+  <Eminence name="リージョン：クゾッツ" stop="true" />
+  <Eminence name="リージョン：ヴォルボー" stop="true" />
+  <Eminence name="リージョン：低地エルシモ" stop="true" />
+  <Eminence name="リージョン：高地エルシモ" stop="true" />
+  <Eminence name="リージョン：リ・テロア" stop="true" />
+  <Eminence name="機船航路(セルビナ-マウラ)" stop="true" />
+</Eminences>

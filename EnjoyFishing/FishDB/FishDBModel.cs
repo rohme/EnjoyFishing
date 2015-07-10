@@ -356,4 +356,38 @@ namespace EnjoyFishing
         }
     }
     #endregion
+
+    #region EminenceModel
+    [XmlRoot("Eminences")]
+    public class EminenceDBModel
+    {
+        [XmlElement("Eminence")]
+        public List<EminenceDBEminenceModel> Eminences { get; set; }
+    }
+    public class EminenceDBEminenceModel : IEquatable<EminenceDBEminenceModel>
+    {
+        [XmlAttribute("name")]
+        public string EminenceName { get; set; }
+        [XmlAttribute("stop")]
+        public bool Stop { get; set; }
+        public EminenceDBEminenceModel()
+            : this(string.Empty, false)
+        {
+        }
+        public EminenceDBEminenceModel(string iName, bool iStop)
+        {
+            this.EminenceName = iName;
+            this.Stop = iStop;
+        }
+        public override string ToString()
+        {
+            return this.EminenceName;
+        }
+        bool IEquatable<EminenceDBEminenceModel>.Equals(EminenceDBEminenceModel other)
+        {
+            if (other == null) return false;
+            return (this.EminenceName == other.EminenceName && this.Stop == other.Stop);
+        }
+    }
+    #endregion
 }
