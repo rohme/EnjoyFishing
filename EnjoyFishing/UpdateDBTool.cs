@@ -155,7 +155,10 @@ namespace EnjoyFishing
                 }
                 else
                 {
+                    //無効なバージョン
                     EventReceiveMessage(resCheckVersion.Message, 0xFFFF0000);
+                    //イベント発生
+                    EventNewerVersion(resCheckVersion.Message, resCheckVersion.NewVersionUrl);
                     return false;
                 }
             }

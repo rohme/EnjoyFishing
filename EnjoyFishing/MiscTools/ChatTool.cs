@@ -20,7 +20,6 @@ namespace MiscTools
         private Thread thChat;
         private FFACE fface;
         private string lastIndex1 = ""; //一行目か判定用
-        private int lastEminenceIndex = -1;
 
         #region コンストラクタ
         public ChatTool(FFACE iFFACE)
@@ -191,6 +190,7 @@ namespace MiscTools
             try
             {
                 int currChatLineIndex = 0;
+                int lastEminenceIndex = -1;
                 if (fface != null && fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
                 {
                     if (fface.Chat.IsNewLine)

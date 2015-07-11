@@ -936,6 +936,7 @@ namespace EnjoyFishing
                 {
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
+                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
                 }
                 //敵からの攻撃感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;

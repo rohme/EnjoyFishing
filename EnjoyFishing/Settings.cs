@@ -153,10 +153,35 @@ namespace EnjoyFishing
         /// <returns></returns>
         public bool Save(string iPlayerName)
         {
-            //設定の読み込み
             string xmlFilename = XML_FILENAME_SETTINGS;
             XmlSerializer serializer;
             SettingsModel xmlSettings = new SettingsModel();
+
+            //設定の読み込み
+            xmlSettings = new SettingsModel();
+            if (File.Exists(xmlFilename))
+            {
+                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                {
+                    try
+                    {
+                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            //シリアライズ
+                            serializer = new XmlSerializer(typeof(SettingsModel));
+                            //読み込み
+                            xmlSettings = (SettingsModel)serializer.Deserialize(fs);
+                            fs.Close();
+                        }
+                        break;
+                    }
+                    catch (IOException)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
+                }
+            }
 
             //保存データ設定
             xmlSettings.Global = this.Global;
