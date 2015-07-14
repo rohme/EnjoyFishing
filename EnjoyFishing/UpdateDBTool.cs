@@ -22,6 +22,7 @@ namespace EnjoyFishing
         private const string URL_API_STATUS = "/api/enjoyfishing/status";
         private const string URL_API_ROD =  "/api/enjoyfishing/rod";
         private const string URL_API_UPLOAD_HISTORY = "/api/enjoyfishing/uploadhistory";
+        
 
         private Settings settings;
         private LoggerTool logger;
@@ -382,18 +383,20 @@ namespace EnjoyFishing
         #region HTTP
         public static bool Http(string iUrl, out string oResponse)
         {
+            oResponse = "";
             try
             {
                 HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
                 webreq.Timeout = 180000;
-                HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse();
+                webreq.UserAgent = GetUserAgent();
+                HttpWebResponse webresp = (HttpWebResponse)webreq.GetResponse();
 
-                Stream st = webres.GetResponseStream();
+                Stream st = webresp.GetResponseStream();
                 StreamReader sr = new StreamReader(st, System.Text.Encoding.UTF8);
                 string htmlSource = sr.ReadToEnd();
                 sr.Close();
                 st.Close();
-                webres.Close();
+                webresp.Close();
                 oResponse = htmlSource;
                 return true;
             }
@@ -406,7 +409,6 @@ namespace EnjoyFishing
         public static bool HttpPost(string iUrl, NameValueCollection iPostNVC, out string oResponse)
         {
             oResponse = "";
-
             try
             {
                 //POSTデータ作成
@@ -420,17 +422,19 @@ namespace EnjoyFishing
                 }
                 byte[] postDataBytes = Encoding.ASCII.GetBytes(postData);
                 //リクエスト作成
-                WebRequest req = WebRequest.Create(iUrl);
-                req.Method = "POST";
-                req.ContentType = "application/x-www-form-urlencoded";
-                req.ContentLength = postDataBytes.Length;
+                HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
+                webreq.UserAgent = GetUserAgent();
+                
+                webreq.Method = "POST";
+                webreq.ContentType = "application/x-www-form-urlencoded";
+                webreq.ContentLength = postDataBytes.Length;
                 //サーバーへ送信
-                Stream reqStream = req.GetRequestStream();
+                Stream reqStream = webreq.GetRequestStream();
                 reqStream.Write(postDataBytes, 0, postDataBytes.Length);
                 reqStream.Close();
                 //レスポンス受信
-                WebResponse res = req.GetResponse();
-                Stream resStream = res.GetResponseStream();
+                WebResponse webresp = webreq.GetResponse();
+                Stream resStream = webresp.GetResponseStream();
                 StreamReader sr = new StreamReader(resStream, Encoding.UTF8);
                 oResponse = sr.ReadToEnd();
                 sr.Close();
@@ -448,47 +452,49 @@ namespace EnjoyFishing
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
 
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(iUrl);
-            wr.ContentType = "multipart/form-data; boundary=" + boundary;
-            wr.Method = "POST";
-            wr.KeepAlive = true;
-            wr.Credentials = System.Net.CredentialCache.DefaultCredentials;
+            HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
+            webreq.UserAgent = GetUserAgent();
 
-            Stream rs = wr.GetRequestStream();
+            webreq.ContentType = "multipart/form-data; boundary=" + boundary;
+            webreq.Method = "POST";
+            webreq.KeepAlive = true;
+            webreq.Credentials = System.Net.CredentialCache.DefaultCredentials;
+
+            Stream requestStream = webreq.GetRequestStream();
 
             string formdataTemplate = "Content-Disposition: form-data; name=\"{0}\"\r\n\r\n{1}";
             foreach (string key in iPostNVC.Keys)
             {
-                rs.Write(boundarybytes, 0, boundarybytes.Length);
+                requestStream.Write(boundarybytes, 0, boundarybytes.Length);
                 string formitem = string.Format(formdataTemplate, key, iPostNVC[key]);
                 byte[] formitembytes = Encoding.UTF8.GetBytes(formitem);
-                rs.Write(formitembytes, 0, formitembytes.Length);
+                requestStream.Write(formitembytes, 0, formitembytes.Length);
             }
-            rs.Write(boundarybytes, 0, boundarybytes.Length);
+            requestStream.Write(boundarybytes, 0, boundarybytes.Length);
 
             string headerTemplate = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n";
             string header = string.Format(headerTemplate, paramName, iUploadFilename, iContentType);
             byte[] headerbytes = System.Text.Encoding.UTF8.GetBytes(header);
-            rs.Write(headerbytes, 0, headerbytes.Length);
+            requestStream.Write(headerbytes, 0, headerbytes.Length);
 
             FileStream fileStream = new FileStream(iUploadFilename, FileMode.Open, FileAccess.Read);
             byte[] buffer = new byte[4096];
             int bytesRead = 0;
             while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
             {
-                rs.Write(buffer, 0, bytesRead);
+                requestStream.Write(buffer, 0, bytesRead);
             }
             fileStream.Close();
 
             byte[] trailer = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "--\r\n");
-            rs.Write(trailer, 0, trailer.Length);
-            rs.Close();
+            requestStream.Write(trailer, 0, trailer.Length);
+            requestStream.Close();
 
-            WebResponse wresp = null;
+            WebResponse webresp = null;
             try
             {
-                wresp = wr.GetResponse();
-                Stream stream2 = wresp.GetResponseStream();
+                webresp = webreq.GetResponse();
+                Stream stream2 = webresp.GetResponseStream();
                 StreamReader reader2 = new StreamReader(stream2);
                 //Console.WriteLine(string.Format("File uploaded, server response is: {0}", reader2.ReadToEnd()));
                 oResponse = reader2.ReadToEnd();
@@ -497,18 +503,22 @@ namespace EnjoyFishing
             catch (Exception ex)
             {
                 Console.WriteLine("Error uploading file", ex);
-                if (wresp != null)
+                if (webresp != null)
                 {
-                    wresp.Close();
-                    wresp = null;
+                    webresp.Close();
+                    webresp = null;
                 }
                 oResponse = ex.Message;
                 return false;
             }
             finally
             {
-                wr = null;
+                webreq = null;
             }
+        }
+        public static string GetUserAgent()
+        {
+            return MiscTool.GetAppTitle() + "/" + MiscTool.GetAppVersion();
         }
         #endregion
     }

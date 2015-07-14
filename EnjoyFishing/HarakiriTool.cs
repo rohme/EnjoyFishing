@@ -339,6 +339,10 @@ namespace EnjoyFishing
                 //ターゲット設定
                 control.SetTargetFromId(NPCID_ZALDON);
                 Thread.Sleep(settings.Global.WaitChat);//Wait
+                //プレイヤーステータスがstandingになるまで待機
+                while(fface.Player.Status != Status.Standing){
+                    Thread.Sleep(settings.Global.WaitBase);//wait
+                }
                 //アイテムトレード
                 fface.Windower.SendString(string.Format("/item {0} <t>", this.HarakiriFishName));
 
