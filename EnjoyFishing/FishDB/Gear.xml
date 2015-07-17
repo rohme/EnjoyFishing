@@ -47,4 +47,6 @@
   <Gear name="バストゥークピアス" position="Earrings" />
   <Gear name="タブナジアピアス" position="Earrings" />
   <Gear name="セルビナピアス" position="Earrings" />
+  <!--食べ物-->
+  <Gear name="釣り人弁当" position="Foods" buff="251" />
 </Gears>

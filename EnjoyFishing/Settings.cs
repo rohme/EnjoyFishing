@@ -560,6 +560,9 @@ namespace EnjoyFishing
         public bool UseWaist { get; set; }
         public bool UseRingLeft { get; set; }
         public bool UseRingRight { get; set; }
+        //食べ物
+        public string Food { get; set; }
+        public bool UseFood { get; set; }
         public SettingsPlayerFishingModel()
         {
             //動作
@@ -639,6 +642,9 @@ namespace EnjoyFishing
             this.UseWaist = false;
             this.UseRingLeft = false;
             this.UseRingRight = false;
+            //食べ物
+            this.Food = string.Empty;
+            this.UseFood = false;
         }
     }
     public class SettingsPlayerEtcModel

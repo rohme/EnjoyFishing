@@ -41,6 +41,7 @@ namespace EnjoyFishing
         Back,
         Rings,
         Earrings,
+        Foods,
     }
 
     #region FishDBModel

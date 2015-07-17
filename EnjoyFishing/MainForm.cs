@@ -454,6 +454,8 @@ namespace EnjoyFishing
                 chkUseRingLeft.Checked = settings.Fishing.UseRingLeft;
                 chkUseRingRight.Checked = settings.Fishing.UseRingRight;
                 chkEquipEnable_CheckedChanged(this, new EventArgs());
+                cmbFood.Text = settings.Fishing.Food;
+                chkUseFood.Checked = settings.Fishing.UseFood;
                 //釣り・情報
                 updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
                 //履歴
@@ -738,6 +740,7 @@ namespace EnjoyFishing
             cmbEquipEarRight.Items.Add(string.Empty);
             cmbEquipRingLeft.Items.Add(string.Empty);
             cmbEquipRingRight.Items.Add(string.Empty);
+            cmbFood.Items.Add(string.Empty);
 
             foreach (string rod in fishDB.Rods)
             {
@@ -788,6 +791,9 @@ namespace EnjoyFishing
                     case GearDBPositionKind.Rings:
                         cmbEquipRingLeft.Items.Add(gear.GearName);
                         cmbEquipRingRight.Items.Add(gear.GearName);
+                        break;
+                    case GearDBPositionKind.Foods:
+                        cmbFood.Items.Add(gear.GearName);
                         break;
                 }
             }
@@ -2102,6 +2108,8 @@ namespace EnjoyFishing
                 settings.Fishing.UseWaist = chkUseWaist.Checked;
                 settings.Fishing.UseRingLeft = chkUseRingLeft.Checked;
                 settings.Fishing.UseRingRight = chkUseRingRight.Checked;
+                settings.Fishing.Food = cmbFood.Text;
+                settings.Fishing.UseFood = chkUseFood.Checked;
                 //履歴
                 DataGridViewColumn sortCol = gridHistory.SortedColumn;
                 if (sortCol != null)
@@ -2744,6 +2752,16 @@ namespace EnjoyFishing
         {
             if (startupFlg) return;
             settings.Fishing.UseRingRight = chkUseRingRight.Checked;
+        }
+        private void cmbFood_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.Food = cmbFood.Text;
+        }
+        private void chkUseFood_CheckedChanged(object sender, EventArgs e)
+        {
+            if (startupFlg) return;
+            settings.Fishing.UseFood = chkUseFood.Checked;
         }
         #endregion
         #endregion

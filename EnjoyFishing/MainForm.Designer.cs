@@ -252,6 +252,9 @@
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
             this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
+            this.cmbFood = new System.Windows.Forms.ComboBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.chkUseFood = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -1359,10 +1362,13 @@
             // 
             // tabFishingMainEquip
             // 
+            this.tabFishingMainEquip.Controls.Add(this.cmbEquipMain);
             this.tabFishingMainEquip.Controls.Add(this.chkEquipEnable);
+            this.tabFishingMainEquip.Controls.Add(this.chkUseFood);
             this.tabFishingMainEquip.Controls.Add(this.chkUseRingRight);
             this.tabFishingMainEquip.Controls.Add(this.chkUseRingLeft);
             this.tabFishingMainEquip.Controls.Add(this.chkUseWaist);
+            this.tabFishingMainEquip.Controls.Add(this.label34);
             this.tabFishingMainEquip.Controls.Add(this.label33);
             this.tabFishingMainEquip.Controls.Add(this.label25);
             this.tabFishingMainEquip.Controls.Add(this.label32);
@@ -1379,6 +1385,7 @@
             this.tabFishingMainEquip.Controls.Add(this.label19);
             this.tabFishingMainEquip.Controls.Add(this.label26);
             this.tabFishingMainEquip.Controls.Add(this.label18);
+            this.tabFishingMainEquip.Controls.Add(this.cmbFood);
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipRingRight);
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipNeck);
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipRingLeft);
@@ -1393,13 +1400,12 @@
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipHead);
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipSub);
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipBait);
-            this.tabFishingMainEquip.Controls.Add(this.cmbEquipMain);
             this.tabFishingMainEquip.Controls.Add(this.cmbEquipRod);
             this.tabFishingMainEquip.Location = new System.Drawing.Point(4, 23);
             this.tabFishingMainEquip.Name = "tabFishingMainEquip";
             this.tabFishingMainEquip.Size = new System.Drawing.Size(413, 305);
             this.tabFishingMainEquip.TabIndex = 2;
-            this.tabFishingMainEquip.Text = "装備";
+            this.tabFishingMainEquip.Text = "装備・食事";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
             // 
             // chkEquipEnable
@@ -1416,7 +1422,7 @@
             // chkUseRingRight
             // 
             this.chkUseRingRight.AutoSize = true;
-            this.chkUseRingRight.Location = new System.Drawing.Point(335, 153);
+            this.chkUseRingRight.Location = new System.Drawing.Point(356, 225);
             this.chkUseRingRight.Name = "chkUseRingRight";
             this.chkUseRingRight.Size = new System.Drawing.Size(48, 18);
             this.chkUseRingRight.TabIndex = 19;
@@ -1427,7 +1433,7 @@
             // chkUseRingLeft
             // 
             this.chkUseRingLeft.AutoSize = true;
-            this.chkUseRingLeft.Location = new System.Drawing.Point(335, 128);
+            this.chkUseRingLeft.Location = new System.Drawing.Point(356, 200);
             this.chkUseRingLeft.Name = "chkUseRingLeft";
             this.chkUseRingLeft.Size = new System.Drawing.Size(48, 18);
             this.chkUseRingLeft.TabIndex = 17;
@@ -1438,10 +1444,10 @@
             // chkUseWaist
             // 
             this.chkUseWaist.AutoSize = true;
-            this.chkUseWaist.Location = new System.Drawing.Point(159, 225);
+            this.chkUseWaist.Location = new System.Drawing.Point(356, 105);
             this.chkUseWaist.Name = "chkUseWaist";
             this.chkUseWaist.Size = new System.Drawing.Size(48, 18);
-            this.chkUseWaist.TabIndex = 10;
+            this.chkUseWaist.TabIndex = 12;
             this.chkUseWaist.Text = "使用";
             this.chkUseWaist.UseVisualStyleBackColor = true;
             this.chkUseWaist.CheckedChanged += new System.EventHandler(this.chkUseWaist_CheckedChanged);
@@ -1449,7 +1455,7 @@
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(175, 153);
+            this.label33.Location = new System.Drawing.Point(202, 225);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(29, 14);
             this.label33.TabIndex = 1;
@@ -1458,7 +1464,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(-1, 201);
+            this.label25.Location = new System.Drawing.Point(202, 81);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(18, 14);
             this.label25.TabIndex = 1;
@@ -1467,7 +1473,7 @@
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(175, 129);
+            this.label32.Location = new System.Drawing.Point(202, 201);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(29, 14);
             this.label32.TabIndex = 1;
@@ -1485,7 +1491,7 @@
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(175, 105);
+            this.label31.Location = new System.Drawing.Point(202, 177);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(29, 14);
             this.label31.TabIndex = 1;
@@ -1503,7 +1509,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(175, 81);
+            this.label30.Location = new System.Drawing.Point(202, 153);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(29, 14);
             this.label30.TabIndex = 1;
@@ -1521,7 +1527,7 @@
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(-1, 250);
+            this.label29.Location = new System.Drawing.Point(202, 129);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(18, 14);
             this.label29.TabIndex = 1;
@@ -1539,7 +1545,7 @@
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(-1, 225);
+            this.label28.Location = new System.Drawing.Point(202, 105);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(18, 14);
             this.label28.TabIndex = 1;
@@ -1557,7 +1563,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(175, 57);
+            this.label27.Location = new System.Drawing.Point(202, 57);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(24, 14);
             this.label27.TabIndex = 1;
@@ -1575,7 +1581,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(175, 33);
+            this.label26.Location = new System.Drawing.Point(202, 33);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(31, 14);
             this.label26.TabIndex = 1;
@@ -1595,7 +1601,7 @@
             this.cmbEquipRingRight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipRingRight.FormattingEnabled = true;
             this.cmbEquipRingRight.ItemHeight = 14;
-            this.cmbEquipRingRight.Location = new System.Drawing.Point(208, 150);
+            this.cmbEquipRingRight.Location = new System.Drawing.Point(232, 222);
             this.cmbEquipRingRight.Name = "cmbEquipRingRight";
             this.cmbEquipRingRight.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipRingRight.TabIndex = 18;
@@ -1606,10 +1612,10 @@
             this.cmbEquipNeck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipNeck.FormattingEnabled = true;
             this.cmbEquipNeck.ItemHeight = 14;
-            this.cmbEquipNeck.Location = new System.Drawing.Point(32, 198);
+            this.cmbEquipNeck.Location = new System.Drawing.Point(232, 78);
             this.cmbEquipNeck.Name = "cmbEquipNeck";
             this.cmbEquipNeck.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipNeck.TabIndex = 8;
+            this.cmbEquipNeck.TabIndex = 10;
             this.cmbEquipNeck.SelectedIndexChanged += new System.EventHandler(this.cmbEquipNeck_SelectedIndexChanged);
             // 
             // cmbEquipRingLeft
@@ -1617,7 +1623,7 @@
             this.cmbEquipRingLeft.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipRingLeft.FormattingEnabled = true;
             this.cmbEquipRingLeft.ItemHeight = 14;
-            this.cmbEquipRingLeft.Location = new System.Drawing.Point(208, 126);
+            this.cmbEquipRingLeft.Location = new System.Drawing.Point(232, 198);
             this.cmbEquipRingLeft.Name = "cmbEquipRingLeft";
             this.cmbEquipRingLeft.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipRingLeft.TabIndex = 16;
@@ -1628,7 +1634,7 @@
             this.cmbEquipFeet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipFeet.FormattingEnabled = true;
             this.cmbEquipFeet.ItemHeight = 14;
-            this.cmbEquipFeet.Location = new System.Drawing.Point(32, 174);
+            this.cmbEquipFeet.Location = new System.Drawing.Point(29, 174);
             this.cmbEquipFeet.Name = "cmbEquipFeet";
             this.cmbEquipFeet.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipFeet.TabIndex = 7;
@@ -1639,7 +1645,7 @@
             this.cmbEquipEarRight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipEarRight.FormattingEnabled = true;
             this.cmbEquipEarRight.ItemHeight = 14;
-            this.cmbEquipEarRight.Location = new System.Drawing.Point(208, 102);
+            this.cmbEquipEarRight.Location = new System.Drawing.Point(232, 174);
             this.cmbEquipEarRight.Name = "cmbEquipEarRight";
             this.cmbEquipEarRight.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipEarRight.TabIndex = 15;
@@ -1650,7 +1656,7 @@
             this.cmbEquipLegs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipLegs.FormattingEnabled = true;
             this.cmbEquipLegs.ItemHeight = 14;
-            this.cmbEquipLegs.Location = new System.Drawing.Point(32, 150);
+            this.cmbEquipLegs.Location = new System.Drawing.Point(29, 150);
             this.cmbEquipLegs.Name = "cmbEquipLegs";
             this.cmbEquipLegs.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipLegs.TabIndex = 6;
@@ -1661,7 +1667,7 @@
             this.cmbEquipEarLeft.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipEarLeft.FormattingEnabled = true;
             this.cmbEquipEarLeft.ItemHeight = 14;
-            this.cmbEquipEarLeft.Location = new System.Drawing.Point(208, 78);
+            this.cmbEquipEarLeft.Location = new System.Drawing.Point(232, 150);
             this.cmbEquipEarLeft.Name = "cmbEquipEarLeft";
             this.cmbEquipEarLeft.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipEarLeft.TabIndex = 14;
@@ -1672,7 +1678,7 @@
             this.cmbEquipHands.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipHands.FormattingEnabled = true;
             this.cmbEquipHands.ItemHeight = 14;
-            this.cmbEquipHands.Location = new System.Drawing.Point(32, 126);
+            this.cmbEquipHands.Location = new System.Drawing.Point(29, 126);
             this.cmbEquipHands.Name = "cmbEquipHands";
             this.cmbEquipHands.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipHands.TabIndex = 5;
@@ -1683,10 +1689,10 @@
             this.cmbEquipBack.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipBack.FormattingEnabled = true;
             this.cmbEquipBack.ItemHeight = 14;
-            this.cmbEquipBack.Location = new System.Drawing.Point(32, 247);
+            this.cmbEquipBack.Location = new System.Drawing.Point(232, 126);
             this.cmbEquipBack.Name = "cmbEquipBack";
             this.cmbEquipBack.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipBack.TabIndex = 11;
+            this.cmbEquipBack.TabIndex = 13;
             this.cmbEquipBack.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBack_SelectedIndexChanged);
             // 
             // cmbEquipBody
@@ -1694,7 +1700,7 @@
             this.cmbEquipBody.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipBody.FormattingEnabled = true;
             this.cmbEquipBody.ItemHeight = 14;
-            this.cmbEquipBody.Location = new System.Drawing.Point(32, 102);
+            this.cmbEquipBody.Location = new System.Drawing.Point(29, 102);
             this.cmbEquipBody.Name = "cmbEquipBody";
             this.cmbEquipBody.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipBody.TabIndex = 4;
@@ -1705,10 +1711,10 @@
             this.cmbEquipWaist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipWaist.FormattingEnabled = true;
             this.cmbEquipWaist.ItemHeight = 14;
-            this.cmbEquipWaist.Location = new System.Drawing.Point(32, 222);
+            this.cmbEquipWaist.Location = new System.Drawing.Point(232, 102);
             this.cmbEquipWaist.Name = "cmbEquipWaist";
             this.cmbEquipWaist.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipWaist.TabIndex = 9;
+            this.cmbEquipWaist.TabIndex = 11;
             this.cmbEquipWaist.SelectedIndexChanged += new System.EventHandler(this.cmbEquipWaist_SelectedIndexChanged);
             // 
             // cmbEquipHead
@@ -1716,7 +1722,7 @@
             this.cmbEquipHead.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipHead.FormattingEnabled = true;
             this.cmbEquipHead.ItemHeight = 14;
-            this.cmbEquipHead.Location = new System.Drawing.Point(32, 78);
+            this.cmbEquipHead.Location = new System.Drawing.Point(29, 78);
             this.cmbEquipHead.Name = "cmbEquipHead";
             this.cmbEquipHead.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipHead.TabIndex = 3;
@@ -1727,10 +1733,10 @@
             this.cmbEquipSub.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipSub.FormattingEnabled = true;
             this.cmbEquipSub.ItemHeight = 14;
-            this.cmbEquipSub.Location = new System.Drawing.Point(208, 54);
+            this.cmbEquipSub.Location = new System.Drawing.Point(232, 54);
             this.cmbEquipSub.Name = "cmbEquipSub";
             this.cmbEquipSub.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipSub.TabIndex = 13;
+            this.cmbEquipSub.TabIndex = 9;
             this.cmbEquipSub.SelectedIndexChanged += new System.EventHandler(this.cmbEquipSub_SelectedIndexChanged);
             // 
             // cmbEquipBait
@@ -1738,7 +1744,7 @@
             this.cmbEquipBait.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipBait.FormattingEnabled = true;
             this.cmbEquipBait.ItemHeight = 14;
-            this.cmbEquipBait.Location = new System.Drawing.Point(32, 54);
+            this.cmbEquipBait.Location = new System.Drawing.Point(29, 54);
             this.cmbEquipBait.Name = "cmbEquipBait";
             this.cmbEquipBait.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipBait.TabIndex = 2;
@@ -1749,10 +1755,10 @@
             this.cmbEquipMain.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipMain.FormattingEnabled = true;
             this.cmbEquipMain.ItemHeight = 14;
-            this.cmbEquipMain.Location = new System.Drawing.Point(208, 30);
+            this.cmbEquipMain.Location = new System.Drawing.Point(232, 30);
             this.cmbEquipMain.Name = "cmbEquipMain";
             this.cmbEquipMain.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipMain.TabIndex = 12;
+            this.cmbEquipMain.TabIndex = 8;
             this.cmbEquipMain.SelectedIndexChanged += new System.EventHandler(this.cmbEquipMain_SelectedIndexChanged);
             // 
             // cmbEquipRod
@@ -1760,7 +1766,7 @@
             this.cmbEquipRod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEquipRod.FormattingEnabled = true;
             this.cmbEquipRod.ItemHeight = 14;
-            this.cmbEquipRod.Location = new System.Drawing.Point(32, 30);
+            this.cmbEquipRod.Location = new System.Drawing.Point(29, 30);
             this.cmbEquipRod.Name = "cmbEquipRod";
             this.cmbEquipRod.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipRod.TabIndex = 1;
@@ -3050,6 +3056,37 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
+            // cmbFood
+            // 
+            this.cmbFood.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbFood.FormattingEnabled = true;
+            this.cmbFood.ItemHeight = 14;
+            this.cmbFood.Location = new System.Drawing.Point(232, 260);
+            this.cmbFood.Name = "cmbFood";
+            this.cmbFood.Size = new System.Drawing.Size(121, 22);
+            this.cmbFood.TabIndex = 20;
+            this.cmbFood.SelectedIndexChanged += new System.EventHandler(this.cmbFood_SelectedIndexChanged);
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(202, 263);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(29, 14);
+            this.label34.TabIndex = 1;
+            this.label34.Text = "食事";
+            // 
+            // chkUseFood
+            // 
+            this.chkUseFood.AutoSize = true;
+            this.chkUseFood.Location = new System.Drawing.Point(356, 263);
+            this.chkUseFood.Name = "chkUseFood";
+            this.chkUseFood.Size = new System.Drawing.Size(48, 18);
+            this.chkUseFood.TabIndex = 21;
+            this.chkUseFood.Text = "使用";
+            this.chkUseFood.UseVisualStyleBackColor = true;
+            this.chkUseFood.CheckedChanged += new System.EventHandler(this.chkUseFood_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3360,5 +3397,8 @@
         private System.Windows.Forms.CheckBox chkViewNotCaughtOnly;
         private System.Windows.Forms.Label lblCaughtFishesCount;
         private System.Windows.Forms.CheckBox chkEminenceClear;
+        private System.Windows.Forms.CheckBox chkUseFood;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.ComboBox cmbFood;
     }
 }

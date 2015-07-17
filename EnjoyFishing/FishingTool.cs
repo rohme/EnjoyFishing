@@ -1162,6 +1162,15 @@ namespace EnjoyFishing
                     setMessage("エンチャントアイテムが使用できなかったので停止");
                     break;
                 }
+                //食事
+                if (this.RunningStatus != RunningStatusKind.Running) break;
+                if (!useFood())
+                {
+                    setRunningStatus(RunningStatusKind.Stop);
+                    setFishingStatus(FishingStatusKind.Error);
+                    setMessage("食事アイテムが使用できなかったので停止");
+                    break;
+                }
                 //ヴァナ時間
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 while (settings.Fishing.VanaTime &&
@@ -2430,6 +2439,28 @@ namespace EnjoyFishing
                     {
                         setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
                         useItem(item[0].GearName);
+                    }
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// 食べ物を食べる
+        /// </summary>
+        /// <returns></returns>
+        public bool useFood()
+        {
+            if (!settings.Fishing.UseFood) return true;
+            //食べ物
+            if (settings.Fishing.UseFood && !string.IsNullOrEmpty(settings.Fishing.Food))
+            {
+                List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.Food, GearDBPositionKind.Foods);
+                if (item.Count > 0 && item[0].BuffID > 0)
+                {
+                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    {
+                        setMessage(string.Format("食事切れ：{0}を使用", item[0].GearName));
+                        return useItem(item[0].GearName);
                     }
                 }
             }
