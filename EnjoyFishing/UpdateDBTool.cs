@@ -381,6 +381,12 @@ namespace EnjoyFishing
         #endregion
 
         #region HTTP
+        /// <summary>
+        /// HTTP通信
+        /// </summary>
+        /// <param name="iUrl">URL</param>
+        /// <param name="oResponse">レスポンス</param>
+        /// <returns></returns>
         public static bool Http(string iUrl, out string oResponse)
         {
             oResponse = "";
@@ -406,6 +412,13 @@ namespace EnjoyFishing
                 return false;
             }
         }
+        /// <summary>
+        /// HTTP通信 POST
+        /// </summary>
+        /// <param name="iUrl">URL</param>
+        /// <param name="iPostNVC">Postパラメータ</param>
+        /// <param name="oResponse">レスポンス</param>
+        /// <returns></returns>
         public static bool HttpPost(string iUrl, NameValueCollection iPostNVC, out string oResponse)
         {
             oResponse = "";
@@ -446,6 +459,16 @@ namespace EnjoyFishing
                 return false;
             }
         }
+        /// <summary>
+        /// HTTP通信 ファイル添付
+        /// </summary>
+        /// <param name="iUrl">URL</param>
+        /// <param name="iUploadFilename">アップロードするファイル名</param>
+        /// <param name="paramName">ファイルPOSTパラメータ名</param>
+        /// <param name="iContentType">コンテントタイプ</param>
+        /// <param name="iPostNVC">パラメータ</param>
+        /// <param name="oResponse">レスポンス</param>
+        /// <returns></returns>
         public static bool HttpUploadFile(string iUrl, string iUploadFilename, string paramName, string iContentType, NameValueCollection iPostNVC, out string oResponse)
         {
             Console.WriteLine(string.Format("Uploading {0} to {1}", iUploadFilename, iUrl));
@@ -516,9 +539,16 @@ namespace EnjoyFishing
                 webreq = null;
             }
         }
+        /// <summary>
+        /// User-Agentの取得
+        /// </summary>
+        /// <returns></returns>
         public static string GetUserAgent()
         {
-            return MiscTool.GetAppTitle() + "/" + MiscTool.GetAppVersion();
+            OperatingSystem os = Environment.OSVersion;
+            string ret = MiscTool.GetAppTitle() + "/" + MiscTool.GetAppVersion();
+            ret += string.Format("(Windows NT {0}.{1};)", os.Version.Major, os.Version.Minor);
+            return ret;
         }
         #endregion
     }
