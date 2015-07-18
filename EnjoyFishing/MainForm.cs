@@ -3288,7 +3288,7 @@ namespace EnjoyFishing
         private void threadNewerVersion(object iUrl)
         {
             string url = (string)iUrl;
-            DialogResult res = MessageBox.Show("新しいバージョンがリリースされています。\nダウンロードページを表示しますか？", MiscTool.GetAppTitle() + " 新バージョンのリリース", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            DialogResult res = MessageBox.Show("新しいバージョンがリリースされています。\nリリースページを表示しますか？", MiscTool.GetAppTitle() + " 新バージョンのリリース", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (res == DialogResult.Yes)
             {
                 System.Diagnostics.Process.Start(url);
