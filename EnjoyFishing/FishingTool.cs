@@ -917,8 +917,18 @@ namespace EnjoyFishing
             logger.Output(LogLevelKind.DEBUG, "釣りスレッド開始");
             setMessage("開始しました");
 
+            //メニュー開いていたら閉じる
+            if (!control.CloseDialog())
+            {
+                setRunningStatus(RunningStatusKind.Stop);
+                setFishingStatus(FishingStatusKind.Error);
+                setMessage("メニューが閉じられない");
+                return;
+            }
+
             //着替え
             setEquipGear();
+            
             //釣りメインループ
             while (this.RunningStatus == RunningStatusKind.Running)
             {
