@@ -2193,7 +2193,6 @@ namespace EnjoyFishing
                 {
                     //キャラクター名が英語のみか？
                     string playerName = fishing.PlayerName;
-                    playerName = "adfkjh& ^";
                     if (MiscTool.IsRegexString(playerName, "^[a-zA-Z0-9]+$"))
                     {
                         settings.Save(playerName);
