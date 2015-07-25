@@ -2189,8 +2189,15 @@ namespace EnjoyFishing
                 settings.Etc.VisibleRemainTimeBar = chkStatusBarVisibleRemainTimeBar.Checked;
                 settings.Etc.VisibleRemainTime = chkStatusBarVisibleRemainTime.Checked;
                 //保存開始
-                if (fishing != null) settings.Save(fishing.PlayerName);
-
+                if (fishing != null)
+                {
+                    //キャラクター名が英語のみか？
+                    string playerName = fishing.PlayerName;
+                    if (MiscTool.IsRegexString(playerName, "^[a-zA-Z0-9]+$"))
+                    {
+                        settings.Save(playerName);
+                    }
+                }
                 this.Cursor = Cursors.Default;
             }
 
