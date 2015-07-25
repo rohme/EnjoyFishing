@@ -2559,11 +2559,11 @@ namespace EnjoyFishing
                     pageCurrent = int.Parse(oArgs[1]);
                     pageMax = int.Parse(oArgs[2]);
                     string[] options = fface.Menu.GetDialogText().Options;
-                    foreach (string option in options)
+                    for (int j = 1; j < 17 - (19 - fface.Menu.DialogOptionCount); j++)
                     {
-                        if (MiscTool.IsRegexString(option, REGEX_FISHEDLIST_OPTIONS))
+                        if (MiscTool.IsRegexString(options[j], REGEX_FISHEDLIST_OPTIONS))
                         {
-                            List<string> oArgs2 = MiscTool.GetRegexString(option, REGEX_FISHEDLIST_OPTIONS);
+                            List<string> oArgs2 = MiscTool.GetRegexString(options[j], REGEX_FISHEDLIST_OPTIONS);
                             SettingsPlayerCaughtFishModel fished = new SettingsPlayerCaughtFishModel();
                             fished.Caught = (oArgs2[0] == "★");
                             fished.FishName = oArgs2[1];
