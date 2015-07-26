@@ -2842,6 +2842,7 @@ namespace EnjoyFishing
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
                     fface.Windower.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));
+                Thread.Sleep(500);
                 //イベント発生
                 EventFished(FishResultStatusKind.Unknown);
             }
