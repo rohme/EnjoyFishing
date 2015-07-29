@@ -979,9 +979,9 @@ namespace EnjoyFishing
                 btnExecFishing.Text = "停　止";
 
                 //魚リスト更新
-                updateFishList();
+                //updateFishList();
                 //Wanted設定
-                setWantedToSettings();
+                //setWantedToSettings();
 
                 thFishing = new Thread(threadFishing);
                 thFishing.Start();
@@ -3067,7 +3067,8 @@ namespace EnjoyFishing
         private void FishingTool_Fished(object sender, FishingTool.FishedEventArgs e)
         {
             //魚リストの更新
-            updateFishList();
+            //竿折れの場合は更新しない
+            if (e.FishResultStatus != FishResultStatusKind.RodBreak) updateFishList();
             //釣り情報の更新
             updateFishingInfo(gridFishingInfo, DateTime.Now, FishResultStatusKind.Unknown, string.Empty);
         }

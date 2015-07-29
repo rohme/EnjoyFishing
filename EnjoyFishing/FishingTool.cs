@@ -928,7 +928,9 @@ namespace EnjoyFishing
 
             //着替え
             setEquipGear();
-            
+            //魚リスト更新
+            EventFished(FishResultStatusKind.Unknown);
+
             //釣りメインループ
             while (this.RunningStatus == RunningStatusKind.Running)
             {
