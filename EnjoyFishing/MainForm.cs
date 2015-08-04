@@ -20,7 +20,7 @@ namespace EnjoyFishing
     {
         #region Dictionary
         #region dicMoonPhaseName
-        private static Dictionary<MoonPhase, string> dicMoonPhaseName = new Dictionary<MoonPhase, string>()
+        public static Dictionary<MoonPhase, string> dicMoonPhaseName = new Dictionary<MoonPhase, string>()
         {
             {MoonPhase.New, "新月"},
             {MoonPhase.WaxingCrescent, "三日月"},
@@ -38,7 +38,7 @@ namespace EnjoyFishing
         };
         #endregion
         #region dicMoonPhaseImage
-        private static Dictionary<MoonPhase, Image> dicMoonPhaseImage = new Dictionary<MoonPhase, Image>()
+        public static Dictionary<MoonPhase, Image> dicMoonPhaseImage = new Dictionary<MoonPhase, Image>()
         {
             {MoonPhase.New, Resources.IMAGE_MOON00},
             {MoonPhase.WaxingCrescent, Resources.IMAGE_MOON01},
@@ -56,7 +56,7 @@ namespace EnjoyFishing
         };
         #endregion
         #region dicWeekDayName
-        private static Dictionary<Weekday, string> dicWeekDayName = new Dictionary<Weekday, string>()
+        public static Dictionary<Weekday, string> dicWeekDayName = new Dictionary<Weekday, string>()
         {
             {Weekday.Firesday, "火曜日"},
             {Weekday.Earthsday, "土曜日"},
@@ -70,7 +70,7 @@ namespace EnjoyFishing
         };
         #endregion
         #region dicWeekDayImage
-        private static Dictionary<Weekday, Image> dicWeekDayImage = new Dictionary<Weekday, Image>()
+        public static Dictionary<Weekday, Image> dicWeekDayImage = new Dictionary<Weekday, Image>()
         {
             {Weekday.Firesday, Resources.IMAGE_WEEK_FIRE},
             {Weekday.Earthsday, Resources.IMAGE_WEEK_EARTH},
@@ -83,6 +83,14 @@ namespace EnjoyFishing
             {Weekday.Unknown, null}
         };
         #endregion
+        private static Dictionary<GuildTimeTableKind, TimeTable> dicTimeTable = new Dictionary<GuildTimeTableKind, TimeTable>()
+        {
+            {GuildTimeTableKind.WINDUST, new TimeTable(2,4)},
+            {GuildTimeTableKind.SELBINA, new TimeTable(3,18)},
+            {GuildTimeTableKind.BIBIKI, new TimeTable(1,18)},
+            {GuildTimeTableKind.WHITEGATE, new TimeTable(1,18)},
+            {GuildTimeTableKind.SHIP, new TimeTable(3,23)},
+        };
         #region lstGridHistory
         private static List<GridColModel> lstGridHistory = new List<GridColModel>()
         {
@@ -126,6 +134,22 @@ namespace EnjoyFishing
             new GridColModel(typeof(DataGridViewTextBoxColumn), "FishName", "魚", 2, true, 200, DataGridViewContentAlignment.MiddleLeft,   string.Empty ,DataGridViewTriState.True),
         };
         #endregion
+        #endregion
+
+        #region enums
+        private enum GuildTimeTableKind
+        {
+            WINDUST,
+            SELBINA,
+            BIBIKI,
+            WHITEGATE,
+            SHIP,
+        }
+        private enum ShipTimeTableKind
+        {
+            SELBINA_MHAURA,
+            MHAURA_WHITEGATE,
+        }
         #endregion
 
         private PolTool pol;
@@ -223,6 +247,26 @@ namespace EnjoyFishing
                 this.Alignment = iAlignment;
                 this.Format = iFormat;
                 this.Resizable = iResizable;
+            }
+        }
+        private class MoonPhaseDay
+        {
+            public MoonPhase MoonPhase { get; set; }
+            public DateTime EarthDate { get; set; }
+            public MoonPhaseDay(MoonPhase iMoonPhase, DateTime iEarthDate)
+            {
+                this.MoonPhase = iMoonPhase;
+                this.EarthDate = iEarthDate;
+            }
+        }
+        private class TimeTable
+        {
+            public byte Open { get; set; }
+            public byte Close { get; set; }
+            public TimeTable(byte iOpen, byte iClose)
+            {
+                this.Open = iOpen;
+                this.Close = iClose;
             }
         }
         #endregion
@@ -1537,6 +1581,137 @@ namespace EnjoyFishing
         {
             System.Diagnostics.Process.Start("http://" + settings.Global.UpdateDB.ServerName);
         }
+        /// <summary>
+        /// 月齢 Clickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lblMoonPhase_Click(object sender, EventArgs e)
+        {
+            MoonPhaseForm frmMoonPhase = new MoonPhaseForm(fface);
+            frmMoonPhase.ShowDialog();
+        }
+        #region Tips
+        private void lblMoonPhase_MouseHover(object sender, EventArgs e)
+        {
+            var pos = this.PointToClient(Cursor.Position);
+            tipAnyTime.Show(getToolTipMoonPhase(fishing), this, pos.X + 20, pos.Y, 60000);
+        }
+        private void lblMoonPhase_MouseLeave(object sender, EventArgs e)
+        {
+            tipAnyTime.Hide(this);
+        }
+        /// <summary>
+        /// 月齢のTipsを取得
+        /// </summary>
+        /// <param name="iFishing"></param>
+        /// <returns></returns>
+        private string getToolTipMoonPhase(FishingTool iFishing)
+        {
+            string ret = string.Format("{0}({1}%)", dicMoonPhaseName[iFishing.MoonPhase], fishing.MoonPercent);
+            if (iFishing.MoonPhase == MoonPhase.New || iFishing.MoonPhase == MoonPhase.Full)
+            {
+                ret += "釣果が向上";
+            }
+            else if (iFishing.MoonPhase == MoonPhase.FirstQuarter || iFishing.MoonPhase == MoonPhase.LastQuarter)
+            {
+                ret += "釣果が低下";
+            }
+            //月齢取得
+            List<MoonPhaseDay> moonPhaseList = getMoonPhaseList(iFishing);
+            //次の月齢
+            TimeSpan spanTime = moonPhaseList[0].EarthDate - DateTime.Now;
+            ret += string.Format("\n次の月齢 {0} あと{1:00}:{2:00}", moonPhaseList[0].EarthDate.ToString("MM/dd HH:mm"), spanTime.Days * 24 + spanTime.Hours, spanTime.Minutes);
+            //次の新月・満月
+            foreach (var moonPhase in moonPhaseList)
+            {
+                if (moonPhase.MoonPhase == MoonPhase.Full || moonPhase.MoonPhase == MoonPhase.New)
+                {
+                    spanTime = moonPhase.EarthDate - DateTime.Now;
+                    ret += string.Format("\n次の{0} {1} あと{2:00}:{3:00}", dicMoonPhaseName[moonPhase.MoonPhase], moonPhase.EarthDate.ToString("MM/dd HH:mm"), spanTime.Days * 24 + spanTime.Hours, spanTime.Minutes);
+                }
+            }
+            return ret;
+        }
+        /// <summary>
+        /// 月齢リストを取得
+        /// </summary>
+        /// <param name="iFishing"></param>
+        /// <returns></returns>
+        private List<MoonPhaseDay> getMoonPhaseList(FishingTool iFishing)
+        {
+            var ret = new List<MoonPhaseDay>();
+            //var vanadate = iFishing.VanaDateTime;
+
+            FFACE.TimerTools.VanaTime v = new FFACE.TimerTools.VanaTime();
+            v.Year = iFishing.VanaDateTime.Year;
+            v.Month = iFishing.VanaDateTime.Month;
+            v.Day = iFishing.VanaDateTime.Day;
+
+            MoonPhase last = FFACEControl.GetMoonPhaseFromVanaTime(v);
+            for (int i = 0; i < (12 * 7); i++)
+            {
+                v = FFACEControl.addVanaDay(v);
+                MoonPhase m = FFACEControl.GetMoonPhaseFromVanaTime(v);
+                if (last != m)
+                {
+                    ret.Add(new MoonPhaseDay(m, FFACEControl.GetEarthTimeFromVanaTime(v)));
+                }
+                last = m;
+            }
+            return ret;
+        }
+        private void lblVanaTime_MouseHover(object sender, EventArgs e)
+        {
+            var pos = this.PointToClient(Cursor.Position);
+            tipAnyTime.Show(getToolTipVanaTime(fishing), this, pos.X + 20, pos.Y, 60000);
+        }
+        private void lblVanaTime_MouseLeave(object sender, EventArgs e)
+        {
+            tipAnyTime.Hide(this);
+        }
+        private string getToolTipVanaTime(FishingTool iFishing)
+        {
+            string ret = "ヴァナ時間 " + iFishing.VanaDateTimeYmdhms + "\n";
+            /*
+            ret += "ギルド\n";
+            ret += "ウィンダス " + getToolTipGuild(iFishing, GuildTimeTableKind.WINDUST) + "\n";
+            ret += "セルビナ　 " + getToolTipGuild(iFishing, GuildTimeTableKind.SELBINA) + "\n";
+            ret += "ビビキー湾 " + getToolTipGuild(iFishing, GuildTimeTableKind.BIBIKI) + "\n";
+            ret += "白門　　　 " + getToolTipGuild(iFishing, GuildTimeTableKind.WHITEGATE) + "\n";
+            ret += "機船　　　 " + getToolTipGuild(iFishing, GuildTimeTableKind.SHIP) + "\n";
+            */ 
+            return ret;
+        }
+        private string getToolTipGuild(FishingTool iFishing, GuildTimeTableKind iKind)
+        {
+            string ret = string.Empty;
+            //開店・閉店
+            string openClose = string.Empty;
+            FFACE.TimerTools.VanaTime currVanaTime = iFishing.VanaDateTime;
+            FFACE.TimerTools.VanaTime v = iFishing.VanaDateTime;
+            if (currVanaTime.Hour >= dicTimeTable[iKind].Open && currVanaTime.Hour < dicTimeTable[iKind].Close)
+            {
+                openClose = "Open";
+                if (v.Hour >= dicTimeTable[iKind].Close) v = FFACEControl.addVanaDay(v);
+                v.Hour = dicTimeTable[iKind].Close;
+                v.Minute = 0;
+                v.Second = 0;
+            }
+            else
+            {
+                openClose = "Close";
+                if (v.Hour >= dicTimeTable[iKind].Close) v = FFACEControl.addVanaDay(v);
+                v.Hour = dicTimeTable[iKind].Open;
+                v.Minute = 0;
+                v.Second = 0;
+            }
+            var remain = FFACEControl.GetEarthTimeFromVanaTime(v) - DateTime.Now;
+
+            ret = string.Format("{0,-5} {1,2}分 {2}", openClose, remain.Hours * 60 + remain.Minutes, v);
+            return ret;
+        }
+        #endregion
         #endregion
 
         #region メソッド
@@ -2309,19 +2484,9 @@ namespace EnjoyFishing
             {
                 FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
                 //月齢
-                lblMoonPhase.ToolTipText = string.Format("{0}({1}%)", dicMoonPhaseName[iFishing.MoonPhase], fishing.MoonPercent);
                 lblMoonPhase.Image = dicMoonPhaseImage[iFishing.MoonPhase];
-                if (iFishing.MoonPhase == MoonPhase.New || iFishing.MoonPhase == MoonPhase.Full)
-                {
-                    lblMoonPhase.ToolTipText += "\r\n釣果が向上";
-                }
-                else if (iFishing.MoonPhase == MoonPhase.FirstQuarter || iFishing.MoonPhase == MoonPhase.LastQuarter)
-                {
-                    lblMoonPhase.ToolTipText += "\r\n釣果が低下";
-                }
                 //ヴァナ時間
                 lblVanaTime.Text = string.Format("{0:00}:{1:00}", iFishing.VanaDateTime.Hour, iFishing.VanaDateTime.Minute);
-                lblVanaTime.ToolTipText = "ヴァナ時間 " + iFishing.VanaDateTimeYmdhms;
                 //地球時間
                 lblEarthTime.Text = iFishing.EarthDateTime.ToString("HH:mm");
                 lblEarthTime.ToolTipText = "地球時間 " + iFishing.EarthDateTime.ToString("yyyy/MM/dd HH:mm");
@@ -3303,5 +3468,6 @@ namespace EnjoyFishing
             }
         }
         #endregion
+
     }
 }
