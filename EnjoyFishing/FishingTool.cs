@@ -1261,7 +1261,7 @@ namespace EnjoyFishing
             oFish.ItemType = FishDBItemTypeKind.Unknown;
             oFish.FishType = FishDBFishTypeKind.Unknown;
             oFish.Result = FishResultStatusKind.NoBite;
-            oFish.EarthTime = this.EarthDateTime.ToString();
+            oFish.EarthTime = this.EarthDateTime.ToString("yyyy/MM/dd HH:mm:ss");
             oFish.VanaTime = this.VanaDateTimeYmdhms;
             oFish.VanaWeekDay = this.DayType;
             oFish.MoonPhase = this.MoonPhase;
@@ -1389,7 +1389,7 @@ namespace EnjoyFishing
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
                         logger.Output(LogLevelKind.INFO, string.Format("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4} アイテムタイプ：{5}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType, oFish.ItemType));
                         //日時の設定
-                        oFish.EarthTime = this.EarthDateTime.ToString();
+                        oFish.EarthTime = this.EarthDateTime.ToString("yyyy/MM/dd HH:mm:ss");
                         oFish.VanaTime = this.VanaDateTimeYmdhms;
                         oFish.VanaWeekDay = this.DayType;
                         oFish.MoonPhase = this.MoonPhase;

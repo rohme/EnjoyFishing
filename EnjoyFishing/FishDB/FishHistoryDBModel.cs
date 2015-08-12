@@ -57,7 +57,7 @@ namespace EnjoyFishing
         {
             this.Version = string.Empty;
             this.PlayerName = string.Empty;
-            this.EarthDate = DateTime.Today.ToString();
+            this.EarthDate = DateTime.Today.ToString("yyyy/MM/dd");
             this.Uploaded = false;
             this.TimeElapsed = 0;
             this.Fishes = new List<FishHistoryDBFishModel>();
@@ -132,7 +132,7 @@ namespace EnjoyFishing
             this.FishCount = 0;
             this.FishType = FishDBFishTypeKind.Unknown;
             this.Result = FishResultStatusKind.NoBite;
-            this.EarthTime = DateTime.Today.ToString();
+            this.EarthTime = DateTime.Today.ToString("yyyy/MM/dd HH:mm:ss");
             this.VanaTime = string.Empty;
             this.VanaWeekDay = Weekday.Unknown;
             this.MoonPhase = FFACETools.MoonPhase.Unknown;
