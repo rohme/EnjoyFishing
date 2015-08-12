@@ -297,13 +297,6 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 #### 履歴 列表示
 * 履歴の詳細タブに表示する項目を指定できます。
 
-### 月齢カレンダー
-
-![月齢カレンダー](http://i.imgur.com/hVbqjFv.jpg)
-
-* ステータスバーの月齢にマウスカーソルを合わせると、現在の月齢の残り時間・次の満月までの時間・次の新月までの時間を表示します。
-* また、月齢をクリックすると、月齢カレンダーを表示します。
-
 ## FFからのEnjoyFishingの制御
 　FFよりEnjoyFishingの制御を行いたい場合、/Echoにて以下の文字列をチャットに表示してください。
 * 釣りの開始 `/echo EnjoyFishing Start`
@@ -326,10 +319,6 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 http://delvl.ffevo.net/Lolwutt/FFACE4-Public/tree/master
 * [FFACE](http://www.ffevo.net/)に障害情報が挙がっていないか確認する。  
 http://delvl.ffevo.net/Lolwutt/FFACE4-Public/issues
-* 最新の[EliteAPI](http://www.elitemmonetwork.com/)をインストールする。  
-http://ext.elitemmonetwork.com/downloads/eliteapi/
-* [EliteAPI](http://www.elitemmonetwork.com/)に障害情報が挙がっていないか確認する。  
-http://www.elitemmonetwork.com/forums/viewforum.php?f=28
 * [VisualStudio2013のランタイム](http://www.microsoft.com/ja-JP/download/details.aspx?id=40784)をインストールする。**（必ずx86版を使用してください）**
 * [.Net4.0](http://www.microsoft.com/ja-JP/download/details.aspx?id=17718)以上をインストールする。
 
@@ -343,7 +332,6 @@ http://www.elitemmonetwork.com/forums/viewforum.php?f=28
 * [Windower4](http://windower.net/)
 * [FFACE](http://www.ffevo.net/)
 * [FFACETools](https://github.com/h1pp0/FFACETools_ffevo.net/)を修正した[FFACEToolsJP](https://github.com/rohme/FFACEToolsJP)
-* [EliteAPI](http://www.elitemmonetwork.com/)
 
 ## ソース
 EnjoyFishingは以下のサイトで、GPLv2ライセンスにて公開しています。  
@@ -355,12 +343,6 @@ https://github.com/rohme/
 　このソフトウェアを使用したことによって生じたすべての障害・損害・不具合等に関しては、作者は一切の責任を負いません。各自の責任においてご使用ください。  
 
 ## 修正履歴
-* **2015-08-12 Ver1.1.4**
-	- 魚ID及びHPの取得、及び竿の入力をEliteAPIで代替
-	- 月齢カレンダー機能の追加
-	- 竿とエサを装備していない状態で自動着替えを行った場合、竿かエサが装備されていないとエラーが発生してしまうのを修正
-	- 竿折れした場合、魚リストのチェックがクリアされるのを修正
-	- 履歴DBの日時フォーマットの修正
 * **2015-07-25 Ver1.1.3**
     - 何かしらのメニューを開いた状態で釣りを開始すると、正常に着替えができなかったのを修正
     - プレイヤー別に設定を保存しておいた状態で回線切断やクラ落ちしてしまった場合、設定ファイルが正常に更新されず、次回起動時に落ちてしまうのを修正
