@@ -85,7 +85,7 @@ namespace EnjoyFishing
         #endregion
         private static Dictionary<GuildTimeTableKind, TimeTable> dicTimeTable = new Dictionary<GuildTimeTableKind, TimeTable>()
         {
-            {GuildTimeTableKind.WINDUST, new TimeTable(2,4)},
+            {GuildTimeTableKind.WINDUST, new TimeTable(3,18)},
             {GuildTimeTableKind.SELBINA, new TimeTable(3,18)},
             {GuildTimeTableKind.BIBIKI, new TimeTable(1,18)},
             {GuildTimeTableKind.WHITEGATE, new TimeTable(1,18)},

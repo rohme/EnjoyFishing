@@ -87,6 +87,9 @@
     <ApplicationManifest>EnjoyFishing.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EliteAPITools">
+      <HintPath>..\..\EliteAPITools\EliteAPITools\bin\x86\Debug\EliteAPITools.dll</HintPath>
+    </Reference>
     <Reference Include="FFACETools">
       <HintPath>..\..\FFACEToolsJP\bin\Debug\FFACETools.dll</HintPath>
     </Reference>
@@ -169,6 +172,9 @@
     <EmbeddedResource Include="MiscTools\PolToolForm.resx">
       <DependentUpon>PolToolForm.cs</DependentUpon>
     </EmbeddedResource>
+    <Content Include="EliteAPI.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="FishDB\Bait.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
