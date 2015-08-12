@@ -547,6 +547,130 @@ namespace MiscTools
         }
         #endregion
 
+        #region 時間関連
+        /// <summary>
+        /// 地球時間からヴァナ時間を取得
+        /// </summary>
+        /// <param name="iEarthDate">地球時間</param>
+        /// <returns>ヴァナ時間</returns>
+        public static FFACETools.FFACE.TimerTools.VanaTime GetVanaTimeFromEarthTime(DateTime iEarthDate)
+        {
+            //地球時間 2002/01/01 00:00:00 = 天晶暦 0886/01/01 00:00:00
+            //一年＝３６０日 一ヶ月＝３０日 一日＝２４時間 一時間＝６０分 一分＝６０秒
+            var ret = new FFACE.TimerTools.VanaTime();
+            DateTime baseDate = new DateTime(2002, 1, 1, 0, 0, 0);
+            DateTime nowDate = new DateTime(iEarthDate.Year, iEarthDate.Month, iEarthDate.Day, iEarthDate.Hour, iEarthDate.Minute, iEarthDate.Second);
+            long baseTicks = baseDate.Ticks / 10000000L;
+            long nowTicks = nowDate.Ticks / 10000000L;
+            long vanaTicks = (nowTicks - baseTicks) * 25L;
+            //年
+            double year = vanaTicks / (360D * 24D * 60D * 60D);
+            ret.Year = (short)(Math.Floor(year) + 886D);
+            //月
+            ret.Month = (byte)((vanaTicks % (360D * 24D * 60D * 60D)) / (30D * 24D * 60D * 60D) + 1);
+            //日
+            ret.Day = (byte)((vanaTicks % (30D * 24D * 60D * 60D)) / (24D * 60D * 60D) + 1);
+            //時
+            ret.Hour = (byte)((vanaTicks % (24D * 60D * 60D)) / (60D * 60D));
+            //分
+            ret.Minute = (byte)((vanaTicks % (60D * 60D)) / (60D));
+            //秒
+            ret.Second = (byte)(vanaTicks % 60D);
+            //曜日
+            double dayType = (byte)((vanaTicks % (8D * 24D * 60D * 60D)) / (24D * 60D * 60D));
+            ret.DayType = (Weekday)dayType;
+            //月齢
+            double moonPhase = (byte)((vanaTicks % (12D * 7D * 24D * 60D * 60D)) / (7D * 24D * 60D * 60D));
+            ret.MoonPhase = (MoonPhase)moonPhase;
+            return ret;
+        }
+        /// <summary>
+        /// ヴァナ日付より地球日付を取得
+        /// </summary>
+        /// <param name="iVanaDate"></param>
+        /// <returns></returns>
+        public static DateTime GetEarthTimeFromVanaTime(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        {
+            //地球時間 2002/01/01 00:00:00 = 天晶暦 0886/01/01 00:00:00
+            //一年＝３６０日 一ヶ月＝３０日 一日＝２４時間 一時間＝６０分 一分＝６０秒
+            long baseTicks = (886L * 360L * 24L * 60L * 60L) + (30L * 24L * 60L * 60L) + (24L * 60L * 60L);
+            long vanaTicks = (iVanaDate.Year * 12L * 30L * 24L * 60L * 60L) +
+                            (iVanaDate.Month * 30L * 24L * 60L * 60L) +
+                            (iVanaDate.Day * 24L * 60L * 60L) +
+                            (iVanaDate.Hour * 60L * 60L) +
+                            (iVanaDate.Minute * 60L) +
+                            (long)iVanaDate.Second;
+            long addseconds = (((vanaTicks - baseTicks) / 25L));
+            DateTime ret = new DateTime(2002, 1, 1, 0, 0, 0);
+            ret = ret.AddSeconds(addseconds);
+            return ret;
+        }
+        /// <summary>
+        /// ヴァナ時間より月齢を取得
+        /// </summary>
+        /// <param name="iVanaDate">ヴァナ日付</param>
+        /// <returns>月齢</returns>
+        public static MoonPhase GetMoonPhaseFromVanaTime(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        {
+            long vanaTicks = getVanaTicks(iVanaDate);
+            double moonPhase = (byte)((vanaTicks % (12D * 7D * 24D * 60D * 60D)) / (7D * 24D * 60D * 60D));
+            return (MoonPhase)moonPhase;
+        }
+        /// <summary>
+        /// ヴァナ日付より曜日を取得
+        /// </summary>
+        /// <param name="iVanaDate"></param>
+        /// <returns></returns>
+        public static Weekday GetWeekdayFromVanaTime(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        {
+            long vanaTicks = getVanaTicks(iVanaDate);
+            double dayType = (byte)((vanaTicks % (8D * 24D * 60D * 60D)) / (24D * 60D * 60D));
+            return (Weekday)dayType;
+        }
+        /// <summary>
+        /// ヴァナ時間のTicksを取得
+        /// </summary>
+        /// <param name="iVanaDate">ヴァナ日付</param>
+        /// <returns>Ticks</returns>
+        private static long getVanaTicks(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        {
+            long baseTicks = (886L * 360L * 24L * 60L * 60L) + (30L * 24L * 60L * 60L) + (24L * 60L * 60L);
+            long vanaTicks = (iVanaDate.Year * 12L * 30L * 24L * 60L * 60L) +
+                            (iVanaDate.Month * 30L * 24L * 60L * 60L) +
+                            (iVanaDate.Day * 24L * 60L * 60L) +
+                            (iVanaDate.Hour * 60L * 60L) +
+                            (iVanaDate.Minute * 60L) +
+                            (long)iVanaDate.Second;
+            return vanaTicks - baseTicks;
+        }
+        /// <summary>
+        /// ヴァナ日付に任意の日付を足す
+        /// </summary>
+        /// <param name="iVanaTime"></param>
+        /// <param name="iAddDays"></param>
+        /// <returns></returns>
+        public static FFACE.TimerTools.VanaTime addVanaDay(FFACE.TimerTools.VanaTime iVanaTime, int iAddDays = 1)
+        {
+            var ret = iVanaTime;
+            for (int i = 0; i < iAddDays; i++)
+            {
+                ret.Day++;
+                if (ret.Day > 30)
+                {
+                    ret.Day = 1;
+                    ret.Month++;
+                }
+                if (ret.Month > 12)
+                {
+                    ret.Month = 1;
+                    ret.Year++;
+                }
+            }
+            return ret;
+        }
+
+        #endregion
+
         #region その他
         /// <summary>
         /// Windowerがインストールされているパスの取得

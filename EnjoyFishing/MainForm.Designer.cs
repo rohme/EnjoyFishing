@@ -106,10 +106,13 @@
             this.chkInventoryFullCmd = new System.Windows.Forms.CheckBox();
             this.txtInventoryFullCmdLine = new System.Windows.Forms.TextBox();
             this.tabFishingMainEquip = new System.Windows.Forms.TabPage();
+            this.cmbEquipMain = new System.Windows.Forms.ComboBox();
             this.chkEquipEnable = new System.Windows.Forms.CheckBox();
+            this.chkUseFood = new System.Windows.Forms.CheckBox();
             this.chkUseRingRight = new System.Windows.Forms.CheckBox();
             this.chkUseRingLeft = new System.Windows.Forms.CheckBox();
             this.chkUseWaist = new System.Windows.Forms.CheckBox();
+            this.label34 = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
             this.label25 = new System.Windows.Forms.Label();
             this.label32 = new System.Windows.Forms.Label();
@@ -126,6 +129,7 @@
             this.label19 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.cmbFood = new System.Windows.Forms.ComboBox();
             this.cmbEquipRingRight = new System.Windows.Forms.ComboBox();
             this.cmbEquipNeck = new System.Windows.Forms.ComboBox();
             this.cmbEquipRingLeft = new System.Windows.Forms.ComboBox();
@@ -140,7 +144,6 @@
             this.cmbEquipHead = new System.Windows.Forms.ComboBox();
             this.cmbEquipSub = new System.Windows.Forms.ComboBox();
             this.cmbEquipBait = new System.Windows.Forms.ComboBox();
-            this.cmbEquipMain = new System.Windows.Forms.ComboBox();
             this.cmbEquipRod = new System.Windows.Forms.ComboBox();
             this.tabFishingMainInfo = new System.Windows.Forms.TabPage();
             this.lblFishingInfoTimeElapsed = new System.Windows.Forms.Label();
@@ -251,10 +254,6 @@
             this.chkStatusBarVisibleHP = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTimeBar = new System.Windows.Forms.CheckBox();
             this.chkStatusBarVisibleRemainTime = new System.Windows.Forms.CheckBox();
-            this.tipSwitching = new System.Windows.Forms.ToolTip(this.components);
-            this.cmbFood = new System.Windows.Forms.ComboBox();
-            this.label34 = new System.Windows.Forms.Label();
-            this.chkUseFood = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtChatRestartMinute)).BeginInit();
@@ -366,7 +365,9 @@
             this.lblMoonPhase.Name = "lblMoonPhase";
             this.lblMoonPhase.Size = new System.Drawing.Size(19, 17);
             this.lblMoonPhase.Text = "月";
-            this.lblMoonPhase.ToolTipText = "てすと";
+            this.lblMoonPhase.Click += new System.EventHandler(this.lblMoonPhase_Click);
+            this.lblMoonPhase.MouseLeave += new System.EventHandler(this.lblMoonPhase_MouseLeave);
+            this.lblMoonPhase.MouseHover += new System.EventHandler(this.lblMoonPhase_MouseHover);
             // 
             // lblDayType
             // 
@@ -381,6 +382,8 @@
             this.lblVanaTime.Name = "lblVanaTime";
             this.lblVanaTime.Size = new System.Drawing.Size(40, 17);
             this.lblVanaTime.Text = "99:99";
+            this.lblVanaTime.MouseLeave += new System.EventHandler(this.lblVanaTime_MouseLeave);
+            this.lblVanaTime.MouseHover += new System.EventHandler(this.lblVanaTime_MouseHover);
             // 
             // lblEarthTime
             // 
@@ -1408,6 +1411,17 @@
             this.tabFishingMainEquip.Text = "装備・食事";
             this.tabFishingMainEquip.UseVisualStyleBackColor = true;
             // 
+            // cmbEquipMain
+            // 
+            this.cmbEquipMain.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEquipMain.FormattingEnabled = true;
+            this.cmbEquipMain.ItemHeight = 14;
+            this.cmbEquipMain.Location = new System.Drawing.Point(232, 30);
+            this.cmbEquipMain.Name = "cmbEquipMain";
+            this.cmbEquipMain.Size = new System.Drawing.Size(121, 22);
+            this.cmbEquipMain.TabIndex = 8;
+            this.cmbEquipMain.SelectedIndexChanged += new System.EventHandler(this.cmbEquipMain_SelectedIndexChanged);
+            // 
             // chkEquipEnable
             // 
             this.chkEquipEnable.AutoSize = true;
@@ -1418,6 +1432,17 @@
             this.chkEquipEnable.Text = "開始時に着替えを行う";
             this.chkEquipEnable.UseVisualStyleBackColor = true;
             this.chkEquipEnable.CheckedChanged += new System.EventHandler(this.chkEquipEnable_CheckedChanged);
+            // 
+            // chkUseFood
+            // 
+            this.chkUseFood.AutoSize = true;
+            this.chkUseFood.Location = new System.Drawing.Point(356, 263);
+            this.chkUseFood.Name = "chkUseFood";
+            this.chkUseFood.Size = new System.Drawing.Size(48, 18);
+            this.chkUseFood.TabIndex = 21;
+            this.chkUseFood.Text = "使用";
+            this.chkUseFood.UseVisualStyleBackColor = true;
+            this.chkUseFood.CheckedChanged += new System.EventHandler(this.chkUseFood_CheckedChanged);
             // 
             // chkUseRingRight
             // 
@@ -1451,6 +1476,15 @@
             this.chkUseWaist.Text = "使用";
             this.chkUseWaist.UseVisualStyleBackColor = true;
             this.chkUseWaist.CheckedChanged += new System.EventHandler(this.chkUseWaist_CheckedChanged);
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(202, 263);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(29, 14);
+            this.label34.TabIndex = 1;
+            this.label34.Text = "食事";
             // 
             // label33
             // 
@@ -1595,6 +1629,17 @@
             this.label18.Size = new System.Drawing.Size(18, 14);
             this.label18.TabIndex = 1;
             this.label18.Text = "竿";
+            // 
+            // cmbFood
+            // 
+            this.cmbFood.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbFood.FormattingEnabled = true;
+            this.cmbFood.ItemHeight = 14;
+            this.cmbFood.Location = new System.Drawing.Point(232, 260);
+            this.cmbFood.Name = "cmbFood";
+            this.cmbFood.Size = new System.Drawing.Size(121, 22);
+            this.cmbFood.TabIndex = 20;
+            this.cmbFood.SelectedIndexChanged += new System.EventHandler(this.cmbFood_SelectedIndexChanged);
             // 
             // cmbEquipRingRight
             // 
@@ -1749,17 +1794,6 @@
             this.cmbEquipBait.Size = new System.Drawing.Size(121, 22);
             this.cmbEquipBait.TabIndex = 2;
             this.cmbEquipBait.SelectedIndexChanged += new System.EventHandler(this.cmbEquipBait_SelectedIndexChanged);
-            // 
-            // cmbEquipMain
-            // 
-            this.cmbEquipMain.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbEquipMain.FormattingEnabled = true;
-            this.cmbEquipMain.ItemHeight = 14;
-            this.cmbEquipMain.Location = new System.Drawing.Point(232, 30);
-            this.cmbEquipMain.Name = "cmbEquipMain";
-            this.cmbEquipMain.Size = new System.Drawing.Size(121, 22);
-            this.cmbEquipMain.TabIndex = 8;
-            this.cmbEquipMain.SelectedIndexChanged += new System.EventHandler(this.cmbEquipMain_SelectedIndexChanged);
             // 
             // cmbEquipRod
             // 
@@ -2153,6 +2187,12 @@
             this.dateHistory.Size = new System.Drawing.Size(104, 21);
             this.dateHistory.TabIndex = 0;
             this.dateHistory.ValueChanged += new System.EventHandler(this.dateHistory_ValueChanged);
+            // 
+            // tipAnyTime
+            // 
+            this.tipAnyTime.AutoPopDelay = 30000;
+            this.tipAnyTime.InitialDelay = 500;
+            this.tipAnyTime.ReshowDelay = 100;
             // 
             // splitMain
             // 
@@ -3056,37 +3096,6 @@
             this.chkStatusBarVisibleRemainTime.UseVisualStyleBackColor = true;
             this.chkStatusBarVisibleRemainTime.CheckedChanged += new System.EventHandler(this.chkVisibleRemainTime_CheckedChanged);
             // 
-            // cmbFood
-            // 
-            this.cmbFood.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbFood.FormattingEnabled = true;
-            this.cmbFood.ItemHeight = 14;
-            this.cmbFood.Location = new System.Drawing.Point(232, 260);
-            this.cmbFood.Name = "cmbFood";
-            this.cmbFood.Size = new System.Drawing.Size(121, 22);
-            this.cmbFood.TabIndex = 20;
-            this.cmbFood.SelectedIndexChanged += new System.EventHandler(this.cmbFood_SelectedIndexChanged);
-            // 
-            // label34
-            // 
-            this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(202, 263);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(29, 14);
-            this.label34.TabIndex = 1;
-            this.label34.Text = "食事";
-            // 
-            // chkUseFood
-            // 
-            this.chkUseFood.AutoSize = true;
-            this.chkUseFood.Location = new System.Drawing.Point(356, 263);
-            this.chkUseFood.Name = "chkUseFood";
-            this.chkUseFood.Size = new System.Drawing.Size(48, 18);
-            this.chkUseFood.TabIndex = 21;
-            this.chkUseFood.Text = "使用";
-            this.chkUseFood.UseVisualStyleBackColor = true;
-            this.chkUseFood.CheckedChanged += new System.EventHandler(this.chkUseFood_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3318,7 +3327,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.ToolTip tipSwitching;
         private System.Windows.Forms.Label lblFishingInfoNoCatchCount;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label lblAddonCancel;

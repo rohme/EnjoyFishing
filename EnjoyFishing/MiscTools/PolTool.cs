@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FFACETools;
+using EliteAPITools;
 using System.Diagnostics;
 using System.Threading;
 
@@ -20,6 +21,7 @@ namespace MiscTools
         }
         private PolStatusKind _Status = PolStatusKind.Unknown;
         private FFACE _FFACE;
+        private EliteAPITools.EliteAPI _EliteAPI;
         private int _ProcessID = 0;
         private Thread thPol;
 
@@ -70,6 +72,13 @@ namespace MiscTools
             get { return _FFACE; }
         }
         /// <summary>
+        /// EliteAPI
+        /// </summary>
+        public EliteAPITools.EliteAPI EliteAPI
+        {
+            get { return _EliteAPI; }
+        }
+        /// <summary>
         /// POLステータス
         /// </summary>
         public PolStatusKind Status
@@ -97,7 +106,7 @@ namespace MiscTools
         /// </summary>
         private void threadPol()
         {
-            LoginStatus lastStatus = LoginStatus.Loading;
+            FFACETools.LoginStatus lastStatus = FFACETools.LoginStatus.Loading;
             while (true)
             {
                 if (_FFACE != null)
@@ -118,17 +127,17 @@ namespace MiscTools
                         continue;
                     }
 
-                    LoginStatus status = _FFACE.Player.GetLoginStatus;
-                    if (status != LoginStatus.Loading)
+                    FFACETools.LoginStatus status = _FFACE.Player.GetLoginStatus;
+                    if (status != FFACETools.LoginStatus.Loading)
                     {
                         if (status != lastStatus)
                         {
                             switch (status)
                             {
-                                case LoginStatus.CharacterLoginScreen:
+                                case FFACETools.LoginStatus.CharacterLoginScreen:
                                     changeStatus(PolStatusKind.CharacterLoginScreen);
                                     break;
-                                case LoginStatus.LoggedIn:
+                                case FFACETools.LoginStatus.LoggedIn:
                                     changeStatus(PolStatusKind.LoggedIn);
                                     break;
                             }
@@ -168,6 +177,7 @@ namespace MiscTools
             if (polId > 0)
             {
                 _FFACE = new FFACE(polId);
+                _EliteAPI = new EliteAPITools.EliteAPI(polId);
                 this._ProcessID = polId;
                 return true;
             }
