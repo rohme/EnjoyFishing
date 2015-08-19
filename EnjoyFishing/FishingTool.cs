@@ -355,7 +355,11 @@ namespace EnjoyFishing
                     return eliteApi.Fish.Stamina;
                 else
                     return 0;
-
+            }
+            set
+            {
+                //fface.Fish.SetHP(value);
+                eliteApi.Fish.Stamina = value;
             }
         }
         /// <summary>
@@ -1503,9 +1507,8 @@ namespace EnjoyFishing
                         }
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
                         //釣り格闘
-                        
                         //while (fface.Fish.HPCurrent > 0 && fface.Player.Status == FFACETools.Status.FishBite)
-                        while (eliteApi.Fish.Stamina > 0 && fface.Player.Status == FFACETools.Status.FishBite)
+                        while (this.HpCurrent > 0 && fface.Player.Status == FFACETools.Status.FishBite)
                         {
                             //強制HP0
                             if (settings.Fishing.HP0)
@@ -1513,7 +1516,7 @@ namespace EnjoyFishing
                                 if (isExecHp0(DateTime.Parse(oFish.EarthTime), waitHP0))
                                 {
                                     logger.Output(LogLevelKind.INFO,"制限時間を過ぎたので、魚のHPを強制的にゼロにします");
-                                    fface.Fish.SetHP(0);
+                                    this.HpCurrent = 0;
                                     Thread.Sleep(1000);
                                 }
                             }
