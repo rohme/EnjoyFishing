@@ -279,20 +279,65 @@ namespace EnjoyFishing
         /// </summary>
         public FFACETools.LoginStatus LoginStatus { get { return fface.Player.GetLoginStatus; } }
         /// <summary>
+        /// 魚ID1
+        /// </summary>
+        public int ID1
+        {
+            get
+            {
+                //return fface.Fish.ID.ID1;
+                return eliteApi.Fish.Id1;
+            }
+        }
+        /// <summary>
+        /// 魚ID2
+        /// </summary>
+        public int ID2
+        {
+            get
+            {
+                //return fface.Fish.ID.ID2;
+                return eliteApi.Fish.Id2;
+            }
+        }
+        /// <summary>
+        /// 魚ID3
+        /// </summary>
+        public int ID3
+        {
+            get
+            {
+                //return fface.Fish.ID.ID3;
+                return eliteApi.Fish.Id3;
+            }
+        }
+        /// <summary>
+        /// 魚ID4
+        /// </summary>
+        public int ID4
+        {
+            get
+            {
+                //return fface.Fish.ID.ID4;
+                return eliteApi.Fish.Id4;
+            }
+        }
+        /// <summary>
         /// 魚HP（最大）
         /// </summary>
         public int HpMax
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
-                {
-                    return fface.Fish.HPMax;
-                }
+                //if (fface.Player.Status == FFACETools.Status.FishBite)
+                //    return fface.Fish.HPMax;
+                //else
+                //    return 0;
+                if (eliteApi.Player.Status == EliteAPITools.Status.FishBite)
+                    return eliteApi.Fish.MaxStamina;
                 else
-                {
                     return 0;
-                }
+
             }
         }
         /// <summary>
@@ -302,14 +347,19 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
-                {
-                    return fface.Fish.HPCurrent;
-                }
+                //if (fface.Player.Status == FFACETools.Status.FishBite)
+                //    return fface.Fish.HPCurrent;
+                //else
+                //    return 0;
+                if (eliteApi.Player.Status == EliteAPITools.Status.FishBite)
+                    return eliteApi.Fish.Stamina;
                 else
-                {
                     return 0;
-                }
+            }
+            set
+            {
+                //fface.Fish.SetHP(value);
+                eliteApi.Fish.Stamina = value;
             }
         }
         /// <summary>
@@ -319,16 +369,27 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                //if (fface.Player.Status == FFACETools.Status.FishBite)
+                //{
+                //    double per = 0.00;
+                //    if (fface.Fish.HPMax > 0) per = (double)fface.Fish.HPCurrent / (double)fface.Fish.HPMax;
+                //    return (int)Math.Round(per * 100);
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
+                if (eliteApi.Player.Status == EliteAPITools.Status.FishBite)
                 {
                     double per = 0.00;
-                    if (fface.Fish.HPMax > 0) per = (double)fface.Fish.HPCurrent / (double)fface.Fish.HPMax;
+                    if (eliteApi.Fish.MaxStamina > 0) per = (double)eliteApi.Fish.Stamina / (double)eliteApi.Fish.MaxStamina;
                     return (int)Math.Round(per * 100);
                 }
                 else
                 {
                     return 0;
                 }
+
             }
         }
         /// <summary>
@@ -338,9 +399,19 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                //if (fface.Player.Status == FFACETools.Status.FishBite)
+                //{
+                //    if (this.remainTimeMAX < fface.Fish.Timeout) this.remainTimeMAX = fface.Fish.Timeout;
+                //    return this.remainTimeMAX;
+                //}
+                //else
+                //{
+                //    this.remainTimeMAX = 0;
+                //    return 0;
+                //}
+                if (eliteApi.Player.Status == EliteAPITools.Status.FishBite)
                 {
-                    if (this.remainTimeMAX < fface.Fish.Timeout) this.remainTimeMAX = fface.Fish.Timeout;
+                    if (this.remainTimeMAX < eliteApi.Fish.FightTime) this.remainTimeMAX = eliteApi.Fish.FightTime;
                     return this.remainTimeMAX;
                 }
                 else
@@ -348,6 +419,7 @@ namespace EnjoyFishing
                     this.remainTimeMAX = 0;
                     return 0;
                 }
+
             }
         }
         /// <summary>
@@ -357,9 +429,17 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                //if (fface.Player.Status == FFACETools.Status.FishBite)
+                //{
+                //    return fface.Fish.Timeout;
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
+                if (eliteApi.Player.Status == EliteAPITools.Status.FishBite)
                 {
-                    return fface.Fish.Timeout;
+                    return eliteApi.Fish.FightTime / 100;
                 }
                 else
                 {
@@ -374,11 +454,23 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                //if (fface.Player.Status == FFACETools.Status.FishBite)
+                //{
+                //    if (this.remainTimeMAX < fface.Fish.Timeout) this.remainTimeMAX = fface.Fish.Timeout;
+                //    double per = 0.00;
+                //    if (this.remainTimeMAX > 0) per = (double)fface.Fish.Timeout / (double)this.remainTimeMAX;
+                //    return (int)Math.Round(per * 100);
+                //}
+                //else
+                //{
+                //    this.remainTimeMAX = 0;
+                //    return 0;
+                //}
+                if (eliteApi.Player.Status == EliteAPITools.Status.FishBite)
                 {
-                    if (this.remainTimeMAX < fface.Fish.Timeout) this.remainTimeMAX = fface.Fish.Timeout;
+                    if (this.remainTimeMAX < eliteApi.Fish.FightTime) this.remainTimeMAX = eliteApi.Fish.FightTime;
                     double per = 0.00;
-                    if (this.remainTimeMAX > 0) per = (double)fface.Fish.Timeout / (double)this.remainTimeMAX;
+                    if (this.remainTimeMAX > 0) per = (double)eliteApi.Fish.FightTime / (double)this.remainTimeMAX;
                     return (int)Math.Round(per * 100);
                 }
                 else
@@ -1363,14 +1455,10 @@ namespace EnjoyFishing
                         }
                         Thread.Sleep(500);
                         //IDの設定
-                        //oFish.ID1 = fface.Fish.ID.ID1;
-                        //oFish.ID2 = fface.Fish.ID.ID2;
-                        //oFish.ID3 = fface.Fish.ID.ID3;
-                        //oFish.ID4 = fface.Fish.ID.ID4;
-                        oFish.ID1 = eliteApi.Fish.Id1;
-                        oFish.ID2 = eliteApi.Fish.Id2;
-                        oFish.ID3 = eliteApi.Fish.Id3;
-                        oFish.ID4 = eliteApi.Fish.Id4;
+                        oFish.ID1 = this.ID1;
+                        oFish.ID2 = this.ID2;
+                        oFish.ID3 = this.ID3;
+                        oFish.ID4 = this.ID4;
                         //魚名称・タイプの設定
                         FishDBFishModel fish = FishDB.SelectFishFromIDZone(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, false);
                         if (!string.IsNullOrEmpty(fish.FishName))
@@ -1419,9 +1507,8 @@ namespace EnjoyFishing
                         }
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
                         //釣り格闘
-                        
                         //while (fface.Fish.HPCurrent > 0 && fface.Player.Status == FFACETools.Status.FishBite)
-                        while (eliteApi.Fish.Stamina > 0 && fface.Player.Status == FFACETools.Status.FishBite)
+                        while (this.HpCurrent > 0 && fface.Player.Status == FFACETools.Status.FishBite)
                         {
                             //強制HP0
                             if (settings.Fishing.HP0)
@@ -1429,7 +1516,7 @@ namespace EnjoyFishing
                                 if (isExecHp0(DateTime.Parse(oFish.EarthTime), waitHP0))
                                 {
                                     logger.Output(LogLevelKind.INFO,"制限時間を過ぎたので、魚のHPを強制的にゼロにします");
-                                    fface.Fish.SetHP(0);
+                                    this.HpCurrent = 0;
                                     Thread.Sleep(1000);
                                 }
                             }
