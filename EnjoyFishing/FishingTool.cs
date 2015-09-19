@@ -1038,7 +1038,7 @@ namespace EnjoyFishing
                 }
                 lastCastDate = DateTime.Now.Date;
                 //チャット処理
-                FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                ChatEntry cl = new ChatEntry();
                 while (chat.GetNextChatLine(out cl))
                 {
                     List<string> chatKbnArgs = new List<string>();
@@ -1071,7 +1071,7 @@ namespace EnjoyFishing
                         setMessage(string.Format("チャット感知：再始動待ち {0}(地球時間)まで待機", restartTime.ToString("HH:mm:ss")));
                         wait(waitSec, waitSec);
                         //チャットバッファをクリア
-                        FFACE.ChatTools.ChatLine waitCl = new FFACE.ChatTools.ChatLine();
+                        ChatEntry waitCl = new ChatEntry();
                         while (chat.GetNextChatLine(out waitCl))
                         {
                             Thread.Sleep(10);
@@ -1378,7 +1378,7 @@ namespace EnjoyFishing
                 fface.Windower.SendString("/fish");
                 Thread.Sleep(2000);//wait
 
-                FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                ChatEntry cl = new ChatEntry();
                 while (chat.GetNextChatLine(out cl))
                 {
                     //チャット区分の取得
@@ -1430,7 +1430,7 @@ namespace EnjoyFishing
             this.lastZoneName = this.ZoneName;
             while (this.RunningStatus == RunningStatusKind.Running)
             {
-                FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                ChatEntry cl = new ChatEntry();
                 //エリア切り替わり感知
                 if (lastZoneName.Length > 0 && lastZoneName != this.ZoneName)
                 {
@@ -1914,35 +1914,35 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iCl">チャットライン</param>
         /// <returns>チャット区分</returns>
-        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs)
+        private ChatKbnKind getChatKbnFromChatline(ChatEntry iCl, out List<string> oArgs)
         {
             oArgs = new List<string>();
-            switch (iCl.Type)
+            switch (iCl.ChatType)
             {
-                case ChatMode.RcvdTell:
+                case ChatType.RcvdTell:
                 //case ChatMode.SentTell:
                     if(settings.Fishing.ChatTell) interrupt.ChatReceive = true;
                     return ChatKbnKind.Tell;
-                case ChatMode.RcvdSay:
-                case ChatMode.SentSay:
+                case ChatType.RcvdSay:
+                case ChatType.SentSay:
                     if (settings.Fishing.ChatSay) interrupt.ChatReceive = true;
                     return ChatKbnKind.Say;
-                case ChatMode.RcvdParty:
-                case ChatMode.SentParty:
+                case ChatType.RcvdParty:
+                case ChatType.SentParty:
                     if (settings.Fishing.ChatParty) interrupt.ChatReceive = true;
                     return ChatKbnKind.Party;
-                case ChatMode.RcvdLinkShell:
-                case ChatMode.SentLinkShell:
+                case ChatType.RcvdLinkShell:
+                case ChatType.SentLinkShell:
                     if (settings.Fishing.ChatLs) interrupt.ChatReceive = true;
                     return ChatKbnKind.Linkshell;
-                case ChatMode.RcvdShout:
-                case ChatMode.SentShout:
-                case ChatMode.RcvdYell:
-                case ChatMode.SentYell:
+                case ChatType.RcvdShout:
+                case ChatType.SentShout:
+                case ChatType.RcvdYell:
+                case ChatType.SentYell:
                     if (settings.Fishing.ChatShout) interrupt.ChatReceive = true;
                     return ChatKbnKind.Shout;
-                case ChatMode.RcvdEmote:
-                case ChatMode.SentEmote:
+                case ChatType.RcvdEmote:
+                case ChatType.SentEmote:
                     if (settings.Fishing.ChatEmote && iCl.Text.Contains(this.PlayerName)) interrupt.ChatReceive = true;
                     return ChatKbnKind.Shout;
             }
@@ -2479,7 +2479,7 @@ namespace EnjoyFishing
             Thread.Sleep(settings.Global.WaitChat);
             //合成ログの確認
             logger.Output(LogLevelKind.DEBUG, "竿の修理：ログ確認");
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            ChatEntry cl = new ChatEntry();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 if(!chat.GetNextChatLine(out cl)) break;
@@ -2583,7 +2583,7 @@ namespace EnjoyFishing
         public bool useItem(string iItemname)
         {
             fface.Windower.SendString(string.Format("/item {0} <me>",iItemname));
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            ChatEntry cl = new ChatEntry();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 chat.GetNextChatLine(out cl);

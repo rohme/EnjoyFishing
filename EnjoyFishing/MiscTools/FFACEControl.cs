@@ -8,6 +8,7 @@ using FFACETools;
 using MiscTools;
 using System.IO;
 using System.Threading;
+using EliteAPITools;
 
 namespace MiscTools
 {
@@ -62,12 +63,12 @@ namespace MiscTools
         public bool WaitChat(ChatTool iChatTool, string iRegexString, int iStartChatIndex, bool iWithEnter)
         {
             logger.Output(LogLevelKind.INFO, "WaitChat", string.Format("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter));
-            List<FFACE.ChatTools.ChatLine> arrChatLine;
+            List<ChatEntry> arrChatLine;
             int currChatIndex = iStartChatIndex;
             for (int i = 0; (i < this.MaxLoopCount); i++)
             {
                 arrChatLine = iChatTool.GetChatLine(currChatIndex);
-                foreach (FFACE.ChatTools.ChatLine cl in arrChatLine)
+                foreach (ChatEntry cl in arrChatLine)
                 {
                     //チャットの判定
                     if (MiscTool.IsRegexString(cl.Text, iRegexString))
@@ -79,7 +80,7 @@ namespace MiscTools
                 if (!this.UseEnternity && iWithEnter)
                 {
                     if (this.fface.Target.ID != 0)
-                        this.fface.Windower.SendKeyPress(KeyCode.EnterKey);///Enter
+                        this.fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);///Enter
                 }
                 System.Threading.Thread.Sleep(this.ChatWait);
             }
@@ -108,7 +109,7 @@ namespace MiscTools
                 }
                 if (!this.UseEnternity && iEnter)
                 {
-                    this.fface.Windower.SendKeyPress(KeyCode.EnterKey);//ENTER
+                    this.fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);//ENTER
                 }
                 System.Threading.Thread.Sleep(this.BaseWait);
             }
@@ -130,7 +131,7 @@ namespace MiscTools
                 {
                     if (iWithEnter)
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.EnterKey);///Enter
+                        this.fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);///Enter
                     }
                     return true;
                 }
@@ -138,22 +139,22 @@ namespace MiscTools
                 {
                     if ((this.fface.Menu.DialogOptionIndex - iIdx) >= 3)
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.LeftArrow);//右矢印
+                        this.fface.Windower.SendKeyPress(FFACETools.KeyCode.LeftArrow);//右矢印
                     }
                     else
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.UpArrow);//上矢印
+                        this.fface.Windower.SendKeyPress(FFACETools.KeyCode.UpArrow);//上矢印
                     }
                 }
                 else if (this.fface.Menu.DialogOptionIndex < iIdx)
                 {
                     if ((iIdx - this.fface.Menu.DialogOptionIndex) >= 3)
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.RightArrow);//左矢印
+                        this.fface.Windower.SendKeyPress(FFACETools.KeyCode.RightArrow);//左矢印
                     }
                     else
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.DownArrow);//下矢印
+                        this.fface.Windower.SendKeyPress(FFACETools.KeyCode.DownArrow);//下矢印
                     }
                 }
                 System.Threading.Thread.Sleep(this.BaseWait);
@@ -187,7 +188,7 @@ namespace MiscTools
             {
                 if (fface.Menu.IsOpen)
                 {
-                    fface.Windower.SendKeyPress(KeyCode.EscapeKey);
+                    fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
                     Thread.Sleep(this.BaseWait);
                 }
                 else
@@ -206,11 +207,11 @@ namespace MiscTools
         /// <returns>プラグイン名</returns>
         public List<string> GetPlugin()
         {
-            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn) return new List<string>();
+            if (pol.FFACE.Player.GetLoginStatus != FFACETools.LoginStatus.LoggedIn) return new List<string>();
             chat.Reset();
             fface.Windower.SendString("//plugin_list");
             List<string> ret = new List<string>();
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            ChatEntry cl = new ChatEntry();
             for (int i = 0; i < this.MaxLoopCount && !MiscTool.IsRegexString(cl.Text, REGEX_PLUGIN_END); i++)
             {
                 while (chat.GetNextChatLine(out cl))
@@ -236,13 +237,13 @@ namespace MiscTools
         /// <returns>アドオン名</returns>
         public List<string> GetAddon()
         {
-            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn) return new List<string>();
+            if (pol.FFACE.Player.GetLoginStatus != FFACETools.LoginStatus.LoggedIn) return new List<string>();
             chat.Reset();
             fface.Windower.SendString("//lua list");
             Thread.Sleep(this.BaseWait);
             fface.Windower.SendString("/echo " + REGEX_ADDON_END);
             List<string> ret = new List<string>();
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            ChatEntry cl = new ChatEntry();
             for (int i = 0; i < this.MaxLoopCount && !MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END); i++)
             {
                 while (chat.GetNextChatLine(out cl))
@@ -269,18 +270,18 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>アイテム数</returns>
-        public short GetInventoryCountByType(InventoryType iInventoryType)
+        public short GetInventoryCountByType(FFACETools.InventoryType iInventoryType)
         {
             short cnt = 0;
-            if (iInventoryType == InventoryType.Inventory) cnt = fface.Item.InventoryCount;
-            else if (iInventoryType == InventoryType.Safe) cnt = fface.Item.SafeCount;
-            else if (iInventoryType == InventoryType.Storage) cnt = fface.Item.StorageCount;
-            else if (iInventoryType == InventoryType.Locker) cnt = fface.Item.LockerCount;
-            else if (iInventoryType == InventoryType.Satchel) cnt = fface.Item.SatchelCount;
-            else if (iInventoryType == InventoryType.Sack) cnt = fface.Item.SackCount;
-            else if (iInventoryType == InventoryType.Temp) cnt = fface.Item.TemporaryCount;
-            else if (iInventoryType == InventoryType.Case) cnt = fface.Item.CaseCount;
-            else if (iInventoryType == InventoryType.Wardrobe) cnt = fface.Item.WardrobeCount;
+            if (iInventoryType == FFACETools.InventoryType.Inventory) cnt = fface.Item.InventoryCount;
+            else if (iInventoryType == FFACETools.InventoryType.Safe) cnt = fface.Item.SafeCount;
+            else if (iInventoryType == FFACETools.InventoryType.Storage) cnt = fface.Item.StorageCount;
+            else if (iInventoryType == FFACETools.InventoryType.Locker) cnt = fface.Item.LockerCount;
+            else if (iInventoryType == FFACETools.InventoryType.Satchel) cnt = fface.Item.SatchelCount;
+            else if (iInventoryType == FFACETools.InventoryType.Sack) cnt = fface.Item.SackCount;
+            else if (iInventoryType == FFACETools.InventoryType.Temp) cnt = fface.Item.TemporaryCount;
+            else if (iInventoryType == FFACETools.InventoryType.Case) cnt = fface.Item.CaseCount;
+            else if (iInventoryType == FFACETools.InventoryType.Wardrobe) cnt = fface.Item.WardrobeCount;
             if (cnt > 0) return cnt;
             return 0;
         }
@@ -289,18 +290,18 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>アイテムMAX数</returns>
-        public short GetInventoryMaxByType(InventoryType iInventoryType)
+        public short GetInventoryMaxByType(FFACETools.InventoryType iInventoryType)
         {
             short cnt = 0;
-            if (iInventoryType == InventoryType.Inventory) cnt = fface.Item.InventoryMax;
-            else if (iInventoryType == InventoryType.Safe) cnt = fface.Item.SafeMax;
-            else if (iInventoryType == InventoryType.Storage) cnt = fface.Item.StorageMax;
-            else if (iInventoryType == InventoryType.Locker) cnt = fface.Item.LockerMax;
-            else if (iInventoryType == InventoryType.Satchel) cnt = fface.Item.SatchelMax;
-            else if (iInventoryType == InventoryType.Sack) cnt = fface.Item.SackMax;
-            else if (iInventoryType == InventoryType.Temp) cnt = fface.Item.TemporaryMax;
-            else if (iInventoryType == InventoryType.Case) cnt = fface.Item.CaseMax;
-            else if (iInventoryType == InventoryType.Wardrobe) cnt = fface.Item.WardrobeMax;
+            if (iInventoryType == FFACETools.InventoryType.Inventory) cnt = fface.Item.InventoryMax;
+            else if (iInventoryType == FFACETools.InventoryType.Safe) cnt = fface.Item.SafeMax;
+            else if (iInventoryType == FFACETools.InventoryType.Storage) cnt = fface.Item.StorageMax;
+            else if (iInventoryType == FFACETools.InventoryType.Locker) cnt = fface.Item.LockerMax;
+            else if (iInventoryType == FFACETools.InventoryType.Satchel) cnt = fface.Item.SatchelMax;
+            else if (iInventoryType == FFACETools.InventoryType.Sack) cnt = fface.Item.SackMax;
+            else if (iInventoryType == FFACETools.InventoryType.Temp) cnt = fface.Item.TemporaryMax;
+            else if (iInventoryType == FFACETools.InventoryType.Case) cnt = fface.Item.CaseMax;
+            else if (iInventoryType == FFACETools.InventoryType.Wardrobe) cnt = fface.Item.WardrobeMax;
             if (cnt > 0) return cnt;
             else return 0;
         }
@@ -310,12 +311,12 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns></returns>
-        public bool GetItem(string iItemName, InventoryType iInventoryType)
+        public bool GetItem(string iItemName, FFACETools.InventoryType iInventoryType)
         {
             //移動元に指定のアイテムが存在するかチェック
             if (!IsExistItem(iItemName, iInventoryType)) return false;
             //移動先に空きがあるかチェック
-            if (!IsInventoryFree(InventoryType.Inventory)) return false;
+            if (!IsInventoryFree(FFACETools.InventoryType.Inventory)) return false;
             //Itemizer実行
             string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), fface.Player.Name);
             //string cmd = string.Format("input /gets \"{0}\" {1}", iItemName, iInventoryType.ToString());
@@ -329,10 +330,10 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>成功した場合Trueを返す</returns>
-        public bool PutItem(string iItemName, InventoryType iInventoryType)
+        public bool PutItem(string iItemName, FFACETools.InventoryType iInventoryType)
         {
             //移動元に指定のアイテムが存在するかチェック
-            if (!IsExistItem(iItemName, InventoryType.Inventory)) return false;
+            if (!IsExistItem(iItemName, FFACETools.InventoryType.Inventory)) return false;
             //移動先に空きがあるかチェック
             if (!IsInventoryFree(iInventoryType)) return false;
             //Itemizer実行
@@ -347,15 +348,15 @@ namespace MiscTools
         /// </summary>
         /// <param name="iItemName"></param>
         /// <returns></returns>
-        public InventoryType GetInventoryTypeFromItemName(string iItemName)
+        public FFACETools.InventoryType GetInventoryTypeFromItemName(string iItemName)
         {
             ushort id = (ushort)FFACE.ParseResources.GetItemID(iItemName);
-            if (fface.Item.GetInventoryItemCount(id) > 0) return InventoryType.Inventory;
-            if (fface.Item.GetSackItemCount(id) > 0) return InventoryType.Sack;
-            if (fface.Item.GetSatchelItemCount(id) > 0) return InventoryType.Satchel;
-            if (fface.Item.GetCaseItemCount(id) > 0) return InventoryType.Case;
-            if (fface.Item.GetWardrobeItemCount(id) > 0) return InventoryType.Wardrobe;
-            return InventoryType.None;
+            if (fface.Item.GetInventoryItemCount(id) > 0) return FFACETools.InventoryType.Inventory;
+            if (fface.Item.GetSackItemCount(id) > 0) return FFACETools.InventoryType.Sack;
+            if (fface.Item.GetSatchelItemCount(id) > 0) return FFACETools.InventoryType.Satchel;
+            if (fface.Item.GetCaseItemCount(id) > 0) return FFACETools.InventoryType.Case;
+            if (fface.Item.GetWardrobeItemCount(id) > 0) return FFACETools.InventoryType.Wardrobe;
+            return FFACETools.InventoryType.None;
         }
         /// <summary>
         /// 指定した倉庫タイプにアイテムが存在するか否か
@@ -363,7 +364,7 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>存在した場合Trueを返す</returns>
-        public bool IsExistItem(string iItemName, InventoryType iInventoryType)
+        public bool IsExistItem(string iItemName, FFACETools.InventoryType iInventoryType)
         {
             //アイテムIDの取得
             int itemId = FFACE.ParseResources.GetItemId(iItemName);
@@ -377,32 +378,32 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>空きがある場合にはTrueを返す</returns>
-        public bool IsInventoryFree(InventoryType iInventoryType)
+        public bool IsInventoryFree(FFACETools.InventoryType iInventoryType)
         {
             switch (iInventoryType)
             {
-                case InventoryType.Inventory:
+                case FFACETools.InventoryType.Inventory:
                     if (fface.Item.InventoryCount < fface.Item.InventoryMax) return true;
                     break;
-                case InventoryType.Safe:
+                case FFACETools.InventoryType.Safe:
                     if (fface.Item.SafeCount < fface.Item.SafeMax) return true;
                     break;
-                case InventoryType.Storage:
+                case FFACETools.InventoryType.Storage:
                     if (fface.Item.StorageCount < fface.Item.StorageMax) return true;
                     break;
-                case InventoryType.Locker:
+                case FFACETools.InventoryType.Locker:
                     if (fface.Item.LockerCount < fface.Item.LockerMax) return true;
                     break;
-                case InventoryType.Satchel:
+                case FFACETools.InventoryType.Satchel:
                     if (fface.Item.SatchelCount < fface.Item.SatchelMax) return true;
                     break;
-                case InventoryType.Sack:
+                case FFACETools.InventoryType.Sack:
                     if (fface.Item.SackCount < fface.Item.SackMax) return true;
                     break;
-                case InventoryType.Case:
+                case FFACETools.InventoryType.Case:
                     if (fface.Item.CaseCount < fface.Item.CaseMax) return true;
                     break;
-                case InventoryType.Wardrobe:
+                case FFACETools.InventoryType.Wardrobe:
                     if (fface.Item.WardrobeCount < fface.Item.WardrobeMax) return true;
                     break;
             }
@@ -503,13 +504,13 @@ namespace MiscTools
             //}
             for (int i= 0; i < this.MaxLoopCount; i++)
             {
-                fface.Windower.SendKeyPress(KeyCode.TabKey);//Tab
+                fface.Windower.SendKeyPress(FFACETools.KeyCode.TabKey);//Tab
                 System.Threading.Thread.Sleep(this.BaseWait);
                 if (fface.Target.ID == iId) 
                 {
                     if (iWithEnter)
                     {
-                        fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
+                        fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);//Enter
                         System.Threading.Thread.Sleep(this.ChatWait);//Wait
                     }
                     return true; 
@@ -537,7 +538,7 @@ namespace MiscTools
         /// <summary>
         /// キー連打
         /// </summary>
-        public void BarrageAnyKey(KeyCode iKeyCode, int iCount)
+        public void BarrageAnyKey(FFACETools.KeyCode iKeyCode, int iCount)
         {
             for (int i = 0; i < iCount; i++)
             {
