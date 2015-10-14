@@ -304,7 +304,7 @@ namespace EnjoyFishing
             //Settings初期設定
             settings = new Settings(iPol.FFACE.Player.Name);
             //ChatTool初期設定
-            chat = new ChatTool(iPol.EliteAPI);
+            chat = new ChatTool(iPol.FFACE);
             chat.ReceivedCommand += new ChatTool.ReceivedCommandEventHandler(this.ChatTool_ReceivedCommand);
             logger.Output(LogLevelKind.DEBUG, "ChatTool起動");
             //FishingTool初期設定

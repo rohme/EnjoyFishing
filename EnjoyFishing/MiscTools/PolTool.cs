@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FFACETools;
-using EliteAPITools;
 using System.Diagnostics;
 using System.Threading;
 
@@ -21,7 +20,6 @@ namespace MiscTools
         }
         private PolStatusKind _Status = PolStatusKind.Unknown;
         private FFACE _FFACE;
-        private EliteAPITools.EliteAPI _EliteAPI;
         private int _ProcessID = 0;
         private Thread thPol;
 
@@ -70,13 +68,6 @@ namespace MiscTools
         public FFACE FFACE
         {
             get { return _FFACE; }
-        }
-        /// <summary>
-        /// EliteAPI
-        /// </summary>
-        public EliteAPITools.EliteAPI EliteAPI
-        {
-            get { return _EliteAPI; }
         }
         /// <summary>
         /// POLステータス
@@ -177,7 +168,6 @@ namespace MiscTools
             if (polId > 0)
             {
                 _FFACE = new FFACE(polId);
-                _EliteAPI = new EliteAPITools.EliteAPI(polId);
                 this._ProcessID = polId;
                 return true;
             }
