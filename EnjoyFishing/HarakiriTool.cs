@@ -1,5 +1,4 @@
-﻿using EliteAPITools;
-using FFACETools;
+﻿using FFACETools;
 using MiscTools;
 using System;
 using System.Collections.Generic;
@@ -248,7 +247,7 @@ namespace EnjoyFishing
         {
             for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Player.Status != FFACETools.Status.Standing; i++)
             {
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                fface.Windower.SendKeyPress(KeyCode.EscapeKey);
                 Thread.Sleep(settings.Global.WaitBase);
             }
         }
@@ -304,23 +303,23 @@ namespace EnjoyFishing
                 firsttime = false;
                 setMessage(string.Format("ハラキリ中：{0} 残り{1}匹", this.HarakiriFishName, remain));
                 //鞄に対象の魚を移動させる
-                if (fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Inventory) <= 0)
+                if (fface.Item.GetItemCount(itemId, InventoryType.Inventory) <= 0)
                 {
-                    if (fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Satchel) > 0)
+                    if (fface.Item.GetItemCount(itemId, InventoryType.Satchel) > 0)
                     {
-                        control.GetItem(this.HarakiriFishName, FFACETools.InventoryType.Satchel);
+                        control.GetItem(this.HarakiriFishName, InventoryType.Satchel);
                     }
-                    else if (fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Sack) > 0)
+                    else if (fface.Item.GetItemCount(itemId, InventoryType.Sack) > 0)
                     {
-                        control.GetItem(this.HarakiriFishName, FFACETools.InventoryType.Sack);
+                        control.GetItem(this.HarakiriFishName, InventoryType.Sack);
                     }
-                    else if (fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Case) > 0)
+                    else if (fface.Item.GetItemCount(itemId, InventoryType.Case) > 0)
                     {
-                        control.GetItem(this.HarakiriFishName, FFACETools.InventoryType.Case);
+                        control.GetItem(this.HarakiriFishName, InventoryType.Case);
                     }
                 }
                 //Zaldonの近くかチェック
-                if (fface.Player.Zone != FFACETools.Zone.Selbina ||
+                if (fface.Player.Zone != Zone.Selbina ||
                     (fface.NPC.Distance(NPCID_ZALDON) != 0f && fface.NPC.Distance(NPCID_ZALDON) > 6))
                 {
                     setRunningStatus(RunningStatusKind.Stop);
@@ -341,8 +340,7 @@ namespace EnjoyFishing
                 control.SetTargetFromId(NPCID_ZALDON);
                 Thread.Sleep(settings.Global.WaitChat);//Wait
                 //プレイヤーステータスがstandingになるまで待機
-                while (fface.Player.Status != FFACETools.Status.Standing)
-                {
+                while(fface.Player.Status != Status.Standing){
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 }
                 //アイテムトレード
@@ -351,7 +349,7 @@ namespace EnjoyFishing
                 //チャット監視開始
                 string itemName = string.Empty;
                 int noResponseCount = 0;
-                ChatEntry cl = new ChatEntry();
+                FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
                 while (this.RunningStatus == RunningStatusKind.Running)
                 {
                     if (!chat.GetNextChatLine(out cl)) 
@@ -376,7 +374,7 @@ namespace EnjoyFishing
                         noResponseCount = 0;
                         if (!settings.UseEnternity)
                         {
-                            fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+                            fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         }
                     }
                     else if (chatKbn == ChatKbnKind.NotFound)
@@ -393,7 +391,7 @@ namespace EnjoyFishing
                         setMessage("ハラキリ結果：何も見つからなかった");
                         if (!settings.UseEnternity)
                         {
-                            fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+                            fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         }
                     }
                     else if (chatKbn == ChatKbnKind.Found)
@@ -409,7 +407,7 @@ namespace EnjoyFishing
                         }
                         EventHarakiriOnce(this.HarakiriFishName, itemName);//イベント発生
                         setMessage(string.Format("ハラキリ結果：{0}を見つけた", itemName));
-                        fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+                        fface.Windower.SendKeyPress(KeyCode.EnterKey);
                         Thread.Sleep(settings.Global.WaitChat);
                     }
                     if (chatKbn == ChatKbnKind.Found || chatKbn == ChatKbnKind.NotFound)
@@ -449,7 +447,7 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iCl">チャットライン</param>
         /// <returns>チャット区分</returns>
-        private ChatKbnKind getChatKbnFromChatline(ChatEntry iCl, out List<string> oArgs)
+        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs)
         {
             oArgs = new List<string>();
             foreach (KeyValuePair<ChatKbnKind, string> v in dictionaryChat)
@@ -473,12 +471,12 @@ namespace EnjoyFishing
         public uint GetHarakiriRemain(string iFishName)
         {
             int itemId = FFACE.ParseResources.GetItemId(iFishName);
-            uint remain = fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Inventory);
+            uint remain = fface.Item.GetItemCount(itemId, InventoryType.Inventory);
             if (settings.UseItemizer)
             {
-                remain += fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Satchel);
-                remain += fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Sack);
-                remain += fface.Item.GetItemCount(itemId, FFACETools.InventoryType.Case);
+                remain += fface.Item.GetItemCount(itemId, InventoryType.Satchel);
+                remain += fface.Item.GetItemCount(itemId, InventoryType.Sack);
+                remain += fface.Item.GetItemCount(itemId, InventoryType.Case);
             }
             return remain;
         }

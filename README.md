@@ -253,7 +253,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
     釣ったことのある魚リストをリセットします。
 
 ### DB更新
-![DB更新](http://i.imgur.com/Zkxu9h0.jpg)
+![DB更新](http://i.imgur.com/HCIeSK8.jpg)
 
 　この機能は、釣りの履歴データをアップロードし、皆さんから収集した履歴データより最新の魚データをダウンロードし、更新します。  
 　アップロードされるデータには、キャラクター情報等、個人を特定するデータは全て削除されてから送信されますので、安心してください。（通信ログにキャラクター名が表示されますが、ファイル名含め内部で全てのキャラクター名は削除されています。）  
@@ -261,6 +261,8 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 　なんか気持ち悪いと思う方は、初期起動時にネットワークを有効するか聞いてきますので、そこで「いいえ」を選択すれば一切通信を行わなくなり、今まで通り使用することができます。  
 　更新時、サーバーが混んでいると、インターナルサーバーエラーが発生する事があります。この場合は再度実行してください。
 
+* 統計情報  
+	統計情報サイトを表示します。
 * 更新  
     サーバーに接続し、履歴データのアップロード及び最新の魚情報を取得します。
 * ネット有効  
@@ -334,16 +336,16 @@ http://www.elitemmonetwork.com/forums/viewforum.php?f=28
 * [.Net4.0](http://www.microsoft.com/ja-JP/download/details.aspx?id=17718)以上をインストールする。
 
 ##今後の予定
-* 統計情報サイトの作成
+* 不具合報告があれば修正:smile:
 
 ## 開発環境
 * Windows7 Ultimate 64bit
 * [Microsoft Visual Studio Express 2013 C#](http://www.visualstudio.com/ja-jp/products/visual-studio-express-vs.aspx)
-* [.NET Framework 4.0](http://www.microsoft.com/ja-jp/net/)
+* [.NET Framework 4.0](http://www.microsoft.com/ja-jp/net/)以上
 * [Windower4](http://windower.net/)
 * [FFACE](http://www.ffevo.net/)
 * [FFACETools](https://github.com/h1pp0/FFACETools_ffevo.net/)を修正した[FFACEToolsJP](https://github.com/rohme/FFACEToolsJP)
-* [EliteAPI](http://www.elitemmonetwork.com/)
+* ~~[EliteAPI](http://www.elitemmonetwork.com/)~~
 
 ## ソース
 EnjoyFishingは以下のサイトで、GPLv2ライセンスにて公開しています。  
@@ -355,6 +357,9 @@ https://github.com/rohme/
 　このソフトウェアを使用したことによって生じたすべての障害・損害・不具合等に関しては、作者は一切の責任を負いません。各自の責任においてご使用ください。  
 
 ## 修正履歴
+* **2015-10-16 Ver1.1.7**
+	- グリッドの魚名称をダブルクリックすると、統計サイトを表示する機能を追加
+	- EliteAPIで代替していた機能をFFACEに戻した（このバージョンではEliteAPIは不要です）
 * **2015-09-19 Ver1.1.6**
     - チャット関連をEliteAPIで代替
 * **2015-08-22 Ver1.1.5**

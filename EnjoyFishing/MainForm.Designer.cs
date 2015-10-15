@@ -1974,6 +1974,7 @@
             this.gridFishingInfo.RowTemplate.Height = 21;
             this.gridFishingInfo.Size = new System.Drawing.Size(413, 259);
             this.gridFishingInfo.TabIndex = 0;
+            this.gridFishingInfo.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridFishingInfo_CellDoubleClick);
             this.gridFishingInfo.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
             // label16
@@ -2176,6 +2177,7 @@
             this.gridHistory.RowTemplate.Height = 21;
             this.gridHistory.Size = new System.Drawing.Size(539, 284);
             this.gridHistory.TabIndex = 0;
+            this.gridHistory.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridHistory_CellDoubleClick);
             this.gridHistory.Sorted += new System.EventHandler(this.gridHistory_Sorted);
             // 
             // dateHistory
@@ -2390,6 +2392,7 @@
             this.gridHistorySummary.RowTemplate.Height = 21;
             this.gridHistorySummary.Size = new System.Drawing.Size(539, 284);
             this.gridHistorySummary.TabIndex = 0;
+            this.gridHistorySummary.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridHistorySummary_CellDoubleClick);
             this.gridHistorySummary.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridFishingInfo_CellFormatting);
             // 
             // cmbHistoryFishName
@@ -2491,6 +2494,7 @@
             this.gridHarakiri.RowTemplate.Height = 21;
             this.gridHarakiri.Size = new System.Drawing.Size(547, 300);
             this.gridHarakiri.TabIndex = 7;
+            this.gridHarakiri.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridHarakiri_CellDoubleClick);
             this.gridHarakiri.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridHarakiri_CellFormatting);
             // 
             // cmbHarakiriFishname
@@ -2583,6 +2587,7 @@
             this.gridCaughtFishes.RowTemplate.Height = 21;
             this.gridCaughtFishes.Size = new System.Drawing.Size(550, 306);
             this.gridCaughtFishes.TabIndex = 3;
+            this.gridCaughtFishes.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridCaughtFishes_CellDoubleClick);
             this.gridCaughtFishes.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridCaughtFishes_CellFormatting);
             // 
             // tabDB
@@ -2626,7 +2631,6 @@
             this.lblUpdateDBUrl.Size = new System.Drawing.Size(51, 14);
             this.lblUpdateDBUrl.TabIndex = 5;
             this.lblUpdateDBUrl.Text = "統計情報";
-            this.lblUpdateDBUrl.Visible = false;
             this.lblUpdateDBUrl.Click += new System.EventHandler(this.lblUpdateDBUrl_Click);
             // 
             // lblLastUpdate
