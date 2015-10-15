@@ -13,6 +13,7 @@ using FFACETools;
 using MiscTools;
 using EnjoyFishing.Properties;
 using System.IO;
+using System.Diagnostics;
 
 namespace EnjoyFishing
 {
@@ -1579,7 +1580,8 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void lblUpdateDBUrl_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("http://" + settings.Global.UpdateDB.ServerName);
+            string url = Constants.URL_HTTP + settings.Global.UpdateDB.ServerName;
+            Process.Start(url);
         }
         /// <summary>
         /// 月齢 Clickイベント
@@ -1590,6 +1592,67 @@ namespace EnjoyFishing
         {
             MoonPhaseForm frmMoonPhase = new MoonPhaseForm(fface);
             frmMoonPhase.ShowDialog();
+        }
+        /// <summary>
+        /// 釣り情報グリッド CellDoubleClickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridFishingInfo_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView grid = (DataGridView)sender;
+            if (e.ColumnIndex != 1) return;
+            string name = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            this.launchBrowserByFish(name);
+        }
+        /// <summary>
+        /// 履歴詳細グリッド CellDoubleClickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridHistory_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView grid = (DataGridView)sender;
+            if (grid.Columns[e.ColumnIndex].HeaderText != "魚") return;
+            string name = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            this.launchBrowserByFish(name);
+
+        }
+        /// <summary>
+        /// 履歴合計グリッド CellDoubleClickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridHistorySummary_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView grid = (DataGridView)sender;
+            if (e.ColumnIndex != 1) return;
+            string name = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            this.launchBrowserByFish(name);
+        }
+        /// <summary>
+        /// ハラキリグリッド CellDoubleClickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridHarakiri_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView grid = (DataGridView)sender;
+            if (e.ColumnIndex != 0) return;
+            string name = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            this.launchBrowserByFish(name);
+        }
+        /// <summary>
+        /// 釣った魚グリッド CellDoubleClickイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridCaughtFishes_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView grid = (DataGridView)sender;
+            if (e.ColumnIndex != 2) return;
+            string name = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            this.launchBrowserByFish(name);
         }
         #region Tips
         private void lblMoonPhase_MouseHover(object sender, EventArgs e)
@@ -2452,6 +2515,16 @@ namespace EnjoyFishing
             {
                 fface.Windower.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
             }
+        }
+        /// <summary>
+        /// ブラウザで魚情報を表示する
+        /// </summary>
+        /// <param name="iFishName">魚名</param>
+        private void launchBrowserByFish(string iFishName)
+        {
+            if (string.IsNullOrEmpty(iFishName)) return;
+            string url = Constants.URL_HTTP + settings.Global.UpdateDB.ServerName + Constants.URL_FISHING_FISH + System.Net.WebUtility.HtmlEncode(iFishName);
+            Process.Start(url);
         }
         #endregion
 
