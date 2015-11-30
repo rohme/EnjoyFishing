@@ -328,10 +328,6 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 http://delvl.ffevo.net/Lolwutt/FFACE4-Public/tree/master
 * [FFACE](http://www.ffevo.net/)に障害情報が挙がっていないか確認する。  
 http://delvl.ffevo.net/Lolwutt/FFACE4-Public/issues
-* 最新の[EliteAPI](http://www.elitemmonetwork.com/)をインストールする。  
-http://ext.elitemmonetwork.com/downloads/eliteapi/
-* [EliteAPI](http://www.elitemmonetwork.com/)に障害情報が挙がっていないか確認する。  
-http://www.elitemmonetwork.com/forums/viewforum.php?f=28
 * [VisualStudio2013のランタイム](http://www.microsoft.com/ja-JP/download/details.aspx?id=40784)をインストールする。**（必ずx86版を使用してください）**
 * [.Net4.0](http://www.microsoft.com/ja-JP/download/details.aspx?id=17718)以上をインストールする。
 
@@ -345,7 +341,6 @@ http://www.elitemmonetwork.com/forums/viewforum.php?f=28
 * [Windower4](http://windower.net/)
 * [FFACE](http://www.ffevo.net/)
 * [FFACETools](https://github.com/h1pp0/FFACETools_ffevo.net/)を修正した[FFACEToolsJP](https://github.com/rohme/FFACEToolsJP)
-* ~~[EliteAPI](http://www.elitemmonetwork.com/)~~
 
 ## ソース
 EnjoyFishingは以下のサイトで、GPLv2ライセンスにて公開しています。  
