@@ -275,7 +275,7 @@ namespace EnjoyFishing
                     for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
                     {
                         string version = getXmlVersion(xmlFileName);
-                        if (version == VERSION)
+                        if (string.IsNullOrEmpty(version) || version == VERSION)
                         {
                             break;
                         }
@@ -771,18 +771,26 @@ namespace EnjoyFishing
         /// <returns></returns>
         private string getXmlVersion(string iXmlFileName)
         {
-            XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
-            XPathNavigator xNavi = xmlDoc.CreateNavigator();
-            string ret = string.Empty;
             try
             {
-                ret = xNavi.SelectSingleNode("/Rod/@version").Value;
+                XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
+                XPathNavigator xNavi = xmlDoc.CreateNavigator();
+                try
+                {
+                    return xNavi.SelectSingleNode("/Rod/@version").Value;
+                }
+                catch (NullReferenceException)
+                {
+                    return "1.0.0";
+                }
             }
-            catch (NullReferenceException)
+            catch(Exception e)
             {
-                ret = "1.0.0";
+                string msg = string.Format("{0}のバージョンチェックでエラー\r\n{1}\r\n{2}", iXmlFileName, e.Message, e.StackTrace);
+                logger.Output(LogLevelKind.FATAL, msg);
+                MessageBox.Show(msg, "エラー",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
-            return ret;
         }
     }
 }
