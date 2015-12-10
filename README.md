@@ -1,5 +1,7 @@
 # ![EnjoyFishing](http://i.imgur.com/pmstLip.png)EnjoyFishing
 
+[![Join the chat at https://gitter.im/rohme/EnjoyFishing](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rohme/EnjoyFishing?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 EnjoyFishingはFF11の釣りを支援するツールです。
 
 ![全体イメージ](http://i.imgur.com/QTNxIid.jpg)
