@@ -47,7 +47,7 @@ namespace EnjoyFishing
         private PolTool pol;
         private FFACE fface;
         private Settings settings;
-        private LoggerTool logger;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private ChatTool chat;
         private FFACEControl control;
         private Thread thHarakiri;
@@ -179,17 +179,15 @@ namespace EnjoyFishing
         /// <param name="iFFACE"></param>
         /// <param name="iChat"></param>
         /// <param name="iSettings"></param>
-        /// <param name="iLogger"></param>
-        public HarakiriTool(PolTool iPol, ChatTool iChat, Settings iSettings, LoggerTool iLogger)
+        public HarakiriTool(PolTool iPol, ChatTool iChat, Settings iSettings)
         {
             pol = iPol;
             fface = iPol.FFACE;
             chat = iChat;
             settings = iSettings;
-            logger = iLogger;
-            fishDB = new FishDB(logger);
-            harakiriDB = new HarakiriDB(logger);
-            control = new FFACEControl(pol, chat, logger);
+            fishDB = new FishDB();
+            harakiriDB = new HarakiriDB();
+            control = new FFACEControl(pol, chat);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
             control.BaseWait = settings.Global.WaitBase;
@@ -263,7 +261,7 @@ namespace EnjoyFishing
             setHarakiriStatus(HarakiriStatusKind.Normal);
             bool firsttime = true;
 
-            logger.Output(LogLevelKind.DEBUG, "ハラキリスレッド開始");
+            logger.Debug("ハラキリスレッド開始");
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 //未入力チェック
@@ -368,7 +366,7 @@ namespace EnjoyFishing
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                     if (chatKbn == ChatKbnKind.Zaldon)
                     {
                         noResponseCount = 0;
@@ -427,7 +425,7 @@ namespace EnjoyFishing
                 }
                 Thread.Sleep(settings.Global.WaitChat);//wait
             }
-            logger.Output(LogLevelKind.DEBUG, "ハラキリスレッド終了");
+            logger.Debug("ハラキリスレッド終了");
         }
 
         private bool putDatabase(string iItemName)
@@ -497,7 +495,7 @@ namespace EnjoyFishing
         private void setMessage(string iMessage)
         {
             if (this.Message == iMessage) return;
-            logger.Output(LogLevelKind.INFO, iMessage);
+            logger.Info(iMessage);
             this.Message = iMessage;
             EventChangeMessage(iMessage);
         }

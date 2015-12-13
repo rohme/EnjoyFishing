@@ -163,6 +163,10 @@ namespace EnjoyFishing
             this.Critical = false;
             this.ItemType = FishDBItemTypeKind.Unknown;
         }
+        public override string ToString()
+        {
+            return string.Format("{0:000}-{1:000}-{2:000}-{3:000}", this.ID1, this.ID2, this.ID3, this.ID4);
+        }
         public override int GetHashCode()
         {
             return this.ID1.GetHashCode() ^ this.ID2.GetHashCode() ^ this.ID3.GetHashCode() ^ this.ID4.GetHashCode();

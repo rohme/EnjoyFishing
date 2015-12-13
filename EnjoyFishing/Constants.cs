@@ -12,6 +12,8 @@ namespace EnjoyFishing
         public const int FILELOCK_RETRY_COUNT = 10;
         public const string WINDOW_TITLE_FORMAT = "{0} {1} {2}";
 
+        public const string PATH_TEMP = "Temp";
+
         public const string URL_HTTP = "http://";
         public const string URL_FISHING = "/fishing/";
         public const string URL_FISHING_FISH = URL_FISHING + "fish/";

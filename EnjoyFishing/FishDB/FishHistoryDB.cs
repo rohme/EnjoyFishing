@@ -18,14 +18,13 @@ namespace EnjoyFishing
         public const string FILENAME_FISHHISTORYDB = "{0}_{1}.xml";
         private const string VERSION = "1.1.0";
 
-        private LoggerTool logger;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public FishHistoryDB(string iPlayerName, DateTime iYmd, LoggerTool iLogger)
+        public FishHistoryDB(string iPlayerName, DateTime iYmd)
         {
-            this.logger = iLogger;
             FishHistoryDBModel history = GetHistoryDB(iPlayerName, iYmd);
             updateCatchCount(history);
         }
@@ -59,6 +58,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public FishHistoryDBModel SelectDayly(string iPlayerName, DateTime iYmd, FishResultStatusKind iResultStatus, string iFishName)
         {
+            logger.DebugFormat("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBModel tmpHistory = GetHistoryDB(iPlayerName, iYmd);
             FishHistoryDBModel ret = GetHistoryDB(iPlayerName, iYmd);
             ret.Fishes.Clear();
@@ -82,6 +82,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public List<string> SelectDaylyUniqueFishName(string iPlayerName, DateTime iYmd)
         {
+            logger.DebugFormat("Player={0} Ymd={1}", iPlayerName, iYmd);
             FishHistoryDBModel tmpHistory = GetHistoryDB(iPlayerName, iYmd);
             List<string> ret = new List<string>();
             foreach (FishHistoryDBFishModel fish in tmpHistory.Fishes)
@@ -96,9 +97,10 @@ namespace EnjoyFishing
         /// <param name="iPlayerName">プレイヤー名</param>
         /// <param name="iYmd">日付</param>
         /// <returns>サマリー情報</returns>
-        public FishHistoryDBSummaryModel GetSummary(string iPlayerName, DateTime iYmd, FishResultStatusKind iResult, string iFishName)
+        public FishHistoryDBSummaryModel GetSummary(string iPlayerName, DateTime iYmd, FishResultStatusKind iResultStatus, string iFishName)
         {
-            FishHistoryDBModel history = SelectDayly(iPlayerName, iYmd, iResult, iFishName);
+            logger.DebugFormat("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
+            FishHistoryDBModel history = SelectDayly(iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBSummaryModel ret = new FishHistoryDBSummaryModel();
             foreach(FishHistoryDBFishModel fish in history.Fishes)
             {
@@ -169,12 +171,12 @@ namespace EnjoyFishing
                         }
                         else if (version == "1.0.0")////1.0.0→1.0.5
                         {
-                            logger.Output(LogLevelKind.INFO, string.Format("FishHistoryDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName));
+                            logger.InfoFormat("FishHistoryDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName);
                             convert1_0_0to1_0_5(xmlFileName, playerName, ymd);
                         }
                         else if (version == "1.0.5")////1.0.5→1.1.0
                         {
-                            logger.Output(LogLevelKind.INFO, string.Format("FishHistoryDBのコンバート 1.0.5→1.1.0 {0}", xmlFileName));
+                            logger.InfoFormat("FishHistoryDBのコンバート 1.0.5→1.1.0 {0}", xmlFileName);
                             convert1_0_5to1_1_0(xmlFileName, playerName, ymd);
                         }
                     }
@@ -299,36 +301,44 @@ namespace EnjoyFishing
         /// <returns>FishHistoryDBModel</returns>
         public FishHistoryDBModel GetHistoryDB(string iPlayerName, DateTime iYmd, string iPath = PATH_FISHHISTORYDB)
         {
-            string xmlFilename =GetXmlName(iPlayerName,iYmd);
-            FishHistoryDBModel history = new FishHistoryDBModel();
-            if (!Directory.Exists(iPath))
+            string xmlFilename = GetXmlName(iPlayerName, iYmd);
+            try
             {
-                Directory.CreateDirectory(iPath);
-            }
-            if (File.Exists(xmlFilename))
-            {
-                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                FishHistoryDBModel history = new FishHistoryDBModel();
+                if (!Directory.Exists(iPath))
                 {
-                    try
+                    Directory.CreateDirectory(iPath);
+                }
+                if (File.Exists(xmlFilename))
+                {
+                    for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                     {
-                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        try
                         {
-                            XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel));
-                            history = (FishHistoryDBModel)serializer.Deserialize(fs);
-                            fs.Close();
+                            using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel));
+                                history = (FishHistoryDBModel)serializer.Deserialize(fs);
+                                fs.Close();
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    catch (IOException)
-                    {
-                        Thread.Sleep(100);
-                        continue;
+                        catch (IOException)
+                        {
+                            Thread.Sleep(100);
+                            continue;
+                        }
                     }
                 }
+                //CatchCountの更新
+                updateCatchCount(history);
+                return history;
             }
-            //CatchCountの更新
-            updateCatchCount(history);
-            return history;
+            catch (Exception e)
+            {
+                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         /// <summary>
         /// xmlの内容を全て取得する(1.0.5)
@@ -337,35 +347,43 @@ namespace EnjoyFishing
         public FishHistoryDBModel1_0_5 GetHistoryDB1_0_5(string iPlayerName, DateTime iYmd, string iPath = PATH_FISHHISTORYDB)
         {
             string xmlFilename = GetXmlName(iPlayerName, iYmd);
-            FishHistoryDBModel1_0_5 history = new FishHistoryDBModel1_0_5();
-            if (!Directory.Exists(iPath))
+            try
             {
-                Directory.CreateDirectory(iPath);
-            }
-            if (File.Exists(xmlFilename))
-            {
-                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                FishHistoryDBModel1_0_5 history = new FishHistoryDBModel1_0_5();
+                if (!Directory.Exists(iPath))
                 {
-                    try
+                    Directory.CreateDirectory(iPath);
+                }
+                if (File.Exists(xmlFilename))
+                {
+                    for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                     {
-                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        try
                         {
-                            XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel1_0_5));
-                            history = (FishHistoryDBModel1_0_5)serializer.Deserialize(fs);
-                            fs.Close();
+                            using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel1_0_5));
+                                history = (FishHistoryDBModel1_0_5)serializer.Deserialize(fs);
+                                fs.Close();
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    catch (IOException)
-                    {
-                        Thread.Sleep(100);
-                        continue;
+                        catch (IOException)
+                        {
+                            Thread.Sleep(100);
+                            continue;
+                        }
                     }
                 }
+                //CatchCountの更新
+                updateCatchCount1_0_5(history);
+                return history;
             }
-            //CatchCountの更新
-            updateCatchCount1_0_5(history);
-            return history;
+            catch (Exception e)
+            {
+                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         /// <summary>
         /// xmlへ書き込む
@@ -376,38 +394,46 @@ namespace EnjoyFishing
         public bool PutHistoryDB(string iPlayerName, FishHistoryDBModel iHistoryDB, string iPath = PATH_FISHHISTORYDB)
         {
             string xmlFilename = GetXmlName(iPlayerName, DateTime.Parse(iHistoryDB.EarthDate), iPath);
-            if (!Directory.Exists(iPath))
+            try
             {
-                Directory.CreateDirectory(iPath);
-            }
+                if (!Directory.Exists(iPath))
+                {
+                    Directory.CreateDirectory(iPath);
+                }
 
-            for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
-            {
-                try
+                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                 {
-                    using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
+                    try
                     {
-                        StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
-                        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                        ns.Add(String.Empty, String.Empty);
-                        XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel));
-                        serializer.Serialize(sw, iHistoryDB, ns);
-                        //書き込み
-                        sw.Flush();
-                        sw.Close();
-                        sw = null;
+                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
+                        {
+                            StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                            ns.Add(String.Empty, String.Empty);
+                            XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel));
+                            serializer.Serialize(sw, iHistoryDB, ns);
+                            //書き込み
+                            sw.Flush();
+                            sw.Close();
+                            sw = null;
+                        }
+                        break;
                     }
-                    break;
+                    catch (IOException)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
                 }
-                catch (IOException)
-                {
-                    Thread.Sleep(100);
-                    continue;
-                }
+                //CatchCountの更新
+                updateCatchCount(iHistoryDB);
+                return true;
             }
-            //CatchCountの更新
-            updateCatchCount(iHistoryDB);
-            return true;
+            catch (Exception e)
+            {
+                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         /// <summary>
         /// xmlへ書き込む(1.0.5)
@@ -418,62 +444,28 @@ namespace EnjoyFishing
         public bool PutHistoryDB1_0_5(string iPlayerName, FishHistoryDBModel1_0_5 iHistoryDB, string iPath = PATH_FISHHISTORYDB)
         {
             string xmlFilename = GetXmlName(iPlayerName, DateTime.Parse(iHistoryDB.EarthDate), iPath);
-            if (!Directory.Exists(iPath))
+            try
             {
-                Directory.CreateDirectory(iPath);
-            }
+                if (!Directory.Exists(iPath))
+                {
+                    Directory.CreateDirectory(iPath);
+                }
 
-            for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
-            {
-                try
-                {
-                    using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
-                    {
-                        StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
-                        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                        ns.Add(String.Empty, String.Empty);
-                        XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel1_0_5));
-                        serializer.Serialize(sw, iHistoryDB, ns);
-                        //書き込み
-                        sw.Flush();
-                        sw.Close();
-                        sw = null;
-                    }
-                    break;
-                }
-                catch (IOException)
-                {
-                    Thread.Sleep(100);
-                    continue;
-                }
-            }
-            //CatchCountの更新
-            updateCatchCount1_0_5(iHistoryDB);
-            return true;
-        }
-        /// <summary>
-        /// xmlの内容を全て取得する(1.0.0)
-        /// </summary>
-        /// <returns>FishHistoryDBModel</returns>
-        private FishHistoryDBModel1_0_0 getHistoryDB1_0_0(string iPlayerName, DateTime iYmd)
-        {
-            string xmlFilename = GetXmlName(iPlayerName, iYmd);
-            FishHistoryDBModel1_0_0 historydb = new FishHistoryDBModel1_0_0();
-            if (!Directory.Exists(PATH_FISHHISTORYDB))
-            {
-                Directory.CreateDirectory(PATH_FISHHISTORYDB);
-            }
-            if (File.Exists(xmlFilename))
-            {
                 for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                 {
                     try
                     {
-                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
                         {
-                            XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel1_0_0));
-                            historydb = (FishHistoryDBModel1_0_0)serializer.Deserialize(fs);
-                            fs.Close();
+                            StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                            ns.Add(String.Empty, String.Empty);
+                            XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel1_0_5));
+                            serializer.Serialize(sw, iHistoryDB, ns);
+                            //書き込み
+                            sw.Flush();
+                            sw.Close();
+                            sw = null;
                         }
                         break;
                     }
@@ -483,8 +475,58 @@ namespace EnjoyFishing
                         continue;
                     }
                 }
+                //CatchCountの更新
+                updateCatchCount1_0_5(iHistoryDB);
+                return true;
             }
-            return historydb;
+            catch (Exception e)
+            {
+                logger.FatalFormat("{0}の登録中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
+        }
+        /// <summary>
+        /// xmlの内容を全て取得する(1.0.0)
+        /// </summary>
+        /// <returns>FishHistoryDBModel</returns>
+        private FishHistoryDBModel1_0_0 getHistoryDB1_0_0(string iPlayerName, DateTime iYmd)
+        {
+            string xmlFilename = GetXmlName(iPlayerName, iYmd);
+            try
+            {
+                FishHistoryDBModel1_0_0 historydb = new FishHistoryDBModel1_0_0();
+                if (!Directory.Exists(PATH_FISHHISTORYDB))
+                {
+                    Directory.CreateDirectory(PATH_FISHHISTORYDB);
+                }
+                if (File.Exists(xmlFilename))
+                {
+                    for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                    {
+                        try
+                        {
+                            using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                XmlSerializer serializer = new XmlSerializer(typeof(FishHistoryDBModel1_0_0));
+                                historydb = (FishHistoryDBModel1_0_0)serializer.Deserialize(fs);
+                                fs.Close();
+                            }
+                            break;
+                        }
+                        catch (IOException)
+                        {
+                            Thread.Sleep(100);
+                            continue;
+                        }
+                    }
+                }
+                return historydb;
+            }
+            catch (Exception e)
+            {
+                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
 
         /// <summary>
@@ -505,18 +547,26 @@ namespace EnjoyFishing
         /// <returns></returns>
         public static string GetXmlVersion(string iXmlFileName)
         {
-            XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
-            XPathNavigator xNavi = xmlDoc.CreateNavigator();
-            string ret = string.Empty;
             try
             {
-                ret = xNavi.SelectSingleNode("/History/@version").Value;
+                XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
+                XPathNavigator xNavi = xmlDoc.CreateNavigator();
+                string ret = string.Empty;
+                try
+                {
+                    ret = xNavi.SelectSingleNode("/History/@version").Value;
+                }
+                catch (NullReferenceException)
+                {
+                    ret = "1.0.0";
+                }
+                return ret;
             }
-            catch (NullReferenceException)
+            catch (Exception e)
             {
-                ret = "1.0.0";
+                logger.FatalFormat("{0}のバージョン取得中にエラーが発生しました。", iXmlFileName);
+                throw e;
             }
-            return ret;
         }
         private void updateCatchCount(FishHistoryDBModel iFishHistoryDB)
         {

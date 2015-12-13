@@ -68,6 +68,10 @@
     <Reference Include="FFACETools">
       <HintPath>..\..\FFACEToolsJP\bin\Debug\FFACETools.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
@@ -121,7 +125,6 @@
     </Compile>
     <Compile Include="MiscTools\ChatTool.cs" />
     <Compile Include="MiscTools\FFACEControl.cs" />
-    <Compile Include="MiscTools\LoggerTool.cs" />
     <Compile Include="MiscTools\PolTool.cs" />
     <Compile Include="MiscTools\PolToolForm.cs">
       <SubType>Form</SubType>
@@ -170,6 +173,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="EnjoyFishing.ico" />
+    <None Include="packages.config" />
     <None Include="Resources\IMAGE_MOON03.png" />
     <None Include="Resources\IMAGE_MOON04.png" />
     <None Include="Resources\IMAGE_MOON05.png" />
@@ -191,6 +195,10 @@
     <None Include="Resources\IMAGE_WEEK_WATER.png" />
     <None Include="Resources\IMAGE_WEEK_LIGHTNING.png" />
     <None Include="Resources\IMAGE_REFRESH.png" />
+    <Content Include="Log4net.Config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="MiscTools\PolTool.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +218,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

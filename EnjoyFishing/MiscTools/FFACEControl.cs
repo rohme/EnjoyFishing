@@ -26,7 +26,7 @@ namespace MiscTools
         private PolTool pol = null;
         private FFACE fface = null;
         private ChatTool chat = null;
-        private LoggerTool logger = null;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         #region メンバ
         public int MaxLoopCount { get; set; }
@@ -39,12 +39,11 @@ namespace MiscTools
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public FFACEControl(PolTool iPOL, ChatTool iChat, LoggerTool iLogger)
+        public FFACEControl(PolTool iPOL, ChatTool iChat)
         {
             this.pol = iPOL;
             this.fface = iPOL.FFACE;
             this.chat = iChat;
-            this.logger = iLogger;
             this.MaxLoopCount = DEFAULT_MAX_LOOP_COUNT;
             this.UseEnternity = DEFAULT_USE_ENTERNITY;
             this.BaseWait = DEFAULT_BASE_WAIT;
@@ -61,7 +60,7 @@ namespace MiscTools
         /// <returns>True:見つかった False:見つからなかった</returns>
         public bool WaitChat(ChatTool iChatTool, string iRegexString, int iStartChatIndex, bool iWithEnter)
         {
-            logger.Output(LogLevelKind.INFO, "WaitChat", string.Format("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter));
+            logger.DebugFormat("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter);
             List<FFACE.ChatTools.ChatLine> arrChatLine;
             int currChatIndex = iStartChatIndex;
             for (int i = 0; (i < this.MaxLoopCount); i++)
@@ -83,7 +82,7 @@ namespace MiscTools
                 }
                 System.Threading.Thread.Sleep(this.ChatWait);
             }
-            logger.Output(LogLevelKind.WARN, "WaitChat", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         #endregion
@@ -97,7 +96,7 @@ namespace MiscTools
         /// <returns>True:ダイアログが表示された False:ダイアログが表示されなかった</returns>
         public bool WaitOpenDialog(string iDialogString, bool iEnter)
         {
-            logger.Output(LogLevelKind.INFO, "WaitOpenDialog", string.Format("DialogString={0} Enter={1}", iDialogString, iEnter));
+            logger.DebugFormat("DialogString={0} Enter={1}", iDialogString, iEnter);
             for (int i = 0; (i < this.MaxLoopCount); i++)
             {
                 Regex reg = new Regex(iDialogString, RegexOptions.IgnoreCase);
@@ -112,7 +111,7 @@ namespace MiscTools
                 }
                 System.Threading.Thread.Sleep(this.BaseWait);
             }
-            logger.Output(LogLevelKind.WARN, "WaitOpenDialog", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         /// <summary>
@@ -123,7 +122,7 @@ namespace MiscTools
         /// <returns></returns>
         public bool SetDialogOptionIndex(short iIdx, bool iWithEnter)
         {
-            logger.Output(LogLevelKind.INFO, "SetDialogOptionIndex", string.Format("iIdx={0} iWithEnter={1}", iIdx, iWithEnter));
+            logger.DebugFormat("iIdx={0} iWithEnter={1}", iIdx, iWithEnter);
             for (int i = 0; i < this.MaxLoopCount; i++)
             {
                 if (this.fface.Menu.DialogOptionIndex == iIdx)
@@ -158,7 +157,7 @@ namespace MiscTools
                 }
                 System.Threading.Thread.Sleep(this.BaseWait);
             }
-            logger.Output(LogLevelKind.WARN, "SetDialogOptionIndex", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         /// <summary>
@@ -439,7 +438,7 @@ namespace MiscTools
             }
             catch (Exception e)
             {
-                logger.Output(LogLevelKind.ERROR, e.Message);
+                logger.Error("スクリプト実行エラー", e);
                 return false;
             }
             return true;
@@ -471,7 +470,7 @@ namespace MiscTools
             }
             catch (Exception e)
             {
-                logger.Output(LogLevelKind.ERROR, e.Message);
+                logger.Error("Lua実行エラー", e);
                 return false;
             }
             return true;
@@ -486,7 +485,7 @@ namespace MiscTools
         /// <returns>True:ターゲット完了 False:ターゲット出来なかった</returns>
         public bool SetTargetFromId(int iId, bool iWithEnter = false)
         {
-            logger.Output(LogLevelKind.DEBUG,  "SetTargetFromId", string.Format("Id={0} WithEnter={1}", iId, iWithEnter));
+            logger.DebugFormat("Id={0} WithEnter={1}", iId, iWithEnter);
             //ToDo:FFACEが修正されるまでTABを使用するように暫定対応
             //for (int i = 0; i < this.MaxLoopCount; i++)
             //{
@@ -515,7 +514,7 @@ namespace MiscTools
                     return true; 
                 }
             }
-            logger.Output(LogLevelKind.WARN, "SetTargetFromId", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         #endregion

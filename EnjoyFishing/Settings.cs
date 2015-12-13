@@ -18,7 +18,6 @@ namespace EnjoyFishing
         public bool UseEnternity { get; set; }
         public bool UseItemizer { get; set; }
         public bool UseCancel { get; set; }
-        public SettingsArgsModel Args { get; set; }
         //xmlファイルに保存するメンバ
         public SettingsGlobalModel Global { get; set; }
         public SettingsPlayerFormModel Form { get; set; }
@@ -57,7 +56,6 @@ namespace EnjoyFishing
             this.PolProcID = 0;
             this.UseEnternity = false;
             this.UseItemizer = false;
-            this.Args = new SettingsArgsModel();
 
             //設定読み込み
             if (iPlayerName.Length > 0) 
@@ -775,18 +773,6 @@ namespace EnjoyFishing
         {
             this.FishName = string.Empty;
             this.Caught = false;
-        }
-    }
-    public class SettingsArgsModel
-    {
-        public bool LoggerEnable { get; set; }
-        public LogLevelKind LoggerLogLevel { get; set; }
-        public bool LoggerVarDumpEnable { get; set; }
-        public SettingsArgsModel()
-        {
-            LoggerEnable = false;
-            LoggerLogLevel = LogLevelKind.INFO;
-            LoggerVarDumpEnable = false;
         }
     }
 }

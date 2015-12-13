@@ -166,7 +166,7 @@ namespace EnjoyFishing
         private PolTool pol;
         private FFACE fface;
         private Settings settings;
-        private LoggerTool logger;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private ChatTool chat;
         private FFACEControl control;
         private Thread thFishing;
@@ -811,20 +811,18 @@ namespace EnjoyFishing
         /// <param name="iFFACE"></param>
         /// <param name="iChat"></param>
         /// <param name="iSettings"></param>
-        /// <param name="iLogger"></param>
-        public FishingTool(PolTool iPol, ChatTool iChat, Settings iSettings, LoggerTool iLogger)
+        public FishingTool(PolTool iPol, ChatTool iChat, Settings iSettings)
         {
             pol = iPol;
             pol.ChangeStatus += new PolTool.ChangeStatusEventHandler(this.PolTool_ChangeStatus);
             fface = iPol.FFACE;
             chat = iChat;
             settings = iSettings;
-            logger = iLogger;
-            FishDB = new FishDB(logger);
-            fishHistoryDB = new FishHistoryDB(this.PlayerName,this.EarthDateTime, logger);
+            FishDB = new FishDB();
+            fishHistoryDB = new FishHistoryDB(this.PlayerName,this.EarthDateTime);
             FishHistoryDBModel history = fishHistoryDB.SelectDayly(this.PlayerName, this.EarthDateTime);
             this.TimeElapsed = history.TimeElapsed;
-            control = new FFACEControl(pol, chat, logger);
+            control = new FFACEControl(pol, chat);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
             control.BaseWait = settings.Global.WaitBase;
@@ -914,7 +912,7 @@ namespace EnjoyFishing
             setFishingStatus(FishingStatusKind.Normal);
             FishHistoryDBFishModel fish = new FishHistoryDBFishModel();
 
-            logger.Output(LogLevelKind.DEBUG, "釣りスレッド開始");
+            logger.Debug("釣りスレッド開始");
             setMessage("開始しました");
 
             //メニュー開いていたら閉じる
@@ -937,7 +935,7 @@ namespace EnjoyFishing
                 //日付が変わったら経過時間クリア
                 if (DateTime.Now.Date != lastCastDate.Date)
                 {
-                    fishHistoryDB = new FishHistoryDB(this.PlayerName, this.EarthDateTime, logger);
+                    fishHistoryDB = new FishHistoryDB(this.PlayerName, this.EarthDateTime);
                     FishHistoryDBModel history = fishHistoryDB.SelectDayly(this.PlayerName, this.EarthDateTime);
                     this.TimeElapsed = history.TimeElapsed;
                 }
@@ -948,7 +946,7 @@ namespace EnjoyFishing
                 {
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                 }
                 //敵からの攻撃感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;
@@ -1233,7 +1231,7 @@ namespace EnjoyFishing
                 firstTime = false;
                 Thread.Sleep(settings.Global.WaitBase);
             }
-            logger.Output(LogLevelKind.DEBUG, "釣りスレッド終了");
+            logger.Debug("釣りスレッド終了");
         }
         /// <summary>
         /// 魚を１回釣る
@@ -1289,7 +1287,7 @@ namespace EnjoyFishing
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                     //エラーチェック
                     if (chatKbn == ChatKbnKind.CanNotFishing)
                     {
@@ -1348,7 +1346,7 @@ namespace EnjoyFishing
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                     
                     if (chatKbn == ChatKbnKind.BaitSmallFish || chatKbn == ChatKbnKind.BaitLargeFish ||
                         chatKbn == ChatKbnKind.BaitItem || chatKbn == ChatKbnKind.BaitMonster)//魚がかかった
@@ -1380,7 +1378,7 @@ namespace EnjoyFishing
                             oFish.FishName = FishDB.GetTmpFishNameFromFishType(oFish.FishType, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4);
                         }
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
-                        logger.Output(LogLevelKind.INFO, string.Format("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4} アイテムタイプ：{5}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType, oFish.ItemType));
+                        logger.InfoFormat("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4} アイテムタイプ：{5}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType, oFish.ItemType);
                         //日時の設定
                         oFish.EarthTime = this.EarthDateTime.ToString("yyyy/MM/dd HH:mm:ss");
                         oFish.VanaTime = this.VanaDateTimeYmdhms;
@@ -1402,7 +1400,7 @@ namespace EnjoyFishing
                         if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, oFish.FishType))
                         {
                             //リリースする
-                            logger.Output(LogLevelKind.DEBUG, string.Format("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
+                            logger.DebugFormat("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
                             while (this.PlayerStatus == FFACETools.Status.FishBite)
                             {
                                 fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
@@ -1420,7 +1418,7 @@ namespace EnjoyFishing
                             {
                                 if (isExecHp0(DateTime.Parse(oFish.EarthTime), waitHP0))
                                 {
-                                    logger.Output(LogLevelKind.INFO,"制限時間を過ぎたので、魚のHPを強制的にゼロにします");
+                                    logger.Info("制限時間を過ぎたので、魚のHPを強制的にゼロにします");
                                     fface.Fish.SetHP(0);
                                     Thread.Sleep(1000);
                                 }
@@ -1444,7 +1442,7 @@ namespace EnjoyFishing
                         //時間切れのログが表示されるまで待機
                         if (settings.Fishing.WaitTimeout)
                         {
-                            logger.Output(LogLevelKind.DEBUG, "時間切れ待機中");
+                            logger.Debug("時間切れ待機中");
                             setMessage(string.Format("時間切れ待機中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
                             int startIndex = chat.CurrentIndex;
                             bool timeUpOkFlg = false;
@@ -2382,7 +2380,7 @@ namespace EnjoyFishing
             }
             Thread.Sleep(settings.Global.WaitChat);
             //合成ログの確認
-            logger.Output(LogLevelKind.DEBUG, "竿の修理：ログ確認");
+            logger.Debug("竿の修理：ログ確認");
             FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
@@ -2390,23 +2388,23 @@ namespace EnjoyFishing
                 //チャット区分の取得
                 List<string> chatKbnArgs = new List<string>();
                 ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                 //合成失敗
                 if (chatKbn == ChatKbnKind.SynthFailure ||
                     chatKbn == ChatKbnKind.SynthNotEnoughSkill)
                 {
-                    logger.Output(LogLevelKind.DEBUG, "竿の修理：合成失敗");
+                    logger.Debug("竿の修理：合成失敗");
                     return false;
                 }
                 //合成成功
                 if (chatKbn == ChatKbnKind.SynthSuccess)
                 {
-                    logger.Output(LogLevelKind.DEBUG, "竿の修理：合成成功");
+                    logger.Debug("竿の修理：合成成功");
                     return true;
                 }
                 Thread.Sleep(settings.Global.WaitChat);
             }
-            logger.Output(LogLevelKind.DEBUG, "竿の修理：合成失敗 タイムアウト");
+            logger.Debug("竿の修理：合成失敗 タイムアウト");
             return false;
         }
         /// <summary>
@@ -2494,7 +2492,7 @@ namespace EnjoyFishing
                 //チャット区分の取得
                 List<string> chatKbnArgs = new List<string>();
                 ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                logger.Output(LogLevelKind.DEBUG, string.Format("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn));
+                logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                 //失敗
                 if (chatKbn == ChatKbnKind.UseItemFailure)
                 {
@@ -2808,7 +2806,7 @@ namespace EnjoyFishing
         {
             if (settings.Fishing.EquipEnable)
             {
-                logger.Output(LogLevelKind.DEBUG, "装備着替え開始");
+                logger.Debug("装備着替え開始");
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRod))
                     fface.Windower.SendString(string.Format("/equip range {0}", settings.Fishing.EquipRod));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipBait))
@@ -2869,7 +2867,7 @@ namespace EnjoyFishing
         private void setMessage(string iMessage)
         {
             if (this.Message == iMessage) return;
-            logger.Output(LogLevelKind.INFO, iMessage);
+            logger.Info(iMessage);
             this.Message = iMessage;
             EventChangeMessage(iMessage);
         }
