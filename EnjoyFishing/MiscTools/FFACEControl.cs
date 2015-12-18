@@ -1,12 +1,11 @@
-﻿using System;
+﻿using FFACETools;
+using NLog;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using FFACETools;
-using MiscTools;
-using System.IO;
 using System.Threading;
 
 namespace MiscTools
@@ -26,7 +25,7 @@ namespace MiscTools
         private PolTool pol = null;
         private FFACE fface = null;
         private ChatTool chat = null;
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         
         #region メンバ
         public int MaxLoopCount { get; set; }
@@ -60,7 +59,7 @@ namespace MiscTools
         /// <returns>True:見つかった False:見つからなかった</returns>
         public bool WaitChat(ChatTool iChatTool, string iRegexString, int iStartChatIndex, bool iWithEnter)
         {
-            logger.DebugFormat("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter);
+            logger.Debug("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter);
             List<FFACE.ChatTools.ChatLine> arrChatLine;
             int currChatIndex = iStartChatIndex;
             for (int i = 0; (i < this.MaxLoopCount); i++)
@@ -96,7 +95,7 @@ namespace MiscTools
         /// <returns>True:ダイアログが表示された False:ダイアログが表示されなかった</returns>
         public bool WaitOpenDialog(string iDialogString, bool iEnter)
         {
-            logger.DebugFormat("DialogString={0} Enter={1}", iDialogString, iEnter);
+            logger.Debug("DialogString={0} Enter={1}", iDialogString, iEnter);
             for (int i = 0; (i < this.MaxLoopCount); i++)
             {
                 Regex reg = new Regex(iDialogString, RegexOptions.IgnoreCase);
@@ -122,7 +121,7 @@ namespace MiscTools
         /// <returns></returns>
         public bool SetDialogOptionIndex(short iIdx, bool iWithEnter)
         {
-            logger.DebugFormat("iIdx={0} iWithEnter={1}", iIdx, iWithEnter);
+            logger.Debug("iIdx={0} iWithEnter={1}", iIdx, iWithEnter);
             for (int i = 0; i < this.MaxLoopCount; i++)
             {
                 if (this.fface.Menu.DialogOptionIndex == iIdx)
@@ -438,7 +437,7 @@ namespace MiscTools
             }
             catch (Exception e)
             {
-                logger.Error("スクリプト実行エラー", e);
+                logger.Error(e, "スクリプト実行エラー");
                 return false;
             }
             return true;
@@ -470,7 +469,7 @@ namespace MiscTools
             }
             catch (Exception e)
             {
-                logger.Error("Lua実行エラー", e);
+                logger.Error(e, "Lua実行エラー");
                 return false;
             }
             return true;
@@ -485,7 +484,7 @@ namespace MiscTools
         /// <returns>True:ターゲット完了 False:ターゲット出来なかった</returns>
         public bool SetTargetFromId(int iId, bool iWithEnter = false)
         {
-            logger.DebugFormat("Id={0} WithEnter={1}", iId, iWithEnter);
+            logger.Debug("Id={0} WithEnter={1}", iId, iWithEnter);
             //ToDo:FFACEが修正されるまでTABを使用するように暫定対応
             //for (int i = 0; i < this.MaxLoopCount; i++)
             //{

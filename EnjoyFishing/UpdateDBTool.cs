@@ -1,15 +1,14 @@
-﻿using FFACETools;
-using MiscTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -24,7 +23,7 @@ namespace EnjoyFishing
         
 
         private Settings settings;
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private FishDB fishDB;
         private FishHistoryDB historyDB;
         private string serverName = string.Empty;
@@ -243,14 +242,14 @@ namespace EnjoyFishing
                         //一時ディレクトリにXMLファイルを保存
                         historyDB.PutHistoryDB(DUMMY_PLAYER_NAME, history, Constants.PATH_TEMP);
                         string uploadFileName = historyDB.GetXmlName(DUMMY_PLAYER_NAME, ymd, Constants.PATH_TEMP);
-                        logger.DebugFormat("コピー {0}→{1}", filename, uploadFileName);
+                        logger.Debug("コピー {0}→{1}", filename, uploadFileName);
                         //ファイルアップロード
-                        logger.DebugFormat("{0}を送信中", uploadFileName);
+                        logger.Debug("{0}を送信中", uploadFileName);
                         EventReceiveMessage(string.Format("{0}をアップロード", filename));
                         NameValueCollection nvc = new NameValueCollection();
                         response = string.Empty;
                         httpRet = HttpUploadFile(serverName + URL_API_UPLOAD_HISTORY, uploadFileName, "upfile", "application/xml", nvc, out response);
-                        logger.DebugFormat("Response:\r{0}", response);
+                        logger.Trace("Response:\r{0}", response);
                         if (httpRet)
                         {
                             //レスポンスを取得
@@ -298,7 +297,7 @@ namespace EnjoyFishing
                 {
                     foreach(UpdateDBApiStatusStatusModel rod in status.Status)
                     {
-                        logger.InfoFormat("竿:{0} 更新日:{1}", rod.RodName, rod.LastUpdate);
+                        logger.Info("竿:{0} 更新日:{1}", rod.RodName, rod.LastUpdate);
                         if (!File.Exists(Path.Combine(FishDB.PATH_FISHDB, rod.RodName + ".xml")) ||
                             DateTime.Parse(rod.LastUpdate) > DateTime.Parse(settings.Global.UpdateDB.LastUpdate))
                         {
@@ -380,7 +379,7 @@ namespace EnjoyFishing
         {
             oResponse = "";
 
-            logger.DebugFormat("{0}", iUrl);
+            logger.Debug("{0}", iUrl);
             
             try
             {
@@ -396,12 +395,12 @@ namespace EnjoyFishing
                 st.Close();
                 webresp.Close();
                 oResponse = htmlSource;
-                logger.DebugFormat("Response:\r{0}", oResponse);
+                logger.Trace("Response:\r{0}", oResponse);
                 return true;
             }
             catch (Exception e)
             {
-                logger.Error(e.Message, e);
+                logger.Error(e);
                 oResponse = e.Message;
                 return false;
             }
@@ -417,8 +416,8 @@ namespace EnjoyFishing
         {
             oResponse = "";
 
-            logger.DebugFormat("{0}", iUrl);
-            foreach (string key in iPostNVC.Keys) logger.DebugFormat("{0}={1}", key, iPostNVC[key]);
+            logger.Debug("{0}", iUrl);
+            foreach (string key in iPostNVC.Keys) logger.Debug("{0}={1}", key, iPostNVC[key]);
 
             try
             {
@@ -448,13 +447,13 @@ namespace EnjoyFishing
                 Stream resStream = webresp.GetResponseStream();
                 StreamReader sr = new StreamReader(resStream, Encoding.UTF8);
                 oResponse = sr.ReadToEnd();
-                logger.DebugFormat("Response:\r{0}", oResponse);
+                logger.Trace("Response:\r{0}", oResponse);
                 sr.Close();
                 return true;
             }
             catch (Exception e)
             {
-                logger.Error(e.Message, e);
+                logger.Error(e);
                 oResponse = e.Message;
                 return false;
             }
@@ -471,7 +470,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public static bool HttpUploadFile(string iUrl, string iUploadFilename, string paramName, string iContentType, NameValueCollection iPostNVC, out string oResponse)
         {
-            logger.DebugFormat("{0}を{1}へアップロード", iUploadFilename, iUrl);
+            logger.Debug("{0}を{1}へアップロード", iUploadFilename, iUrl);
 
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
@@ -521,7 +520,7 @@ namespace EnjoyFishing
                 Stream stream2 = webresp.GetResponseStream();
                 StreamReader reader2 = new StreamReader(stream2);
                 oResponse = reader2.ReadToEnd();
-                logger.DebugFormat("Response:\r{0}", oResponse);
+                logger.Debug("Response:\r{0}", oResponse);
                 return true;
             }
             catch (Exception e)
@@ -531,7 +530,7 @@ namespace EnjoyFishing
                     webresp.Close();
                     webresp = null;
                 }
-                logger.Error(e.Message, e);
+                logger.Error(e);
                 oResponse = e.Message;
                 return false;
             }

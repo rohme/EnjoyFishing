@@ -1,11 +1,9 @@
-﻿using FFACETools;
-using MiscTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
+using FFACETools;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -47,7 +45,7 @@ namespace EnjoyFishing
         private PolTool pol;
         private FFACE fface;
         private Settings settings;
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private ChatTool chat;
         private FFACEControl control;
         private Thread thHarakiri;
@@ -366,7 +364,7 @@ namespace EnjoyFishing
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
+                    logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                     if (chatKbn == ChatKbnKind.Zaldon)
                     {
                         noResponseCount = 0;

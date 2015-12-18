@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using FFACETools;
 using MiscTools;
-using System.Threading;
-using System.IO;
-using System.Windows.Forms;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -166,7 +162,7 @@ namespace EnjoyFishing
         private PolTool pol;
         private FFACE fface;
         private Settings settings;
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private ChatTool chat;
         private FFACEControl control;
         private Thread thFishing;
@@ -946,7 +942,7 @@ namespace EnjoyFishing
                 {
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
+                    logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                 }
                 //敵からの攻撃感知
                 if (this.RunningStatus != RunningStatusKind.Running) break;
@@ -1287,7 +1283,7 @@ namespace EnjoyFishing
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
+                    logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                     //エラーチェック
                     if (chatKbn == ChatKbnKind.CanNotFishing)
                     {
@@ -1346,7 +1342,7 @@ namespace EnjoyFishing
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                    logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
+                    logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                     
                     if (chatKbn == ChatKbnKind.BaitSmallFish || chatKbn == ChatKbnKind.BaitLargeFish ||
                         chatKbn == ChatKbnKind.BaitItem || chatKbn == ChatKbnKind.BaitMonster)//魚がかかった
@@ -1378,7 +1374,7 @@ namespace EnjoyFishing
                             oFish.FishName = FishDB.GetTmpFishNameFromFishType(oFish.FishType, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4);
                         }
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
-                        logger.InfoFormat("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4} アイテムタイプ：{5}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType, oFish.ItemType);
+                        logger.Info("魚ID：{0:000}-{1:000}-{2:000}-{3:000} 魚タイプ：{4} アイテムタイプ：{5}", oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.FishType, oFish.ItemType);
                         //日時の設定
                         oFish.EarthTime = this.EarthDateTime.ToString("yyyy/MM/dd HH:mm:ss");
                         oFish.VanaTime = this.VanaDateTimeYmdhms;
@@ -1400,7 +1396,7 @@ namespace EnjoyFishing
                         if (!isWantedFish(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, oFish.FishType))
                         {
                             //リリースする
-                            logger.DebugFormat("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
+                            logger.Debug("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
                             while (this.PlayerStatus == FFACETools.Status.FishBite)
                             {
                                 fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
@@ -2388,7 +2384,7 @@ namespace EnjoyFishing
                 //チャット区分の取得
                 List<string> chatKbnArgs = new List<string>();
                 ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
+                logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                 //合成失敗
                 if (chatKbn == ChatKbnKind.SynthFailure ||
                     chatKbn == ChatKbnKind.SynthNotEnoughSkill)
@@ -2492,7 +2488,7 @@ namespace EnjoyFishing
                 //チャット区分の取得
                 List<string> chatKbnArgs = new List<string>();
                 ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
-                logger.DebugFormat("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
+                logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
                 //失敗
                 if (chatKbn == ChatKbnKind.UseItemFailure)
                 {

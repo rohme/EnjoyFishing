@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Threading;
 using System.Media;
+using System.Threading;
+using System.Windows.Forms;
+using EnjoyFishing.Properties;
 using FFACETools;
 using MiscTools;
-using EnjoyFishing.Properties;
-using System.IO;
-using System.Diagnostics;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -155,7 +152,7 @@ namespace EnjoyFishing
 
         private PolTool pol;
         private FFACE fface;
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private Settings settings;
         private ChatTool chat;
         private FishingTool fishing;
@@ -1134,7 +1131,7 @@ namespace EnjoyFishing
             logger.Debug("セットされてる魚");
             foreach (SettingsPlayerFishListWantedModel wanted in settings.FishList.Wanted)
             {
-                logger.DebugFormat("Name={0} ID1={1} ID2={2} ID3={3} ID4={4}", wanted.FishName, wanted.ID1, wanted.ID2, wanted.ID3, wanted.ID4);
+                logger.Debug("Name={0} ID1={1} ID2={2} ID3={3} ID4={4}", wanted.FishName, wanted.ID1, wanted.ID2, wanted.ID3, wanted.ID4);
             }
         }
         /// <summary>
@@ -2175,7 +2172,7 @@ namespace EnjoyFishing
             settings.UseEnternity = addons.Contains("enternity");
             settings.UseCancel = addons.Contains("Cancel");
             logger.Debug("使用中のアドオン");
-            foreach (string addon in addons) logger.DebugFormat(" {0}", addon);
+            foreach (string addon in addons) logger.Debug(" {0}", addon);
 
 
             if (settings.UseItemizer)
@@ -3221,7 +3218,7 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void PolTool_ChangeStatus(object sender, PolTool.ChangeStatusEventArgs e)
         {
-            logger.InfoFormat("POLステータスが{0}に変更された", e.PolStatus);
+            logger.Info("POLステータスが{0}に変更された", e.PolStatus);
             if (e.PolStatus == PolTool.PolStatusKind.LoggedIn)
             {
                 //プレイヤーが描画されるまで待機

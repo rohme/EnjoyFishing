@@ -1,11 +1,9 @@
-﻿using MiscTools;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -15,7 +13,7 @@ namespace EnjoyFishing
         private const string FILENAME_HARAKIRIDB = "Harakiri.xml";
         private const string VERSION = "1.0.0";
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// コンストラクタ
@@ -141,7 +139,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -190,7 +188,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の登録中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の登録中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }

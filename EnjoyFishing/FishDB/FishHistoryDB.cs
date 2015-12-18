@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Xml.Serialization;
-using MiscTools;
+using System.Text;
 using System.Threading;
-using System.Xml.Linq;
+using System.Xml.Serialization;
 using System.Xml.XPath;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -18,7 +16,7 @@ namespace EnjoyFishing
         public const string FILENAME_FISHHISTORYDB = "{0}_{1}.xml";
         private const string VERSION = "1.1.0";
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// コンストラクタ
@@ -58,7 +56,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public FishHistoryDBModel SelectDayly(string iPlayerName, DateTime iYmd, FishResultStatusKind iResultStatus, string iFishName)
         {
-            logger.DebugFormat("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
+            logger.Trace("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBModel tmpHistory = GetHistoryDB(iPlayerName, iYmd);
             FishHistoryDBModel ret = GetHistoryDB(iPlayerName, iYmd);
             ret.Fishes.Clear();
@@ -82,7 +80,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public List<string> SelectDaylyUniqueFishName(string iPlayerName, DateTime iYmd)
         {
-            logger.DebugFormat("Player={0} Ymd={1}", iPlayerName, iYmd);
+            logger.Trace("Player={0} Ymd={1}", iPlayerName, iYmd);
             FishHistoryDBModel tmpHistory = GetHistoryDB(iPlayerName, iYmd);
             List<string> ret = new List<string>();
             foreach (FishHistoryDBFishModel fish in tmpHistory.Fishes)
@@ -99,7 +97,7 @@ namespace EnjoyFishing
         /// <returns>サマリー情報</returns>
         public FishHistoryDBSummaryModel GetSummary(string iPlayerName, DateTime iYmd, FishResultStatusKind iResultStatus, string iFishName)
         {
-            logger.DebugFormat("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
+            logger.Trace("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBModel history = SelectDayly(iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBSummaryModel ret = new FishHistoryDBSummaryModel();
             foreach(FishHistoryDBFishModel fish in history.Fishes)
@@ -171,12 +169,12 @@ namespace EnjoyFishing
                         }
                         else if (version == "1.0.0")////1.0.0→1.0.5
                         {
-                            logger.InfoFormat("FishHistoryDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName);
+                            logger.Info("FishHistoryDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName);
                             convert1_0_0to1_0_5(xmlFileName, playerName, ymd);
                         }
                         else if (version == "1.0.5")////1.0.5→1.1.0
                         {
-                            logger.InfoFormat("FishHistoryDBのコンバート 1.0.5→1.1.0 {0}", xmlFileName);
+                            logger.Info("FishHistoryDBのコンバート 1.0.5→1.1.0 {0}", xmlFileName);
                             convert1_0_5to1_1_0(xmlFileName, playerName, ymd);
                         }
                     }
@@ -336,7 +334,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -381,7 +379,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -431,7 +429,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -481,7 +479,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の登録中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の登録中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -524,7 +522,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -564,7 +562,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}のバージョン取得中にエラーが発生しました。", iXmlFileName);
+                logger.Fatal("{0}のバージョン取得中にエラーが発生しました。", iXmlFileName);
                 throw e;
             }
         }

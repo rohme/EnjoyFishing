@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using MiscTools;
-using FFACETools;
 using System.Threading;
-using log4net;
-using System.IO;
-using log4net.Repository.Hierarchy;
-using log4net.Core;
+using System.Windows.Forms;
+using FFACETools;
+using MiscTools;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace EnjoyFishing
 {
     static class EnjoyFishing
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
@@ -26,6 +23,14 @@ namespace EnjoyFishing
             // エラーハンドラ
             Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
             Thread.GetDomain().UnhandledException += new UnhandledExceptionEventHandler(Program_UnhandledException);
+#if DEBUG
+            // VS出力にログ表示
+            var targetConsole = new ConsoleTarget();
+            targetConsole.Layout = @"@${uppercase:${level:padding=-5}} ${message}";
+            LogManager.Configuration.AddTarget("console", targetConsole);
+            var ruleConsole = new LoggingRule("*", LogLevel.Debug, targetConsole);
+            LogManager.Configuration.LoggingRules.Add(ruleConsole);
+#endif
 
             // コマンドライン引数の処理
             try
@@ -36,17 +41,27 @@ namespace EnjoyFishing
                     if (MiscTool.IsRegexString(argLower, "/ll:(.+)"))
                     {
                         List<string> reg = MiscTool.GetRegexString(argLower, "/ll:(.+)");
-                        Level lv = Level.Off;
-                        if (reg[0] == "off") lv = Level.Off;
-                        else if (reg[0] == "debug") lv = Level.Debug;
-                        else if (reg[0] == "info" || reg[0] == "information") lv = Level.Info;
-                        else if (reg[0] == "warn" || reg[0] == "warning") lv = Level.Warn;
-                        else if (reg[0] == "error") lv = Level.Error;
-                        else if (reg[0] == "fatal") lv = Level.Fatal;
-                        else if (reg[0] == "all") lv = Level.All;
+                        LogLevel lv = LogLevel.Off;
+                        if (reg[0] == "off") lv = LogLevel.Off;
+                        else if (reg[0] == "trace") lv = LogLevel.Trace;
+                        else if (reg[0] == "debug") lv = LogLevel.Debug;
+                        else if (reg[0] == "info" || reg[0] == "information") lv = LogLevel.Info;
+                        else if (reg[0] == "warn" || reg[0] == "warning") lv = LogLevel.Warn;
+                        else if (reg[0] == "error") lv = LogLevel.Error;
+                        else if (reg[0] == "fatal") lv = LogLevel.Fatal;
                         else throw new ArgumentException("引数の値が不正です。", arg);
-                        var root = ((Hierarchy)logger.Logger.Repository).Root;
-                        root.Level = lv;
+                        foreach (var rule in LogManager.Configuration.LoggingRules)
+                        {
+                            foreach (var target in rule.Targets)
+                            {
+                                if (target.GetType() == typeof(FileTarget))
+                                {
+                                    rule.EnableLoggingForLevel(lv);
+                                    break;
+                                }
+                            }
+                        }
+                        LogManager.ReconfigExistingLoggers();
                     }
                 }
             }
@@ -54,12 +69,13 @@ namespace EnjoyFishing
             {
                 string msg = string.Format("{0}\r\r", e.Message);
                 msg += "EnjoyFishing.exe [OPTION]\r";
-                msg += "/ll:[LEVEL] 出力ログレベル(none,debug,info,warn,fatal,all)\r";
+                msg += "OPTIONS:\r";
+                msg += "/ll:[off|trace|debug|info|warn|fatal] 出力ログレベル\r";
                 MessageBox.Show(msg, MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 System.Environment.Exit(1);//プログラム終了
             }
 
-            logger.InfoFormat("===== {0} {1} =====", MiscTool.GetAppAssemblyName(), MiscTool.GetAppVersion());
+            logger.Info("===== {0} {1} =====", MiscTool.GetAppAssemblyName(), MiscTool.GetAppVersion());
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -130,7 +146,7 @@ namespace EnjoyFishing
         /// <param name="title"></param>
         private static void ShowError(Exception e, string title)
         {
-            logger.Fatal(title, e);
+            logger.Fatal(e, title);
             string msg = string.Format("補足されないエラーが発生しました。\r詳細はログファイルを参照してください。\r\r{0}\r{1}", e.Message, e.StackTrace);
             MessageBox.Show(msg, title, MessageBoxButtons.OK,MessageBoxIcon.Stop);
         }

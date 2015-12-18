@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Xml.Serialization;
-using MiscTools;
-using System.Reflection;
+using System.Text;
 using System.Threading;
-using System.Windows.Forms;
+using System.Xml.Serialization;
 using System.Xml.XPath;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -26,7 +23,7 @@ namespace EnjoyFishing
         public const string FILENAME_EMINENCEDB = "Eminence.xml";
         private const string VERSION = "1.1.0";
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private List<string> _Rods = new List<string>();
         private List<string> _Baits = new List<string>();
         private List<GearDBGearModel> _Gears = new List<GearDBGearModel>();
@@ -98,7 +95,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public List<FishDBFishModel> SelectFishList(string iRodName, string iZoneName, string iBaitName)
         {
-            logger.DebugFormat("RodName={0} ZoneName={1} BaitName={2}", iRodName, iZoneName, iBaitName);
+            logger.Trace("RodName={0} ZoneName={1} BaitName={2}", iRodName, iZoneName, iBaitName);
             List<FishDBFishModel> ret = new List<FishDBFishModel>();
             FishDBModel fishDB = getFishDB(iRodName);
             foreach (FishDBFishModel fish in fishDB.Fishes)
@@ -141,7 +138,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public FishDBFishModel SelectFishFromIDZone(string iRodName, int iID1, int iID2, int iID3, int iID4, string iZoneName, bool iWithUnknownFish)
         {
-            logger.DebugFormat("RodName={0} ID1={1} ID2={2} ID3={3} ID4={4} ZoneName={5} WithUnknownFish={6}", iRodName, iID1, iID2, iID3, iID4, iZoneName, iWithUnknownFish);
+            logger.Trace("RodName={0} ID1={1} ID2={2} ID3={3} ID4={4} ZoneName={5} WithUnknownFish={6}", iRodName, iID1, iID2, iID3, iID4, iZoneName, iWithUnknownFish);
             FishDBModel fishDB = getFishDB(iRodName);
             foreach (FishDBFishModel fish in fishDB.Fishes)
             {
@@ -163,7 +160,7 @@ namespace EnjoyFishing
         }
         public bool AddFish(string iRodName, string iFishName, FishDBFishTypeKind iFishType, FishDBIdModel iID, string iZoneName, string iBaitName)
         {
-            logger.DebugFormat("RodName={0} Fish={1} Type={2} ID={3} Zone={4} Bait={5}", iRodName, iFishName, iFishType, iID, iZoneName, iBaitName);
+            logger.Trace("RodName={0} Fish={1} Type={2} ID={3} Zone={4} Bait={5}", iRodName, iFishName, iFishType, iID, iZoneName, iBaitName);
             FishDBModel fishDB = getFishDB(iRodName);
             fishDB.Version = VERSION;
             fishDB.RodName = iRodName;
@@ -199,17 +196,17 @@ namespace EnjoyFishing
                     fishDB.Fishes[fishIdx].FishName = iFishName;
                     fishDB.Fishes[fishIdx].FishType = iFishType;
                     if (!fishDB.Fishes[fishIdx].IDs.Contains(iID)) {
-                        logger.InfoFormat("IDの追加 竿={0} 魚={1} ID={2}", iRodName, iFishName, iID);
+                        logger.Info("IDの追加 竿={0} 魚={1} ID={2}", iRodName, iFishName, iID);
                         fishDB.Fishes[fishIdx].IDs.Add(iID);
                     }
                     if (!fishDB.Fishes[fishIdx].ZoneNames.Contains(iZoneName))
                     {
-                        logger.InfoFormat("エリアの追加 竿={0} 魚={1} エリア={2}", iRodName, iFishName, iZoneName);
+                        logger.Info("エリアの追加 竿={0} 魚={1} エリア={2}", iRodName, iFishName, iZoneName);
                         fishDB.Fishes[fishIdx].ZoneNames.Add(iZoneName);
                     }
                     if (!fishDB.Fishes[fishIdx].BaitNames.Contains(iBaitName))
                     {
-                        logger.InfoFormat("エサの追加 竿={0} 魚={1} エサ={2}", iRodName, iFishName, iBaitName);
+                        logger.Info("エサの追加 竿={0} 魚={1} エサ={2}", iRodName, iFishName, iBaitName);
                         fishDB.Fishes[fishIdx].BaitNames.Add(iBaitName);
                     }
                 }
@@ -217,7 +214,7 @@ namespace EnjoyFishing
             //新規追加処理
             if (!foundFlg)
             {
-                logger.InfoFormat("魚の追加 竿={0} 魚={1} 魚タイプ={2} ID={3} エリア={4} エサ={5}", iRodName, iFishName, iFishType, iID, iZoneName, iBaitName);
+                logger.Info("魚の追加 竿={0} 魚={1} 魚タイプ={2} ID={3} エリア={4} エサ={5}", iRodName, iFishName, iFishType, iID, iZoneName, iBaitName);
                 FishDBFishModel fish = new FishDBFishModel();
                 fish.FishName = iFishName;
                 fish.FishType = iFishType;
@@ -243,7 +240,7 @@ namespace EnjoyFishing
         /// <returns>True:成功</returns>
         public bool DeleteFish(string iRodName, string iFishName)
         {
-            logger.DebugFormat("RodName={0} FishName={1}", iRodName, iFishName);
+            logger.Trace("RodName={0} FishName={1}", iRodName, iFishName);
             FishDBModel fishDB = getFishDB(iRodName);
             //xmlに存在すれば削除する
             for (int i = 0; i < fishDB.Fishes.Count; i++)
@@ -282,7 +279,7 @@ namespace EnjoyFishing
                         }
                         if (version == "1.0.0")////1.0.0→1.0.5
                         {
-                            logger.InfoFormat("FishDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName);
+                            logger.Info("FishDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName);
                             convert1_0_0to1_0_5(xmlFileName, rodName);
                         }
                     }
@@ -390,7 +387,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -428,7 +425,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -470,7 +467,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の登録中にエラーが発生しました。", xmlFilename);
+                logger.Fatal("{0}の登録中にエラーが発生しました。", xmlFilename);
                 throw e;
             }
         }
@@ -492,7 +489,7 @@ namespace EnjoyFishing
         /// <returns>竿の一覧</returns>
         public List<RodDBRodModel> SelectRod(string iSearchString)
         {
-            logger.DebugFormat("SearchString={0}", iSearchString);
+            logger.Trace("SearchString={0}", iSearchString);
             List<RodDBRodModel> ret = new List<RodDBRodModel>();
             RodDBModel roddb = getRodDB();
             if (iSearchString == string.Empty)
@@ -533,7 +530,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", FILENAME_RODDB);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_RODDB);
                 throw e;
             }
         }
@@ -560,7 +557,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の登録中にエラーが発生しました。", FILENAME_RODDB);
+                logger.Fatal("{0}の登録中にエラーが発生しました。", FILENAME_RODDB);
                 throw e;
             }
         }
@@ -582,7 +579,7 @@ namespace EnjoyFishing
         /// <returns>餌の一覧</returns>
         public List<BaitDBBaitModel> SelectBait(string iSearchString)
         {
-            logger.DebugFormat("SearchString={0}", iSearchString);
+            logger.Trace("SearchString={0}", iSearchString);
             List<BaitDBBaitModel> ret = new List<BaitDBBaitModel>();
             BaitDBModel Baitdb = getBaitDB();
             if (iSearchString == string.Empty)
@@ -623,7 +620,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", FILENAME_BAITDB);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_BAITDB);
                 throw e;
             }
         }
@@ -650,7 +647,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の登録中にエラーが発生しました。", FILENAME_BAITDB);
+                logger.Fatal("{0}の登録中にエラーが発生しました。", FILENAME_BAITDB);
                 throw e;
             }
         }
@@ -672,7 +669,7 @@ namespace EnjoyFishing
         /// <returns>装備の一覧</returns>
         public List<GearDBGearModel> SelectGear(string iSearchString, GearDBPositionKind iPosition)
         {
-            logger.DebugFormat("SearchString={0}", iSearchString);
+            logger.Trace("SearchString={0}", iSearchString);
             List<GearDBGearModel> ret = new List<GearDBGearModel>();
             GearDBModel gearDB = getGearDB();
             if (iSearchString == string.Empty && iPosition == GearDBPositionKind.Unknown)
@@ -715,7 +712,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", FILENAME_GEARDB);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_GEARDB);
                 throw e;
             }
         }
@@ -737,7 +734,7 @@ namespace EnjoyFishing
         /// <returns>装備の一覧</returns>
         public List<EminenceDBEminenceModel> SelectEminence(string iSearchString)
         {
-            logger.DebugFormat("SearchString={0}", iSearchString);
+            logger.Trace("SearchString={0}", iSearchString);
             List<EminenceDBEminenceModel> ret = new List<EminenceDBEminenceModel>();
             EminenceDBModel eminenceDB = getEminenceDB();
             if (iSearchString == string.Empty)
@@ -777,7 +774,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}の取得中にエラーが発生しました。", FILENAME_EMINENCEDB);
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_EMINENCEDB);
                 throw e;
             }
         }
@@ -853,7 +850,7 @@ namespace EnjoyFishing
             }
             catch (Exception e)
             {
-                logger.FatalFormat("{0}のバージョン取得中にエラーが発生しました。", iXmlFileName);
+                logger.Fatal("{0}のバージョン取得中にエラーが発生しました。", iXmlFileName);
                 throw e;
             }
         }

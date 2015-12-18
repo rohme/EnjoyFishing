@@ -65,8 +65,8 @@
     <ApplicationManifest>EnjoyFishing.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net40-full\log4net.dll</HintPath>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.2\lib\net40\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -170,6 +170,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="EnjoyFishing.ico" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Resources\IMAGE_MOON03.png" />
     <None Include="Resources\IMAGE_MOON04.png" />
@@ -192,10 +199,6 @@
     <None Include="Resources\IMAGE_WEEK_WATER.png" />
     <None Include="Resources\IMAGE_WEEK_LIGHTNING.png" />
     <None Include="Resources\IMAGE_REFRESH.png" />
-    <Content Include="Log4net.Config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="MiscTools\PolTool.ico" />
   </ItemGroup>
   <ItemGroup>
