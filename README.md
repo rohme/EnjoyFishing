@@ -465,3 +465,7 @@ https://github.com/rohme/
     - 大きな魚を小さな魚として登録していた
     - 竿折れが発生したとき、代わりの竿を装備しなかった
 * **2014-12-28 ver0.0.1 プレリリース1**
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/rohme/enjoyfishing/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
