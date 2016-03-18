@@ -30,6 +30,7 @@ namespace EnjoyFishing
             LogManager.Configuration.AddTarget("console", targetConsole);
             var ruleConsole = new LoggingRule("*", LogLevel.Debug, targetConsole);
             LogManager.Configuration.LoggingRules.Add(ruleConsole);
+            LogManager.ReconfigExistingLoggers();
 #endif
 
             // コマンドライン引数の処理
