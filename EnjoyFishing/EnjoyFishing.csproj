@@ -168,9 +168,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FFACE.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="FishDB\Eminence.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
