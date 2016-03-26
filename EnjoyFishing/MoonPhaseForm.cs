@@ -1,5 +1,4 @@
 ﻿using EnjoyFishing.Properties;
-using FFACETools;
 using MiscTools;
 using System;
 using System.Collections.Generic;
@@ -9,45 +8,52 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using EliteMMO.API;
 
 namespace EnjoyFishing
 {
     public partial class MoonPhaseForm : Form
     {
-        private FFACE fface;
-        public MoonPhaseForm(FFACE iFFACE)
+        private PolTool pol;
+        private EliteAPI api;
+        public MoonPhaseForm(PolTool iPol)
         {
             InitializeComponent();
-            fface = iFFACE;
+            pol = iPol;
+            api = iPol.EliteAPI;
         }
 
         private void MoonPhaseForm_Load(object sender, EventArgs e)
         {
             this.Icon = Icon.FromHandle(Resources.IMAGE_MOON02.GetHicon());
+            var v1 = new VanaTime()
+            {
+                Year = api.VanaTime.CurrentYear,
+                Month = api.VanaTime.CurrentMonth,
+                Day = api.VanaTime.CurrentDay,
+                Hour = api.VanaTime.CurrentHour,
+                Minute = api.VanaTime.CurrentMinute,
+                Second = api.VanaTime.CurrentSecond,
+            };
 
-            MoonPhase lastMoonPhase = FFACEControl.GetMoonPhaseFromVanaTime(fface.Timer.GetVanaTime());
-
-            FFACE.TimerTools.VanaTime v = new FFACE.TimerTools.VanaTime();
-            v.Year = fface.Timer.GetVanaTime().Year;
-            v.Month = fface.Timer.GetVanaTime().Month;
-            v.Day = fface.Timer.GetVanaTime().Day;
+            MoonPhase lastMoonPhase = EliteAPIControl.GetMoonPhaseFromVanaTime(v1);
 
             for (int i = 0; i <= 4; i++)
             {
                 gridMoonPhase.Columns[i].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 gridMoonPhase.Columns[i].HeaderCell.Style.Font = new Font(gridMoonPhase.Font,gridMoonPhase.Font.Style | FontStyle.Bold);
             }
-            MoonPhase last = FFACEControl.GetMoonPhaseFromVanaTime(v);
+            MoonPhase last = EliteAPIControl.GetMoonPhaseFromVanaTime(v1);
             for (int i = 0; i < 360; i++)
             {
-                v = FFACEControl.addVanaDay(v);
-                MoonPhase m = FFACEControl.GetMoonPhaseFromVanaTime(v);
+                var v2 = EliteAPIControl.addVanaDay(v1, i);
+                MoonPhase m = EliteAPIControl.GetMoonPhaseFromVanaTime(v2);
                 if (last != m)
                 {
                     gridMoonPhase.Rows.Add();
-                    gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[0].Value = FFACEControl.GetEarthTimeFromVanaTime(v).ToString("yyyy/MM/dd HH:mm");
-                    gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[1].Value = string.Format("{0:0000}/{1:00}/{2:00}", v.Year, v.Month, v.Day);
-                    gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[2].Value = MainForm.dicWeekDayImage[FFACEControl.GetWeekdayFromVanaTime(v)];
+                    gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[0].Value = EliteAPIControl.GetEarthTimeFromVanaTime(v2).ToString("yyyy/MM/dd HH:mm");
+                    gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[1].Value = string.Format("{0:0000}/{1:00}/{2:00}", v2.Year, v2.Month, v2.Day);
+                    gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[2].Value = MainForm.dicWeekDayImage[EliteAPIControl.GetWeekdayFromVanaTime(v2)];
                     gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[3].Value = MainForm.dicMoonPhaseImage[m];
                     gridMoonPhase.Rows[gridMoonPhase.Rows.Count - 1].Cells[4].Value = MainForm.dicMoonPhaseName[m];
                     //行の色変更

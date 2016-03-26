@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using FFACETools;
+using EliteMMO.API;
 using MiscTools;
 using NLog;
 
@@ -43,11 +43,12 @@ namespace EnjoyFishing
         private const int NPCID_ZALDON = 23;
 
         private PolTool pol;
-        private FFACE fface;
+        private EliteAPI api;
         private Settings settings;
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private ChatTool chat;
-        private FFACEControl control;
+        private ResourceTool resource;
+        private EliteAPIControl control;
         private Thread thHarakiri;
         private FishDB fishDB;
         private HarakiriDB harakiriDB;
@@ -174,18 +175,19 @@ namespace EnjoyFishing
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="iFFACE"></param>
+        /// <param name="iPol"></param>
         /// <param name="iChat"></param>
         /// <param name="iSettings"></param>
-        public HarakiriTool(PolTool iPol, ChatTool iChat, Settings iSettings)
+        public HarakiriTool(PolTool iPol, ResourceTool iResource, ChatTool iChat, Settings iSettings)
         {
             pol = iPol;
-            fface = iPol.FFACE;
+            api = iPol.EliteAPI;
             chat = iChat;
+            resource = iResource;
             settings = iSettings;
             fishDB = new FishDB();
             harakiriDB = new HarakiriDB();
-            control = new FFACEControl(pol, chat);
+            control = new EliteAPIControl(pol, resource, chat);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
             control.BaseWait = settings.Global.WaitBase;
@@ -241,9 +243,9 @@ namespace EnjoyFishing
         /// </summary>
         private void threadWaitStatusStanding()
         {
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Player.Status != FFACETools.Status.Standing; i++)
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT && api.Player.Status != (uint)Status.Standing; i++)
             {
-                fface.Windower.SendKeyPress(KeyCode.EscapeKey);
+                api.ThirdParty.KeyPress(Keys.ESCAPE);
                 Thread.Sleep(settings.Global.WaitBase);
             }
         }
@@ -260,6 +262,7 @@ namespace EnjoyFishing
             bool firsttime = true;
 
             logger.Debug("ハラキリスレッド開始");
+            chat.Clear();
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 //未入力チェック
@@ -270,17 +273,9 @@ namespace EnjoyFishing
                     setMessage("ハラキリする魚を入力してください");
                     return;
                 }
-                //鞄が満杯？
-                //if (fface.Item.InventoryCount >= fface.Item.InventoryMax)
-                //{
-                //    setRunningStatus(RunningStatusKind.Stop);
-                //    setHarakiriStatus(HarakiriStatusKind.Error);
-                //    setMessage("鞄が満杯です");
-                //    return;
-                //}
                 //鞄に入っている魚の総数を取得
-                int itemId = FFACE.ParseResources.GetItemId(this.HarakiriFishName);
-                uint remain = GetHarakiriRemain(this.HarakiriFishName);
+                uint itemId = resource.GetItem(this.HarakiriFishName).ItemID;
+                int remain = GetHarakiriRemain(this.HarakiriFishName);
                 if (remain <= 0)
                 {
                     setRunningStatus(RunningStatusKind.Stop);
@@ -299,24 +294,24 @@ namespace EnjoyFishing
                 firsttime = false;
                 setMessage(string.Format("ハラキリ中：{0} 残り{1}匹", this.HarakiriFishName, remain));
                 //鞄に対象の魚を移動させる
-                if (fface.Item.GetItemCount(itemId, InventoryType.Inventory) <= 0)
+                if (control.GetInventoryItemCount(itemId, InventoryType.Inventory) <= 0)
                 {
-                    if (fface.Item.GetItemCount(itemId, InventoryType.Satchel) > 0)
+                    if (control.GetInventoryItemCount(itemId, InventoryType.Satchel) > 0)
                     {
-                        control.GetItem(this.HarakiriFishName, InventoryType.Satchel);
+                        control.GetItemizer(this.HarakiriFishName, InventoryType.Satchel);
                     }
-                    else if (fface.Item.GetItemCount(itemId, InventoryType.Sack) > 0)
+                    else if (control.GetInventoryItemCount(itemId, InventoryType.Sack) > 0)
                     {
-                        control.GetItem(this.HarakiriFishName, InventoryType.Sack);
+                        control.GetItemizer(this.HarakiriFishName, InventoryType.Sack);
                     }
-                    else if (fface.Item.GetItemCount(itemId, InventoryType.Case) > 0)
+                    else if (control.GetInventoryItemCount(itemId, InventoryType.Case) > 0)
                     {
-                        control.GetItem(this.HarakiriFishName, InventoryType.Case);
+                        control.GetItemizer(this.HarakiriFishName, InventoryType.Case);
                     }
                 }
                 //Zaldonの近くかチェック
-                if (fface.Player.Zone != Zone.Selbina ||
-                    (fface.NPC.Distance(NPCID_ZALDON) != 0f && fface.NPC.Distance(NPCID_ZALDON) > 6))
+                if (api.Player.ZoneId != (int)Zone.Selbina ||
+                    (api.Entity.GetEntity(NPCID_ZALDON).Distance != 0f && api.Entity.GetEntity(NPCID_ZALDON).Distance > 6))
                 {
                     setRunningStatus(RunningStatusKind.Stop);
                     setHarakiriStatus(HarakiriStatusKind.Error);
@@ -336,16 +331,16 @@ namespace EnjoyFishing
                 control.SetTargetFromId(NPCID_ZALDON);
                 Thread.Sleep(settings.Global.WaitChat);//Wait
                 //プレイヤーステータスがstandingになるまで待機
-                while(fface.Player.Status != Status.Standing){
+                while(api.Player.Status != (uint)Status.Standing){
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 }
                 //アイテムトレード
-                fface.Windower.SendString(string.Format("/item {0} <t>", this.HarakiriFishName));
+                api.ThirdParty.SendString(string.Format("/item {0} <t>", this.HarakiriFishName));
 
                 //チャット監視開始
                 string itemName = string.Empty;
                 int noResponseCount = 0;
-                FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                var cl = new EliteAPI.ChatEntry();
                 while (this.RunningStatus == RunningStatusKind.Running)
                 {
                     if (!chat.GetNextChatLine(out cl)) 
@@ -370,7 +365,7 @@ namespace EnjoyFishing
                         noResponseCount = 0;
                         if (!settings.UseEnternity)
                         {
-                            fface.Windower.SendKeyPress(KeyCode.EnterKey);
+                            api.ThirdParty.KeyPress(Keys.RETURN);
                         }
                     }
                     else if (chatKbn == ChatKbnKind.NotFound)
@@ -387,7 +382,7 @@ namespace EnjoyFishing
                         setMessage("ハラキリ結果：何も見つからなかった");
                         if (!settings.UseEnternity)
                         {
-                            fface.Windower.SendKeyPress(KeyCode.EnterKey);
+                            api.ThirdParty.KeyPress(Keys.RETURN);
                         }
                     }
                     else if (chatKbn == ChatKbnKind.Found)
@@ -403,7 +398,7 @@ namespace EnjoyFishing
                         }
                         EventHarakiriOnce(this.HarakiriFishName, itemName);//イベント発生
                         setMessage(string.Format("ハラキリ結果：{0}を見つけた", itemName));
-                        fface.Windower.SendKeyPress(KeyCode.EnterKey);
+                        api.ThirdParty.KeyPress(Keys.RETURN);
                         Thread.Sleep(settings.Global.WaitChat);
                     }
                     if (chatKbn == ChatKbnKind.Found || chatKbn == ChatKbnKind.NotFound)
@@ -428,22 +423,21 @@ namespace EnjoyFishing
 
         private bool putDatabase(string iItemName)
         {
-            FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
             string vanadate = string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}",
-                                                                        int.Parse(vt.Year.ToString()),
-                                                                        int.Parse(vt.Month.ToString()),
-                                                                        int.Parse(vt.Day.ToString()),
-                                                                        int.Parse(vt.Hour.ToString()),
-                                                                        int.Parse(vt.Minute.ToString()),
-                                                                        int.Parse(vt.Second.ToString()));
-            return harakiriDB.Add(fface.Player.Name, DateTime.Now, vanadate, this.HarakiriFishName, iItemName);
+                                                                        api.VanaTime.CurrentYear,
+                                                                        api.VanaTime.CurrentMonth,
+                                                                        api.VanaTime.CurrentDay,
+                                                                        api.VanaTime.CurrentHour,
+                                                                        api.VanaTime.CurrentMinute,
+                                                                        api.VanaTime.CurrentSecond);
+            return harakiriDB.Add(api.Player.Name, DateTime.Now, vanadate, this.HarakiriFishName, iItemName);
         }
         /// <summary>
         /// チャット内容からChatKbnKindを取得する
         /// </summary>
         /// <param name="iCl">チャットライン</param>
         /// <returns>チャット区分</returns>
-        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs)
+        private ChatKbnKind getChatKbnFromChatline(EliteAPI.ChatEntry iCl, out List<string> oArgs)
         {
             oArgs = new List<string>();
             foreach (KeyValuePair<ChatKbnKind, string> v in dictionaryChat)
@@ -464,15 +458,15 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iFishName">魚名称</param>
         /// <returns>残数</returns>
-        public uint GetHarakiriRemain(string iFishName)
+        public int GetHarakiriRemain(string iFishName)
         {
-            int itemId = FFACE.ParseResources.GetItemId(iFishName);
-            uint remain = fface.Item.GetItemCount(itemId, InventoryType.Inventory);
+            uint itemId = resource.GetItem(iFishName).ItemID;
+            int remain = control.GetInventoryItemCount(itemId, InventoryType.Inventory);
             if (settings.UseItemizer)
             {
-                remain += fface.Item.GetItemCount(itemId, InventoryType.Satchel);
-                remain += fface.Item.GetItemCount(itemId, InventoryType.Sack);
-                remain += fface.Item.GetItemCount(itemId, InventoryType.Case);
+                remain += control.GetInventoryItemCount(itemId, InventoryType.Satchel);
+                remain += control.GetInventoryItemCount(itemId, InventoryType.Sack);
+                remain += control.GetInventoryItemCount(itemId, InventoryType.Case);
             }
             return remain;
         }

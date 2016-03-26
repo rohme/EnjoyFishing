@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
-using FFACETools;
 using MiscTools;
 using NLog;
 using NLog.Config;
@@ -94,7 +93,7 @@ namespace EnjoyFishing
             {
                 System.Environment.Exit(1); // プログラム終了
             }
-            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn)
+            if (pol.EliteAPI.Player.LoginStatus != (int)LoginStatus.LoggedIn)
             {
                 string msg = "キャラクター選択後に起動してください。";
                 logger.Error(msg);
@@ -104,14 +103,16 @@ namespace EnjoyFishing
             // シフトキーでテストフォーム表示
             if (Control.ModifierKeys == Keys.Shift)
             {
-                logger.Info("FFACEテストモード");
+                logger.Info("EliteAPIテストモード");
                 //テストモード
-                FFACETestForm testForm = new FFACETestForm(pol);
+                EliteAPITestForm testForm = new EliteAPITestForm(pol);
                 testForm.ShowDialog();
                 System.Environment.Exit(0); // プログラム終了
             }
+            // ResourceTool
+            var resource = new ResourceTool(pol.EliteAPI);
             // メインフォーム表示
-            MainForm mainForm = new MainForm(pol);
+            MainForm mainForm = new MainForm(pol, resource);
             mainForm.ShowDialog();
         }
 

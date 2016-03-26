@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FFACETools;
 using System.Diagnostics;
 using System.Threading;
+using EliteMMO.API;
+using EnjoyFishing;
 
 namespace MiscTools
 {
@@ -19,7 +20,7 @@ namespace MiscTools
             LoggedIn,
         }
         private PolStatusKind _Status = PolStatusKind.Unknown;
-        private FFACE _FFACE;
+        private EliteAPI _EliteAPI;
         private int _ProcessID = 0;
         private Thread thPol;
 
@@ -63,11 +64,11 @@ namespace MiscTools
 
         #region メンバ
         /// <summary>
-        /// FFACE
+        /// EliteAPI
         /// </summary>
-        public FFACE FFACE
+        public EliteAPI EliteAPI
         {
-            get { return _FFACE; }
+            get { return _EliteAPI; }
         }
         /// <summary>
         /// POLステータス
@@ -97,10 +98,10 @@ namespace MiscTools
         /// </summary>
         private void threadPol()
         {
-            FFACETools.LoginStatus lastStatus = FFACETools.LoginStatus.Loading;
+            LoginStatus lastStatus = LoginStatus.Loading;
             while (true)
             {
-                if (_FFACE != null)
+                if (_EliteAPI != null)
                 {
                     List<Process> pols = GetPolProcess();
                     bool polFoundFlg = false;
@@ -118,17 +119,17 @@ namespace MiscTools
                         continue;
                     }
 
-                    FFACETools.LoginStatus status = _FFACE.Player.GetLoginStatus;
-                    if (status != FFACETools.LoginStatus.Loading)
+                    LoginStatus status = (LoginStatus)_EliteAPI.Player.LoginStatus;
+                    if (status != LoginStatus.Loading)
                     {
                         if (status != lastStatus)
                         {
                             switch (status)
                             {
-                                case FFACETools.LoginStatus.CharacterLoginScreen:
+                                case LoginStatus.CharacterLoginScreen:
                                     changeStatus(PolStatusKind.CharacterLoginScreen);
                                     break;
-                                case FFACETools.LoginStatus.LoggedIn:
+                                case LoginStatus.LoggedIn:
                                     changeStatus(PolStatusKind.LoggedIn);
                                     break;
                             }
@@ -167,7 +168,7 @@ namespace MiscTools
             }
             if (polId > 0)
             {
-                _FFACE = new FFACE(polId);
+                _EliteAPI = new EliteAPI(polId);
                 this._ProcessID = polId;
                 return true;
             }

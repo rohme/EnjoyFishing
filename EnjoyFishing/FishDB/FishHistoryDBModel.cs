@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FFACETools;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.Collections;
@@ -135,7 +134,7 @@ namespace EnjoyFishing
             this.EarthTime = DateTime.Today.ToString("yyyy/MM/dd HH:mm:ss");
             this.VanaTime = string.Empty;
             this.VanaWeekDay = Weekday.Unknown;
-            this.MoonPhase = FFACETools.MoonPhase.Unknown;
+            this.MoonPhase = MoonPhase.Unknown;
             this.X = 0.0f;
             this.Y = 0.0f;
             this.Z = 0.0f;

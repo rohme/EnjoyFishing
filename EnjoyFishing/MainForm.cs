@@ -7,8 +7,8 @@ using System.Drawing;
 using System.Media;
 using System.Threading;
 using System.Windows.Forms;
+using EliteMMO.API;
 using EnjoyFishing.Properties;
-using FFACETools;
 using MiscTools;
 using NLog;
 
@@ -151,13 +151,14 @@ namespace EnjoyFishing
         #endregion
 
         private PolTool pol;
-        private FFACE fface;
+        private ResourceTool resource;
+        private EliteAPI api;
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private Settings settings;
         private ChatTool chat;
         private FishingTool fishing;
         private HarakiriTool harakiri;
-        private FFACEControl control;
+        private EliteAPIControl control;
         private FishDB fishDB;
         private FishHistoryDB fishHistoryDB;
         private HarakiriDB harakiriDB;
@@ -272,49 +273,51 @@ namespace EnjoyFishing
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MainForm(PolTool iPol)
+        public MainForm(PolTool iPol, ResourceTool iResource)
         {
             startupFlg = true;
             InitializeComponent();
-            constructor(iPol);
+            constructor(iPol, iResource);
         }
         /// <summary>
         /// コンストラクタ処理部
         /// </summary>
         /// <param name="iPol"></param>
-        private void constructor(PolTool iPol)
+        private void constructor(PolTool iPol, ResourceTool iResource)
         {
             //PolTool初期設定
             pol = iPol;
             pol.ChangeStatus += new PolTool.ChangeStatusEventHandler(this.PolTool_ChangeStatus);
-            //FFACE初期設定
-            fface = iPol.FFACE;
+            //ResourceTool設定
+            resource = iResource;
+            //EliteAPI初期設定
+            api = iPol.EliteAPI;
             //Settings初期設定
-            settings = new Settings(iPol.FFACE.Player.Name);
+            settings = new Settings(api.Player.Name);
             //ChatTool初期設定
-            chat = new ChatTool(iPol.FFACE);
+            chat = new ChatTool(iPol.EliteAPI);
             chat.ReceivedCommand += new ChatTool.ReceivedCommandEventHandler(this.ChatTool_ReceivedCommand);
             logger.Debug("ChatTool起動");
             //FishingTool初期設定
-            fishing = new FishingTool(iPol, chat, settings);
+            fishing = new FishingTool(iPol, resource, chat, settings);
             fishing.Fished += new FishingTool.FishedEventHandler(this.FishingTool_Fished);
             fishing.ChangeMessage += new FishingTool.ChangeMessageEventHandler(this.FishingTool_ChangeMessage);
             fishing.ChangeStatus += new FishingTool.ChangeStatusEventHandler(this.FishingTool_ChangeStatus);
             fishing.CaughtFishesUpdate += new FishingTool.CaughtFishesUpdateEventHandler(this.FishingTool_CaughtFishesUpdate);
             logger.Debug("FishingTool起動");
             //HarakiriTool初期設定
-            harakiri = new HarakiriTool(iPol, chat, settings);
+            harakiri = new HarakiriTool(iPol, resource, chat, settings);
             harakiri.HarakiriOnce += new HarakiriTool.HarakiriOnceEventHandler(this.HarakiriTool_HarakiriOnce);
             harakiri.ChangeMessage += new HarakiriTool.ChangeMessageEventHandler(this.HarakiriTool_ChangeMessage);
             harakiri.ChangeStatus += new HarakiriTool.ChangeStatusEventHandler(this.HarakiriTool_ChangeStatus);
             logger.Debug("HarakiriTool起動");
-            //FFACEControl初期設定
-            control = new FFACEControl(pol, chat);
+            //EliteAPIControl初期設定
+            control = new EliteAPIControl(pol, resource, chat);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
             control.BaseWait = settings.Global.WaitBase;
             control.ChatWait = settings.Global.WaitChat;
-            logger.Debug("FFACEControl起動");
+            logger.Debug("EliteAPIControl起動");
             //監視スレッド起動
             thMonitor = new Thread(threadMonitor);
             thMonitor.Start();
@@ -959,7 +962,7 @@ namespace EnjoyFishing
             if (thMonitor != null && thMonitor.IsAlive) thMonitor.Abort();
             thMonitor = null;
             logger.Debug("監視スレッド停止");
-            //FFACEControl停止
+            //EliteAPIControl停止
             control = null;
             //HarakiriTool停止
             if (harakiri != null) harakiri.SystemAbort();
@@ -1070,11 +1073,11 @@ namespace EnjoyFishing
         private void btnUpdateFishList_Click(object sender, EventArgs e)
         {
             //ログイン中ではない場合、再稼動させる
-            if (!loginFlg && fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
+            if (!loginFlg && fishing.LoginStatus == LoginStatus.LoggedIn)
             {
                 logger.Debug("再稼動開始");
                 startupFlg = true;
-                constructor(pol);
+                constructor(pol, resource);
                 initForm();
                 startupFlg = false;
                 loginFlg = true;
@@ -1571,7 +1574,7 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void lblMoonPhase_Click(object sender, EventArgs e)
         {
-            MoonPhaseForm frmMoonPhase = new MoonPhaseForm(fface);
+            MoonPhaseForm frmMoonPhase = new MoonPhaseForm(pol);
             frmMoonPhase.ShowDialog();
         }
         /// <summary>
@@ -1685,21 +1688,25 @@ namespace EnjoyFishing
         private List<MoonPhaseDay> getMoonPhaseList(FishingTool iFishing)
         {
             var ret = new List<MoonPhaseDay>();
-            //var vanadate = iFishing.VanaDateTime;
 
-            FFACE.TimerTools.VanaTime v = new FFACE.TimerTools.VanaTime();
-            v.Year = iFishing.VanaDateTime.Year;
-            v.Month = iFishing.VanaDateTime.Month;
-            v.Day = iFishing.VanaDateTime.Day;
+            var v1 = new VanaTime()
+            {
+                Year = api.VanaTime.CurrentYear,
+                Month = api.VanaTime.CurrentMonth,
+                Day = api.VanaTime.CurrentDay,
+                Hour = 0,
+                Minute = 0,
+                Second = 0,
+            };
 
-            MoonPhase last = FFACEControl.GetMoonPhaseFromVanaTime(v);
+            MoonPhase last = EliteAPIControl.GetMoonPhaseFromVanaTime(v1);
             for (int i = 0; i < (12 * 7); i++)
             {
-                v = FFACEControl.addVanaDay(v);
-                MoonPhase m = FFACEControl.GetMoonPhaseFromVanaTime(v);
+                var v2 = EliteAPIControl.addVanaDay(v1, i);
+                MoonPhase m = EliteAPIControl.GetMoonPhaseFromVanaTime(v2);
                 if (last != m)
                 {
-                    ret.Add(new MoonPhaseDay(m, FFACEControl.GetEarthTimeFromVanaTime(v)));
+                    ret.Add(new MoonPhaseDay(m, EliteAPIControl.GetEarthTimeFromVanaTime(v2)));
                 }
                 last = m;
             }
@@ -1732,12 +1739,11 @@ namespace EnjoyFishing
             string ret = string.Empty;
             //開店・閉店
             string openClose = string.Empty;
-            FFACE.TimerTools.VanaTime currVanaTime = iFishing.VanaDateTime;
-            FFACE.TimerTools.VanaTime v = iFishing.VanaDateTime;
-            if (currVanaTime.Hour >= dicTimeTable[iKind].Open && currVanaTime.Hour < dicTimeTable[iKind].Close)
+            var v = control.GetVanaTime();
+            if (v.Hour >= dicTimeTable[iKind].Open && v.Hour < dicTimeTable[iKind].Close)
             {
                 openClose = "Open";
-                if (v.Hour >= dicTimeTable[iKind].Close) v = FFACEControl.addVanaDay(v);
+                if (v.Hour >= dicTimeTable[iKind].Close) v = EliteAPIControl.addVanaDay(v);
                 v.Hour = dicTimeTable[iKind].Close;
                 v.Minute = 0;
                 v.Second = 0;
@@ -1745,12 +1751,12 @@ namespace EnjoyFishing
             else
             {
                 openClose = "Close";
-                if (v.Hour >= dicTimeTable[iKind].Close) v = FFACEControl.addVanaDay(v);
+                if (v.Hour >= dicTimeTable[iKind].Close) v = EliteAPIControl.addVanaDay(v);
                 v.Hour = dicTimeTable[iKind].Open;
                 v.Minute = 0;
                 v.Second = 0;
             }
-            var remain = FFACEControl.GetEarthTimeFromVanaTime(v) - DateTime.Now;
+            var remain = EliteAPIControl.GetEarthTimeFromVanaTime(v) - DateTime.Now;
 
             ret = string.Format("{0,-5} {1,2}分 {2}", openClose, remain.Hours * 60 + remain.Minutes, v);
             return ret;
@@ -2494,7 +2500,7 @@ namespace EnjoyFishing
             lblMessage.Text = iMessage;
             if (settings.Etc.MessageEcho && iMessage != string.Empty)
             {
-                fface.Windower.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
+                api.ThirdParty.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
             }
         }
         /// <summary>
@@ -2536,7 +2542,7 @@ namespace EnjoyFishing
             }
             else
             {
-                FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
+                var vt = control.GetVanaTime();
                 //月齢
                 lblMoonPhase.Image = dicMoonPhaseImage[iFishing.MoonPhase];
                 //ヴァナ時間
@@ -3223,7 +3229,7 @@ namespace EnjoyFishing
             {
                 //プレイヤーが描画されるまで待機
                 logger.Debug("プレイヤーのIsRendered待機");
-                while (fface.NPC.IsRendered(fface.Player.ID) == false)
+                while ((api.Player.Render0000 & 0x200) != 0x200)
                 {
                     Thread.Sleep(100);
                 }
@@ -3231,7 +3237,7 @@ namespace EnjoyFishing
                 //初期化
                 logger.Debug("再起動開始");
                 startupFlg = true;
-                constructor(pol);
+                constructor(pol, resource);
                 initForm();
                 startupFlg = false;
                 //画面ロック解除

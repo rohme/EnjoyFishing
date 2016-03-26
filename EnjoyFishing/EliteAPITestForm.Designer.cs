@@ -1,6 +1,6 @@
 ﻿namespace EnjoyFishing
 {
-    partial class FFACETestForm
+    partial class EliteAPITestForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FFACETestForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EliteAPITestForm));
             this.timRefresh = new System.Windows.Forms.Timer(this.components);
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -223,58 +223,58 @@
             // ChatIndex
             // 
             this.ChatIndex.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ChatIndex.HeaderText = "Index";
+            this.ChatIndex.HeaderText = "idx1";
             this.ChatIndex.Name = "ChatIndex";
             this.ChatIndex.ReadOnly = true;
             this.ChatIndex.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.ChatIndex.Width = 43;
+            this.ChatIndex.Width = 36;
             // 
             // ChatTime
             // 
             this.ChatTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ChatTime.HeaderText = "Time";
+            this.ChatTime.HeaderText = "idx2";
             this.ChatTime.Name = "ChatTime";
             this.ChatTime.ReadOnly = true;
             this.ChatTime.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.ChatTime.Width = 40;
+            this.ChatTime.Width = 36;
             // 
             // ChatType
             // 
             this.ChatType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ChatType.HeaderText = "Type";
+            this.ChatType.HeaderText = "Time";
             this.ChatType.Name = "ChatType";
             this.ChatType.ReadOnly = true;
             this.ChatType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.ChatType.Width = 38;
+            this.ChatType.Width = 40;
             // 
             // Idx1
             // 
             this.Idx1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.Idx1.HeaderText = "Idx1";
+            this.Idx1.HeaderText = "len";
             this.Idx1.Name = "Idx1";
             this.Idx1.ReadOnly = true;
             this.Idx1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Idx1.Width = 37;
+            this.Idx1.Width = 29;
             // 
             // Idx2
             // 
             this.Idx2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.Idx2.HeaderText = "Idx2";
+            this.Idx2.HeaderText = "Mode";
             this.Idx2.Name = "Idx2";
             this.Idx2.ReadOnly = true;
             this.Idx2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Idx2.Width = 37;
+            this.Idx2.Width = 42;
             // 
             // ChatText
             // 
             this.ChatText.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ChatText.HeaderText = "Chat";
+            this.ChatText.HeaderText = "Text";
             this.ChatText.Name = "ChatText";
             this.ChatText.ReadOnly = true;
             this.ChatText.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.ChatText.Width = 37;
+            this.ChatText.Width = 35;
             // 
-            // FFACETestForm
+            // EliteAPITestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -283,9 +283,9 @@
             this.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "FFACETestForm";
-            this.Text = "FFACEテスト";
-            this.Load += new System.EventHandler(this.FFACETestForm_Load);
+            this.Name = "EliteAPITestForm";
+            this.Text = "EliteAPI動作テスト";
+            this.Load += new System.EventHandler(this.EliteAPITestForm_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -322,6 +322,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Idx1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Idx2;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChatText;
-
     }
 }

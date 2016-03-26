@@ -1,5 +1,4 @@
-﻿using FFACETools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -105,7 +104,7 @@ namespace EnjoyFishing
             this.EarthTime = DateTime.Today.ToString();
             this.VanaTime = string.Empty;
             this.VanaWeekDay = Weekday.Unknown;
-            this.MoonPhase = FFACETools.MoonPhase.Unknown;
+            this.MoonPhase = MoonPhase.Unknown;
             this.X = 0.0f;
             this.Y = 0.0f;
             this.Z = 0.0f;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using FFACETools;
+using EliteMMO.API;
 using MiscTools;
 using NLog;
 
@@ -155,16 +155,17 @@ namespace EnjoyFishing
         #endregion
 
         //釣った魚
-        private const int NPCID_KATSUNAGA = 37;
+        private const int NPCINDEX_KATSUNAGA = 37;
         private const string REGEX_FISHEDLIST_DIALOG = @"釣りあげた獲物の種類【([0-9]*)】\(ページ：([0-9]*)/([0-9]*)\)";
-        private const string REGEX_FISHEDLIST_OPTIONS = "【(.*)】：{(.*)}";
+        private const string REGEX_FISHEDLIST_OPTIONS = "【(.*)】：(.*)";
 
         private PolTool pol;
-        private FFACE fface;
+        private EliteAPI api;
         private Settings settings;
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private ChatTool chat;
-        private FFACEControl control;
+        private EliteAPIControl control;
+        private ResourceTool resource;
         private Thread thFishing;
         private Thread thSneak;
         private Thread thTimeElapsed;
@@ -175,7 +176,7 @@ namespace EnjoyFishing
         private string lastZoneName = string.Empty;
         private DateTime lastCastDate = new DateTime(2000, 1, 1);
         private int noCatchCount = 0;
-        private int chatFishingSkill = 0;//チャットから取得した釣りスキル
+        private ushort chatFishingSkill = 0;//チャットから取得した釣りスキル
         private FishingInterrupt interrupt = new FishingInterrupt();
 
         #region メンバ
@@ -221,21 +222,27 @@ namespace EnjoyFishing
         /// <summary>
         /// 月齢
         /// </summary>
-        public MoonPhase MoonPhase{ get { return fface.Timer.GetVanaTime().MoonPhase; } }
+        public MoonPhase MoonPhase { get { return (MoonPhase)api.VanaTime.CurrentMoonPhase; } }
         /// <summary>
         /// 月齢（％）
         /// </summary>
-        public int MoonPercent { get { return (int)fface.Timer.GetVanaTime().MoonPercent; } }
+        public int MoonPercent { get { return (int)api.VanaTime.CurrentMoonPercent; } }
         /// <summary>
         /// ヴァナ時間
         /// </summary>
-        public FFACETools.FFACE.TimerTools.VanaTime VanaDateTime
+        public VanaTime VanaDateTime
         {
             get
             {
-                return fface.Timer.GetVanaTime();
+                return control.GetVanaTime();
             }
         }
+        public uint VanaYear { get { return api.VanaTime.CurrentYear; } }
+        public uint VanaMonth { get { return api.VanaTime.CurrentMonth; } }
+        public uint VanaDay { get { return api.VanaTime.CurrentDay; } }
+        public uint VanaHour { get { return api.VanaTime.CurrentHour; } }
+        public uint VanaMinute { get { return api.VanaTime.CurrentMinute; } }
+        public uint VanaSecond { get { return api.VanaTime.CurrentSecond; } }
         /// <summary>
         /// ヴァナ時間
         /// </summary>
@@ -243,13 +250,12 @@ namespace EnjoyFishing
         {
             get
             {
-                FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
-                return string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}", int.Parse(vt.Year.ToString()),
-                                                                                    int.Parse(vt.Month.ToString()),
-                                                                                    int.Parse(vt.Day.ToString()),
-                                                                                    int.Parse(vt.Hour.ToString()),
-                                                                                    int.Parse(vt.Minute.ToString()),
-                                                                                    int.Parse(vt.Second.ToString()));
+                return string.Format("{0:0000}/{1:00}/{2:00} {3:00}:{4:00}:{5:00}", this.VanaYear,
+                                                                                    this.VanaMonth,
+                                                                                    this.VanaDay,
+                                                                                    this.VanaHour,
+                                                                                    this.VanaMinute,
+                                                                                    this.VanaSecond);
             }
         }
         /// <summary>
@@ -259,19 +265,19 @@ namespace EnjoyFishing
         /// <summary>
         /// ヴァナ曜日
         /// </summary>
-        public Weekday DayType{ get { return fface.Timer.GetVanaTime().DayType; } }
+        public Weekday DayType{ get { return (Weekday)api.VanaTime.CurrentWeekDay; } }
         /// <summary>
         /// プレイヤーステータス
         /// </summary>
-        public FFACETools.Status PlayerStatus { get { return fface.Player.Status; } }
+        public Status PlayerStatus { get { return (Status)api.Player.Status; } }
         /// <summary>
         /// プレイヤー名
         /// </summary>
-        public string PlayerName { get { return fface.Player.Name; } }
+        public string PlayerName { get { return api.Player.Name; } }
         /// <summary>
         /// ログインステータス
         /// </summary>
-        public FFACETools.LoginStatus LoginStatus { get { return fface.Player.GetLoginStatus; } }
+        public LoginStatus LoginStatus { get { return (LoginStatus)api.Player.LoginStatus; } }
         /// <summary>
         /// 魚HP（最大）
         /// </summary>
@@ -279,9 +285,9 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                if (api.Player.Status == (uint)Status.FishBite)
                 {
-                    return fface.Fish.HPMax;
+                    return api.Fish.MaxStamina;
                 }
                 else
                 {
@@ -296,9 +302,9 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                if (api.Player.Status== (uint)Status.FishBite)
                 {
-                    return fface.Fish.HPCurrent;
+                    return api.Fish.Stamina;
                 }
                 else
                 {
@@ -313,10 +319,10 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                if (api.Player.Status == (uint)Status.FishBite)
                 {
                     double per = 0.00;
-                    if (fface.Fish.HPMax > 0) per = (double)fface.Fish.HPCurrent / (double)fface.Fish.HPMax;
+                    if (api.Fish.MaxStamina > 0) per = (double)api.Fish.Stamina / (double)api.Fish.MaxStamina;
                     return (int)Math.Round(per * 100);
                 }
                 else
@@ -332,10 +338,10 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                if (this.PlayerStatus == Status.FishBite)
                 {
-                    if (this.remainTimeMAX < fface.Fish.Timeout) this.remainTimeMAX = fface.Fish.Timeout;
-                    return this.remainTimeMAX;
+                    if (this.remainTimeMAX < api.Fish.FightTime) this.remainTimeMAX = api.Fish.FightTime;
+                    return (int)(this.remainTimeMAX / 100);
                 }
                 else
                 {
@@ -351,9 +357,9 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                if (this.PlayerStatus == Status.FishBite)
                 {
-                    return fface.Fish.Timeout;
+                    return (int)(api.Fish.FightTime / 100);
                 }
                 else
                 {
@@ -368,11 +374,11 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.Status == FFACETools.Status.FishBite)
+                if (this.PlayerStatus == Status.FishBite)
                 {
-                    if (this.remainTimeMAX < fface.Fish.Timeout) this.remainTimeMAX = fface.Fish.Timeout;
+                    if (this.remainTimeMAX < api.Fish.FightTime) this.remainTimeMAX = api.Fish.FightTime;
                     double per = 0.00;
-                    if (this.remainTimeMAX > 0) per = (double)fface.Fish.Timeout / (double)this.remainTimeMAX;
+                    if (this.remainTimeMAX > 0) per = (double)api.Fish.FightTime / (double)this.remainTimeMAX;
                     return (int)Math.Round(per * 100);
                 }
                 else
@@ -385,83 +391,83 @@ namespace EnjoyFishing
         /// <summary>
         /// 鞄所持数
         /// </summary>
-        public short InventoryCount
+        public int InventoryCount
         {
-            get { return control.GetInventoryCountByType(FFACETools.InventoryType.Inventory); }
+            get { return control.GetInventoryCountByType(InventoryType.Inventory); }
         }
         /// <summary>
         /// 鞄最大所持数
         /// </summary>
-        public short InventoryMax
+        public int InventoryMax
         {
-            get { return control.GetInventoryMaxByType(FFACETools.InventoryType.Inventory); }
+            get { return control.GetInventoryMaxByType(InventoryType.Inventory); }
         }
         /// <summary>
         /// モグサッチェル所持数
         /// </summary>
-        public short SatchelCount
+        public int SatchelCount
         {
-            get { return control.GetInventoryCountByType(FFACETools.InventoryType.Satchel); }
+            get { return control.GetInventoryCountByType(InventoryType.Satchel); }
         }
         /// <summary>
         /// モグサッチェル最大所持数
         /// </summary>
-        public short SatchelMax
+        public int SatchelMax
         {
-            get { return control.GetInventoryMaxByType(FFACETools.InventoryType.Satchel); }
+            get { return control.GetInventoryMaxByType(InventoryType.Satchel); }
         }
         /// <summary>
         /// モグサック所持数
         /// </summary>
-        public short SackCount
+        public int SackCount
         {
-            get { return control.GetInventoryCountByType(FFACETools.InventoryType.Sack); }
+            get { return control.GetInventoryCountByType(InventoryType.Sack); }
         }
         /// <summary>
         /// モグサック最大所持数
         /// </summary>
-        public short SackMax
+        public int SackMax
         {
-            get { return control.GetInventoryMaxByType(FFACETools.InventoryType.Sack); }
+            get { return control.GetInventoryMaxByType(InventoryType.Sack); }
         }
         /// <summary>
         /// モグケース所持数
         /// </summary>
         public int CaseCount
         {
-            get { return control.GetInventoryCountByType(FFACETools.InventoryType.Case); }
+            get { return control.GetInventoryCountByType(InventoryType.Case); }
         }
         /// <summary>
         /// モグケース最大所持数
         /// </summary>
         public int CaseMax
         {
-            get { return control.GetInventoryMaxByType(FFACETools.InventoryType.Case); }
+            get { return control.GetInventoryMaxByType(InventoryType.Case); }
         }
         /// <summary>
         /// ワードローブ所持数
         /// </summary>
         public int WardrobeCount
         {
-            get { return control.GetInventoryCountByType(FFACETools.InventoryType.Wardrobe); }
+            get { return control.GetInventoryCountByType(InventoryType.Wardrobe); }
         }
         /// <summary>
         /// ワードローブ最大所持数
         /// </summary>
         public int WardrobeMax
         {
-            get { return control.GetInventoryMaxByType(FFACETools.InventoryType.Wardrobe); }
+            get { return control.GetInventoryMaxByType(InventoryType.Wardrobe); }
         }
         /// <summary>
         /// 釣りスキル
         /// </summary>
-        public int FishingSkill
+        public ushort FishingSkill
         {
             get
             {
-                if (fface.Player.GetCraftDetails(Craft.Fishing).Level > chatFishingSkill)
+                if (api.Player.CraftSkills.Fishing.Skill > chatFishingSkill)
                 {
-                    return fface.Player.GetCraftDetails(Craft.Fishing).Level;
+                    return api.Player.CraftSkills.Fishing.Skill;
                 }
                 else
                 {
@@ -474,7 +480,7 @@ namespace EnjoyFishing
         /// </summary>
         public string ZoneName
         {
-            get { return FFACE.ParseResources.GetAreaName(fface.Player.Zone); }
+            get { return api.Resources.GetString("areas", (uint)api.Player.ZoneId, 1); }
         }
         /// <summary>
         /// 竿名称
@@ -483,16 +489,9 @@ namespace EnjoyFishing
         {
             get 
             {
-                int rodId = fface.Item.GetEquippedItemID(FFACETools.EquipSlot.Range);
-                string rodName = FFACE.ParseResources.GetItemName(rodId);
-                if (rodId != 0 && FishDB.Rods.Contains(rodName))
-                {
-                    return rodName;
-                }
-                else
-                {
-                    return string.Empty;
-                }
+                var rodId = api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id;
+                string rodName = resource.GetItem(rodId).Name[1];
+                return (rodId != 0 && FishDB.Rods.Contains(rodName)) ? rodName : string.Empty;
             }
         }
         /// <summary>
@@ -504,14 +503,14 @@ namespace EnjoyFishing
             {
                 if (!isRod(this.RodName)) return string.Empty;
                 //鞄にアイテムが存在するかチェック
-                int rodId = FFACE.ParseResources.GetItemId(this.RodName);
-                uint remain = fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Inventory) +
-                                fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Wardrobe);
+                uint rodId = resource.GetItem(this.RodName).ItemID;
+                int remain = control.GetInventoryItemCount(rodId, InventoryType.Inventory) +
+                             control.GetInventoryItemCount(rodId, InventoryType.Wardrobe);
                 if (settings.UseItemizer)
                 {
-                    if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Satchel);
-                    if (settings.Fishing.NoBaitNoRodSack) remain += fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Sack);
-                    if (settings.Fishing.NoBaitNoRodCase) remain += fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Case);
+                    if (settings.Fishing.NoBaitNoRodSatchel) remain += control.GetInventoryItemCount(rodId, InventoryType.Satchel);
+                    if (settings.Fishing.NoBaitNoRodSack) remain += control.GetInventoryItemCount(rodId, InventoryType.Sack);
+                    if (settings.Fishing.NoBaitNoRodCase) remain += control.GetInventoryItemCount(rodId, InventoryType.Case);
                 }
                 if (remain <= 1)
                 {
@@ -530,8 +529,8 @@ namespace EnjoyFishing
         {
             get 
             {
-                int baitId = fface.Item.GetEquippedItemID(FFACETools.EquipSlot.Ammo);
-                string baitName = FFACE.ParseResources.GetItemName(baitId);
+                var baitId = api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id;
+                string baitName = resource.GetItem(baitId).Name[1];
                 if (baitId != 0 && FishDB.Baits.Contains(baitName))
                 {
                     return baitName;
@@ -551,14 +550,14 @@ namespace EnjoyFishing
             {
                 if (!isBait(this.BaitName)) return string.Empty;
                 //鞄にアイテムが存在するかチェック
-                int baitId = FFACE.ParseResources.GetItemId(this.BaitName);
-                uint remain = fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Inventory) +
-                                fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Wardrobe);
+                var baitId = resource.GetItem(this.BaitName).ItemID;
+                int remain = control.GetInventoryItemCount(baitId, InventoryType.Inventory) +
+                              control.GetInventoryItemCount(baitId, InventoryType.Wardrobe);
                 if (settings.UseItemizer)
                 {
-                    if (settings.Fishing.NoBaitNoRodSatchel) remain += fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Satchel);
-                    if (settings.Fishing.NoBaitNoRodSack) remain += fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Sack);
-                    if (settings.Fishing.NoBaitNoRodCase) remain += fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Case);
+                    if (settings.Fishing.NoBaitNoRodSatchel) remain += control.GetInventoryItemCount(baitId, InventoryType.Satchel);
+                    if (settings.Fishing.NoBaitNoRodSack) remain += control.GetInventoryItemCount(baitId, InventoryType.Sack);
+                    if (settings.Fishing.NoBaitNoRodCase) remain += control.GetInventoryItemCount(baitId, InventoryType.Case);
                 }
                 if (remain <= 1)
                 {
@@ -573,11 +572,17 @@ namespace EnjoyFishing
         /// <summary>
         /// プレイヤー位置情報
         /// </summary>
-        public FFACE.Position Position
+        public Position Position
         {
             get
             {
-                return fface.Player.Position;
+                return new Position()
+                {
+                    X = api.Player.X,
+                    Y = api.Player.Y,
+                    Z = api.Player.Z,
+                    H = api.Player.H,
+                };
             }
         }
         /// <summary>
@@ -601,14 +606,7 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.HasKeyitem(FFACETools.KeyItem.Serpent_Rumors))
-                {
-                    return HasKeyItemKind.Yes;
-                }
-                else
-                {
-                    return HasKeyItemKind.No;
-                }
+                return(api.Player.HasKeyItem((uint)KeyItem.Serpent_Rumors)) ? HasKeyItemKind.Yes : HasKeyItemKind.No;
             }
         }
         /// <summary>
@@ -618,14 +616,7 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.HasKeyitem(FFACETools.KeyItem.Anglers_Almanac))
-                {
-                    return HasKeyItemKind.Yes;
-                }
-                else
-                {
-                    return HasKeyItemKind.No;
-                }
+                return (api.Player.HasKeyItem((uint)KeyItem.Anglers_Almanac)) ? HasKeyItemKind.Yes : HasKeyItemKind.No;
             }
         }
         /// <summary>
@@ -635,14 +626,7 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.HasKeyitem(FFACETools.KeyItem.Frog_Fishing))
-                {
-                    return HasKeyItemKind.Yes;
-                }
-                else
-                {
-                    return HasKeyItemKind.No;
-                }
+                return (api.Player.HasKeyItem((uint)KeyItem.Frog_Fishing)) ? HasKeyItemKind.Yes : HasKeyItemKind.No;
             }
         }
         /// <summary>
@@ -652,14 +636,7 @@ namespace EnjoyFishing
         {
             get
             {
-                if (fface.Player.HasKeyitem(FFACETools.KeyItem.Mooching))
-                {
-                    return HasKeyItemKind.Yes;
-                }
-                else
-                {
-                    return HasKeyItemKind.No;
-                }
+                return (api.Player.HasKeyItem((uint)KeyItem.Mooching)) ? HasKeyItemKind.Yes : HasKeyItemKind.No;
             }
         }
         #endregion
@@ -804,21 +781,22 @@ namespace EnjoyFishing
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="iFFACE"></param>
+        /// <param name="iPol"></param>
         /// <param name="iChat"></param>
         /// <param name="iSettings"></param>
-        public FishingTool(PolTool iPol, ChatTool iChat, Settings iSettings)
+        public FishingTool(PolTool iPol, ResourceTool iResource, ChatTool iChat, Settings iSettings)
         {
             pol = iPol;
             pol.ChangeStatus += new PolTool.ChangeStatusEventHandler(this.PolTool_ChangeStatus);
-            fface = iPol.FFACE;
+            api = iPol.EliteAPI;
             chat = iChat;
+            resource = iResource;
             settings = iSettings;
             FishDB = new FishDB();
             fishHistoryDB = new FishHistoryDB(this.PlayerName,this.EarthDateTime);
             FishHistoryDBModel history = fishHistoryDB.SelectDayly(this.PlayerName, this.EarthDateTime);
             this.TimeElapsed = history.TimeElapsed;
-            control = new FFACEControl(pol, chat);
+            control = new EliteAPIControl(pol, resource, chat);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
             control.BaseWait = settings.Global.WaitBase;
@@ -884,9 +862,9 @@ namespace EnjoyFishing
         /// </summary>
         private void threadWaitStatusStanding()
         {
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Player.Status != FFACETools.Status.Standing; i++)
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT && this.PlayerStatus != Status.Standing; i++)
             {
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                api.ThirdParty.KeyPress(Keys.ESCAPE);
                 Thread.Sleep(settings.Global.WaitBase);
             }
         }
@@ -937,7 +915,7 @@ namespace EnjoyFishing
                 }
                 lastCastDate = DateTime.Now.Date;
                 //チャット処理
-                FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                var cl = new EliteAPI.ChatEntry();
                 while (chat.GetNextChatLine(out cl))
                 {
                     List<string> chatKbnArgs = new List<string>();
@@ -954,7 +932,7 @@ namespace EnjoyFishing
                     //コマンド実行
                     if (settings.Fishing.EnemyAttackCmd)
                     {
-                        fface.Windower.SendString(settings.Fishing.EnemyAttackCmdLine);
+                        api.ThirdParty.SendString(settings.Fishing.EnemyAttackCmdLine);
                     }
                     break;
                 }
@@ -970,7 +948,7 @@ namespace EnjoyFishing
                         setMessage(string.Format("チャット感知：再始動待ち {0}(地球時間)まで待機", restartTime.ToString("HH:mm:ss")));
                         wait(waitSec, waitSec);
                         //チャットバッファをクリア
-                        FFACE.ChatTools.ChatLine waitCl = new FFACE.ChatTools.ChatLine();
+                        var waitCl = new EliteAPI.ChatEntry();
                         while (chat.GetNextChatLine(out waitCl))
                         {
                             Thread.Sleep(10);
@@ -1060,11 +1038,12 @@ namespace EnjoyFishing
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 if (settings.Fishing.SneakFishing && settings.UseCancel)
                 {
-                    if (interrupt.SneakWarning || !control.IsBuff(StatusEffect.Sneak))
+                    if (interrupt.SneakWarning || !control.IsBuff(EliteMMO.API.StatusEffect.Sneak))
                     {
                         setMessage("スニークをかけます");
                         castSneak();
                         interrupt.SneakWarning = false;
+                        chat.Clear();
                     }
                 }
                 //鞄1
@@ -1075,7 +1054,7 @@ namespace EnjoyFishing
                     {
                         if (settings.Fishing.InventoryFullCmd)
                         {
-                            fface.Windower.SendString(settings.Fishing.InventoryFullCmdLine);
+                            api.ThirdParty.SendString(settings.Fishing.InventoryFullCmdLine);
                         }
                         setRunningStatus(RunningStatusKind.Stop);
                         setFishingStatus(FishingStatusKind.Normal);
@@ -1088,8 +1067,8 @@ namespace EnjoyFishing
                 if (this.RodName == string.Empty)
                 {
                     if (!string.IsNullOrEmpty(lastRodName) &&
-                        !control.IsExistItem(lastRodName, FFACETools.InventoryType.Inventory) &&
-                        !control.IsExistItem(lastRodName, FFACETools.InventoryType.Wardrobe))
+                        !control.IsExistItem(lastRodName, InventoryType.Inventory) &&
+                        !control.IsExistItem(lastRodName, InventoryType.Wardrobe))
                     {
                         //予備の竿を鞄へ移動
                         if (!getRodBaitItem(lastRodName))
@@ -1115,7 +1094,7 @@ namespace EnjoyFishing
                         //コマンド実行
                         if (settings.Fishing.NoBaitNoRodCmd)
                         {
-                            fface.Windower.SendString(settings.Fishing.NoBaitNoRodCmdLine);
+                            api.ThirdParty.SendString(settings.Fishing.NoBaitNoRodCmdLine);
                         }
                         break;
                     }
@@ -1125,8 +1104,8 @@ namespace EnjoyFishing
                 if (this.BaitName == string.Empty)
                 {
                     if (!string.IsNullOrEmpty(lastBaitName) &&
-                        !control.IsExistItem(lastBaitName, FFACETools.InventoryType.Inventory) &&
-                        !control.IsExistItem(lastBaitName, FFACETools.InventoryType.Wardrobe))
+                        !control.IsExistItem(lastBaitName, InventoryType.Inventory) &&
+                        !control.IsExistItem(lastBaitName, InventoryType.Wardrobe))
                     {
                         getRodBaitItem(lastBaitName);
                     }
@@ -1138,7 +1117,7 @@ namespace EnjoyFishing
                         //コマンド実行
                         if (settings.Fishing.NoBaitNoRodCmd)
                         {
-                            fface.Windower.SendString(settings.Fishing.NoBaitNoRodCmdLine);
+                            api.ThirdParty.SendString(settings.Fishing.NoBaitNoRodCmdLine);
                         }
                         break;
                     }
@@ -1151,7 +1130,7 @@ namespace EnjoyFishing
                     {
                         if (settings.Fishing.InventoryFullCmd)
                         {
-                            fface.Windower.SendString(settings.Fishing.InventoryFullCmdLine);
+                            api.ThirdParty.SendString(settings.Fishing.InventoryFullCmdLine);
                         }
                         setRunningStatus(RunningStatusKind.Stop);
                         setFishingStatus(FishingStatusKind.Normal);
@@ -1272,12 +1251,12 @@ namespace EnjoyFishing
             setMessage(string.Format("キャスト中：{0}x{1}", this.RodNameWithRemain, this.BaitNameWithRemain));
 
             //キャスト
-            while (this.RunningStatus == RunningStatusKind.Running && fface.Player.Status != FFACETools.Status.Fishing)
+            while (this.RunningStatus == RunningStatusKind.Running && this.PlayerStatus != Status.Fishing)
             {
-                fface.Windower.SendString("/fish");
+                api.ThirdParty.SendString("/fish");
                 Thread.Sleep(2000);//wait
 
-                FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                var cl = new EliteAPI.ChatEntry();
                 while (chat.GetNextChatLine(out cl))
                 {
                     //チャット区分の取得
@@ -1311,9 +1290,9 @@ namespace EnjoyFishing
                     }
                     else if (interrupt.ChatReceive) //チャット感知
                     {
-                        while (this.PlayerStatus != FFACETools.Status.Standing)
+                        while (this.PlayerStatus != Status.Standing)
                         {
-                            fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                            api.ThirdParty.KeyPress(Keys.ESCAPE);
                             Thread.Sleep(settings.Global.WaitBase);
                         }
                         return true;
@@ -1329,7 +1308,7 @@ namespace EnjoyFishing
             this.lastZoneName = this.ZoneName;
             while (this.RunningStatus == RunningStatusKind.Running)
             {
-                FFACETools.FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+                var cl = new EliteAPI.ChatEntry();
                 //エリア切り替わり感知
                 if (lastZoneName.Length > 0 && lastZoneName != this.ZoneName)
                 {
@@ -1348,16 +1327,16 @@ namespace EnjoyFishing
                         chatKbn == ChatKbnKind.BaitItem || chatKbn == ChatKbnKind.BaitMonster)//魚がかかった
                     {
                         //プレイヤステータスがFishBiteになるまで待つ
-                        while (this.PlayerStatus != FFACETools.Status.FishBite)
+                        while (this.PlayerStatus != Status.FishBite)
                         {
                             Thread.Sleep(settings.Global.WaitBase);
                         }
                         Thread.Sleep(500);
                         //IDの設定
-                        oFish.ID1 = fface.Fish.ID.ID1;
-                        oFish.ID2 = fface.Fish.ID.ID2;
-                        oFish.ID3 = fface.Fish.ID.ID3;
-                        oFish.ID4 = fface.Fish.ID.ID4;
+                        oFish.ID1 = api.Fish.Id1;
+                        oFish.ID2 = api.Fish.Id2;
+                        oFish.ID3 = api.Fish.Id3;
+                        oFish.ID4 = api.Fish.Id4;
                         //魚名称・タイプの設定
                         FishDBFishModel fish = FishDB.SelectFishFromIDZone(oFish.RodName, oFish.ID1, oFish.ID2, oFish.ID3, oFish.ID4, oFish.ZoneName, false);
                         if (!string.IsNullOrEmpty(fish.FishName))
@@ -1397,9 +1376,9 @@ namespace EnjoyFishing
                         {
                             //リリースする
                             logger.Debug("リリースする {0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType));
-                            while (this.PlayerStatus == FFACETools.Status.FishBite)
+                            while (this.PlayerStatus == Status.FishBite)
                             {
-                                fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                                api.ThirdParty.KeyPress(Keys.ESCAPE);
                                 Thread.Sleep(settings.Global.WaitBase);
                             }
                             continue;
@@ -1407,7 +1386,7 @@ namespace EnjoyFishing
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
                         //釣り格闘
                         
-                        while (fface.Fish.HPCurrent > 0 && fface.Player.Status == FFACETools.Status.FishBite)
+                        while (api.Fish.Stamina > 0 && this.PlayerStatus == Status.FishBite)
                         {
                             //強制HP0
                             if (settings.Fishing.HP0)
@@ -1415,12 +1394,12 @@ namespace EnjoyFishing
                                 if (isExecHp0(DateTime.Parse(oFish.EarthTime), waitHP0))
                                 {
                                     logger.Info("制限時間を過ぎたので、魚のHPを強制的にゼロにします");
-                                    fface.Fish.SetHP(0);
+                                    api.Fish.Stamina = 0;
                                     Thread.Sleep(1000);
                                 }
                             }
                             //格闘
-                            fface.Fish.FightFish();
+                            api.Fish.FightFish();
                             Thread.Sleep(settings.Global.WaitBase);
                         }
                         //HP0になった瞬間に釣り上げるとFFの画面上ではHPが残ったままになるのでウェイト
@@ -1446,7 +1425,7 @@ namespace EnjoyFishing
                             {
                                 if (timeUpOkFlg) break;
                                 //釣りが中止された場合、待機処理を中止する
-                                if (this.PlayerStatus != FFACETools.Status.FishBite) break;
+                                if (this.PlayerStatus != Status.FishBite) break;
                                 //チャット監視
                                 var cl2 = chat.GetChatLine(startIndex, false);
                                 foreach (var c in cl2)
@@ -1489,10 +1468,10 @@ namespace EnjoyFishing
                         }
                         //釣り上げる
                         //プレイヤステータスがFishBite以外になるまで待つ
-                        while (this.PlayerStatus == FFACETools.Status.FishBite)
+                        while (this.PlayerStatus == Status.FishBite)
                         {
                             fishedFlg = true;
-                            fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+                            api.ThirdParty.KeyPress(Keys.RETURN);
                             Thread.Sleep(settings.Global.WaitBase);
                         } 
                     }
@@ -1511,7 +1490,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.CatchMultiple)//複数釣れた
@@ -1529,7 +1508,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.CatchMonster)//モンスター釣れた
@@ -1545,7 +1524,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.CatchTempItem)//テンポラリアイテム釣れた
@@ -1563,7 +1542,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.CatchKeyItem)//だいじなもの釣れた
@@ -1581,7 +1560,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.InventoryFull)//鞄いっぱい
@@ -1597,7 +1576,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.NoBait)//何も釣れなかった
@@ -1611,7 +1590,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.Release)//リリース
@@ -1625,7 +1604,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.NoCatch)//逃げられた
@@ -1639,7 +1618,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.LineBreak)//糸切れ
@@ -1653,7 +1632,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.RodBreak)//竿折れ
@@ -1667,7 +1646,7 @@ namespace EnjoyFishing
                         //イベント発生
                         EventFished(oFish.Result);
                         //プレイヤステータスがStandingになるまで待つ
-                        waitChangePlayerStatus(FFACETools.Status.Standing);
+                        waitChangePlayerStatus(Status.Standing);
                         return true;
                     }
                     else if (chatKbn == ChatKbnKind.BaitCritical)//クリティカル
@@ -1677,9 +1656,9 @@ namespace EnjoyFishing
                     else if (interrupt.ChatReceive) //チャット感知
                     {
                         //プレイヤステータスがStandingになるまで待つ
-                        while (this.PlayerStatus != FFACETools.Status.Standing)
+                        while (this.PlayerStatus != Status.Standing)
                         {
-                            fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                            api.ThirdParty.KeyPress(Keys.ESCAPE);
                             Thread.Sleep(settings.Global.WaitBase);
                         }
                         return true;
@@ -1687,9 +1666,9 @@ namespace EnjoyFishing
                     else if (interrupt.EnemyAttack) //敵の攻撃感知
                     {
                         //プレイヤステータスがStandingになるまで待つ
-                        while (this.PlayerStatus != FFACETools.Status.Standing)
+                        while (this.PlayerStatus != Status.Standing)
                         {
-                            fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                            api.ThirdParty.KeyPress(Keys.ESCAPE);
                             Thread.Sleep(settings.Global.WaitBase);
                         }
                         return true;
@@ -1812,35 +1791,35 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iCl">チャットライン</param>
         /// <returns>チャット区分</returns>
-        private ChatKbnKind getChatKbnFromChatline(FFACE.ChatTools.ChatLine iCl, out List<string> oArgs)
+        private ChatKbnKind getChatKbnFromChatline(EliteAPI.ChatEntry iCl, out List<string> oArgs)
         {
             oArgs = new List<string>();
-            switch (iCl.Type)
+            switch (iCl.ChatType)
             {
-                case ChatMode.RcvdTell:
+                case (int)ChatMode.RcvdTell:
                 //case ChatMode.SentTell:
                     if(settings.Fishing.ChatTell) interrupt.ChatReceive = true;
                     return ChatKbnKind.Tell;
-                case ChatMode.RcvdSay:
-                case ChatMode.SentSay:
+                case (int)ChatMode.RcvdSay:
+                case (int)ChatMode.SentSay:
                     if (settings.Fishing.ChatSay) interrupt.ChatReceive = true;
                     return ChatKbnKind.Say;
-                case ChatMode.RcvdParty:
-                case ChatMode.SentParty:
+                case (int)ChatMode.RcvdParty:
+                case (int)ChatMode.SentParty:
                     if (settings.Fishing.ChatParty) interrupt.ChatReceive = true;
                     return ChatKbnKind.Party;
-                case ChatMode.RcvdLinkShell:
-                case ChatMode.SentLinkShell:
+                case (int)ChatMode.RcvdLinkShell:
+                case (int)ChatMode.SentLinkShell:
                     if (settings.Fishing.ChatLs) interrupt.ChatReceive = true;
                     return ChatKbnKind.Linkshell;
-                case ChatMode.RcvdShout:
-                case ChatMode.SentShout:
-                case ChatMode.RcvdYell:
-                case ChatMode.SentYell:
+                case (int)ChatMode.RcvdShout:
+                case (int)ChatMode.SentShout:
+                case (int)ChatMode.RcvdYell:
+                case (int)ChatMode.SentYell:
                     if (settings.Fishing.ChatShout) interrupt.ChatReceive = true;
                     return ChatKbnKind.Shout;
-                case ChatMode.RcvdEmote:
-                case ChatMode.SentEmote:
+                case (int)ChatMode.RcvdEmote:
+                case (int)ChatMode.SentEmote:
                     if (settings.Fishing.ChatEmote && iCl.Text.Contains(this.PlayerName)) interrupt.ChatReceive = true;
                     return ChatKbnKind.Shout;
             }
@@ -1901,7 +1880,7 @@ namespace EnjoyFishing
                     //スキルアップ
                     if (v.Key == ChatKbnKind.SkillLvUp)
                     {
-                        chatFishingSkill = int.Parse(oArgs[0]);
+                        chatFishingSkill = ushort.Parse(oArgs[0]);
                     }
                     return v.Key;
                 }
@@ -2046,7 +2025,7 @@ namespace EnjoyFishing
         /// <param name="iFrom">時間From</param>
         /// <param name="iTo">時間To</param>
         /// <returns></returns>
-        private bool isHourInRange(FFACETools.FFACE.TimerTools.VanaTime iTarget, int iFrom, int iTo)
+        private bool isHourInRange(VanaTime iTarget, int iFrom, int iTo)
         {
             if (iFrom <= iTo)
             {
@@ -2088,7 +2067,7 @@ namespace EnjoyFishing
         /// プレイヤーステータスが指定したステータスになるまで待つ
         /// </summary>
         /// <param name="iPlayerStatus">待機を解除するプレイヤーステータス</param>
-        private void waitChangePlayerStatus(FFACETools.Status iPlayerStatus)
+        private void waitChangePlayerStatus(Status iPlayerStatus)
         {
             while (this.PlayerStatus != iPlayerStatus)
             {
@@ -2112,28 +2091,28 @@ namespace EnjoyFishing
         public void threadSneak()
         {
             //MPチェック
-            if (fface.Player.MPCurrent < 12) return;
+            if (api.Player.MP < 12) return;
             //魔法詠唱可能かチェック
-            if (!fface.Player.KnowsSpell(SpellList.Sneak)) return;
+            if (!api.Player.HasSpell(137)) return;
             //リキャストタイムまで待つ
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Timer.GetSpellRecast(SpellList.Sneak) > 0; i++) Thread.Sleep(100);
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT && api.Recast.GetSpellRecast(137) > 0; i++) Thread.Sleep(100);
             //スニーク詠唱
-            fface.Windower.SendString("/ma スニーク <me>");
+            api.ThirdParty.SendString("/ma スニーク <me>");
             //詠唱開始まで待つ
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Player.CastPercentEx == 100; i++) Thread.Sleep(100);
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT && fface.Player.CastMax == 0.0f; i++) Thread.Sleep(100);
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT && api.CastBar.Percent == 1.0f; i++) Thread.Sleep(100);
             //BUFFが残っている場合は、詠唱完了１秒前に切る
-            if (control.IsBuff(StatusEffect.Sneak))
+            if (control.IsBuff(EliteMMO.API.StatusEffect.Sneak))
             {
                 for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
                 {
-                    float remain = fface.Player.CastMax - (fface.Player.CastMax * fface.Player.CastPercent);
+                    float remain = (api.CastBar.Max - (api.CastBar.Max - api.CastBar.Count)) / 100;
                     if (remain < settings.Fishing.SneakFishingRemain) break;
                     Thread.Sleep(100);
                 }
-                fface.Windower.SendString(string.Format("//lua c cancel {0}", StatusEffect.Sneak.ToString("D")));
+                api.ThirdParty.SendString(string.Format("//lua c cancel {0}", StatusEffect.Sneak.ToString("D")));
             }
-            Thread.Sleep(5000);
+            //詠唱終了まで待つ
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT && api.CastBar.Percent < 1.0f; i++) Thread.Sleep(100);
         }
         /// <summary>
         /// 経過時間メインスレッド
@@ -2157,18 +2136,18 @@ namespace EnjoyFishing
             List<RodDBRodModel> rods = FishDB.SelectRod(iRodName);
             if (rods.Count != 1) return false;
             string breakRodName = rods[0].BreakRodName;
-            ushort breakRodID = (ushort)FFACE.ParseResources.GetItemID(breakRodName);
+            uint breakRodID = resource.GetItem(breakRodName).ItemID;
             string repairCrystal = rods[0].RepairCrystal;
 
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 //鞄に竿が入っていない場合、鞄に移動する
                 bool wardrobe = false;
-                if (!control.IsExistItem(breakRodName, FFACETools.InventoryType.Inventory))
+                if (!control.IsExistItem(breakRodName, InventoryType.Inventory))
                 {
                     wardrobe = true;
                     //ワードローブに竿があるか確認
-                    if (fface.Item.GetWardrobeItemCount(breakRodID) == 0)
+                    if (control.GetInventoryItemCount(breakRodID,InventoryType.Wardrobe) == 0)
                     {
                         setMessage(string.Format("竿の修理：{0}が見つからなかったので停止", breakRodName));
                         return false;
@@ -2183,19 +2162,19 @@ namespace EnjoyFishing
                         }
                     }
                     //竿を鞄に移動
-                    if (!control.GetItem(breakRodName, FFACETools.InventoryType.Wardrobe))
+                    if (!control.GetItemizer(breakRodName, InventoryType.Wardrobe))
                     {
                         setMessage(string.Format("竿の修理：{0}が鞄に移動できなかったので停止", breakRodName));
                         return false;
                     }
-                    setMessage(string.Format("{0}を{1}から取り出しました", breakRodName, FFACETools.InventoryType.Wardrobe.ToString()));
+                    setMessage(string.Format("{0}を{1}から取り出しました", breakRodName, InventoryType.Wardrobe.ToString()));
                     Thread.Sleep(1000);
                 }
                 //鞄にクリスタルが入っていない場合、鞄に移動する
-                if (!control.IsExistItem(repairCrystal, FFACETools.InventoryType.Inventory))
+                if (!control.IsExistItem(repairCrystal, InventoryType.Inventory))
                 {
                     //クリスタルが存在する？
-                    if (control.GetInventoryTypeFromItemName(repairCrystal) == FFACETools.InventoryType.None)
+                    if (control.GetInventoryTypeFromItemName(repairCrystal) == null)
                     {
                         setMessage(string.Format("竿の修理：{0}が見つからなかったので停止", repairCrystal));
                         return false;
@@ -2229,9 +2208,9 @@ namespace EnjoyFishing
                 //ワードローブに竿を戻す
                 if (synthSuccess && wardrobe)
                 {
-                    if (!putItem(iRodName, FFACETools.InventoryType.Wardrobe))
+                    if (!putItem(iRodName, InventoryType.Wardrobe))
                     {
-                        setMessage(string.Format("竿の修理：{0}が{1}に移動できなかったので停止", breakRodName, FFACETools.InventoryType.Wardrobe.ToString()));
+                        setMessage(string.Format("竿の修理：{0}が{1}に移動できなかったので停止", breakRodName, InventoryType.Wardrobe.ToString()));
                         return false;
                     }
                     Thread.Sleep(500);
@@ -2251,18 +2230,18 @@ namespace EnjoyFishing
         private bool RepairRodSynthesis(string iCrystalName, string iBreakRodName)
         {
             //入力チェック
-            if (!control.IsExistItem(iCrystalName, FFACETools.InventoryType.Inventory) ||
-                !control.IsExistItem(iBreakRodName, FFACETools.InventoryType.Inventory)) return false;
+            if (!control.IsExistItem(iCrystalName, InventoryType.Inventory) ||
+                !control.IsExistItem(iBreakRodName, InventoryType.Inventory)) return false;
             //メニュー閉じる
             bool maxLoop = true;
             for (int i = 0; i < Constants.MAX_LOOP_COUNT ; i++)
             {
-                if (!fface.Menu.IsOpen)
+                if (!api.Menu.IsMenuOpen)
                 {
                     maxLoop = false;
                     break;
                 }
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                api.ThirdParty.KeyPress(Keys.ESCAPE);
                 Thread.Sleep(100);
             }
             if (maxLoop) return false;
@@ -2270,15 +2249,15 @@ namespace EnjoyFishing
             maxLoop = true;
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if (fface.Menu.Selection == "アイテム")
+                if (control.GetMenuHelpName() == "アイテム")
                 {
                     maxLoop = false;
                     break;
                 }
-                fface.Windower.SendKey(FFACETools.KeyCode.LeftCtrlKey, true);
-                fface.Windower.SendKey(FFACETools.KeyCode.LetterI, true);
-                fface.Windower.SendKey(FFACETools.KeyCode.LeftCtrlKey, false);
-                fface.Windower.SendKey(FFACETools.KeyCode.LetterI, false);
+                api.ThirdParty.KeyDown(Keys.LCONTROL);
+                api.ThirdParty.KeyDown(Keys.I);
+                api.ThirdParty.KeyUp(Keys.LCONTROL);
+                api.ThirdParty.KeyUp(Keys.I);
                 Thread.Sleep(100);
             }
             if (maxLoop) return false;
@@ -2287,7 +2266,7 @@ namespace EnjoyFishing
             bool firstTime = true;
             for (int i = 0; i < 200; i++)
             {
-                if (FFACE.ParseResources.GetItemName(fface.Item.SelectedItemID) == iCrystalName)
+                if (resource.GetItem(api.Inventory.SelectedItemId).Name[1] == iCrystalName)
                 {
                     maxLoop = false;
                     break;
@@ -2296,14 +2275,14 @@ namespace EnjoyFishing
                 {
                     for (int j = 0; j < 15; j++)
                     {
-                        fface.Windower.SendKeyPress(FFACETools.KeyCode.RightArrow);
+                        api.ThirdParty.KeyPress(Keys.RIGHT);
                         Thread.Sleep(100);
                     }
                     firstTime = false;
                 }
                 else
                 {
-                    fface.Windower.SendKeyPress(FFACETools.KeyCode.UpArrow);
+                    api.ThirdParty.KeyPress(Keys.UP);
                     Thread.Sleep(100);
                 }
             }
@@ -2312,38 +2291,30 @@ namespace EnjoyFishing
             maxLoop = true;
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if (fface.Menu.Selection == "アイテム合成")
+                if (control.GetMenuHelpName() == "アイテム合成")
                 {
                     maxLoop = false;
                     break;
                 }
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+                api.ThirdParty.KeyPress(Keys.RETURN);
                 Thread.Sleep(100);
             }
             if (maxLoop) return false;
             //アイテム情報取得
-            int itemID = FFACE.ParseResources.GetItemID(iBreakRodName);
-            int itemIndex = fface.Item.GetFirstIndexByItemID(itemID, FFACETools.InventoryType.Inventory);
+            uint itemID = resource.GetItem(iBreakRodName).ItemID;
+            int itemIndex = control.GetInventoryFirstItemIndex(itemID, InventoryType.Inventory);
             //合成アイテムのセット
-            FFACE.TRADEITEM item = new FFACE.TRADEITEM();
-            item.ItemID = (ushort)itemID;
-            item.Index = (byte)itemIndex;
-            item.Count = 1;
-
-            FFACE.NPCTRADEINFO trade = new FFACE.NPCTRADEINFO();
-            Array.Resize(ref trade.items, 1);
-            trade.items[0] = item;
-            fface.Menu.SetCraftItems(trade);
+            api.CraftMenu.SetCraftItem(0, (ushort)itemID, (byte)itemIndex, 1);
             //中止ボタンへ移動
             maxLoop = true;
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if (fface.Menu.Help == "中止します。")
+                if (control.GetMenuHelpDescription() == "中止します。")
                 {
                     maxLoop = false;
                     break;
                 }
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.EscapeKey);
+                api.ThirdParty.KeyPress(Keys.ESCAPE);
                 Thread.Sleep(200);
             }
             if (maxLoop) return false;
@@ -2351,33 +2322,33 @@ namespace EnjoyFishing
             maxLoop = true;
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if (fface.Menu.Help == "この組み合わせでアイテムを合成します。")
+                if (control.GetMenuHelpDescription() == "この組み合わせでアイテムを合成します。")
                 {
                     maxLoop = false;
                     break;
                 }
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.UpArrow);
+                api.ThirdParty.KeyPress(Keys.UP);
                 Thread.Sleep(200);
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.RightArrow);
+                api.ThirdParty.KeyPress(Keys.RIGHT);
                 Thread.Sleep(200);
             }
             if (maxLoop) return false;
-            fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+            api.ThirdParty.KeyPress(Keys.RETURN);
             //合成終了するまで待機
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if (this.PlayerStatus == FFACETools.Status.Synthing) break;
+                if (this.PlayerStatus == Status.Synthing) break;
                 Thread.Sleep(settings.Global.WaitBase);
             }
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if (this.PlayerStatus != FFACETools.Status.Synthing) break;
+                if (this.PlayerStatus != Status.Synthing) break;
                 Thread.Sleep(settings.Global.WaitBase);
             }
             Thread.Sleep(settings.Global.WaitChat);
             //合成ログの確認
             logger.Debug("竿の修理：ログ確認");
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            var cl = new EliteAPI.ChatEntry();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 if(!chat.GetNextChatLine(out cl)) break;
@@ -2416,7 +2387,7 @@ namespace EnjoyFishing
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipWaist, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
                 {
-                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    if (!control.IsBuff((EliteMMO.API.StatusEffect)item[0].BuffID))
                     {
                         setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
                         useItem(item[0].GearName);
@@ -2429,7 +2400,7 @@ namespace EnjoyFishing
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingLeft, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
                 {
-                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    if (!control.IsBuff((EliteMMO.API.StatusEffect)item[0].BuffID))
                     {
                         setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
                         useItem(item[0].GearName);
@@ -2442,7 +2413,7 @@ namespace EnjoyFishing
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipRingRight, GearDBPositionKind.Rings);
                 if (item.Count > 0 && item[0].BuffID > 0)
                 {
-                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    if (!control.IsBuff((EliteMMO.API.StatusEffect)item[0].BuffID))
                     {
                         setMessage(string.Format("強化切れ：{0}を使用", item[0].GearName));
                         useItem(item[0].GearName);
@@ -2464,7 +2435,7 @@ namespace EnjoyFishing
                 List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.Food, GearDBPositionKind.Foods);
                 if (item.Count > 0 && item[0].BuffID > 0)
                 {
-                    if (!control.IsBuff((StatusEffect)item[0].BuffID))
+                    if (!control.IsBuff((EliteMMO.API.StatusEffect)item[0].BuffID))
                     {
                         setMessage(string.Format("食事切れ：{0}を使用", item[0].GearName));
                         return useItem(item[0].GearName);
@@ -2480,8 +2451,8 @@ namespace EnjoyFishing
         /// <returns></returns>
         public bool useItem(string iItemname)
         {
-            fface.Windower.SendString(string.Format("/item {0} <me>",iItemname));
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            api.ThirdParty.SendString(string.Format("/item {0} <me>",iItemname));
+            var cl = new EliteAPI.ChatEntry();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 chat.GetNextChatLine(out cl);
@@ -2517,8 +2488,8 @@ namespace EnjoyFishing
             setRunningStatus(RunningStatusKind.Running);
 
             //Katsunagaの近くかチェック
-            if (fface.Player.Zone != FFACETools.Zone.Mhaura ||
-                (fface.NPC.Distance(NPCID_KATSUNAGA) != 0f && fface.NPC.Distance(NPCID_KATSUNAGA) > 6))
+            if (api.Player.ZoneId != (int)Zone.Mhaura ||
+                (api.Entity.GetEntity(NPCINDEX_KATSUNAGA).Distance != 0f && api.Entity.GetEntity(NPCINDEX_KATSUNAGA).Distance > 6))
             {
                 setMessage("マウラのKatsunagaの近くで実行してください");
                 setFishingStatus(FishingStatusKind.Error);
@@ -2534,29 +2505,29 @@ namespace EnjoyFishing
                 return ret;
             }
             //メニューを開く
-            while (!fface.Menu.IsOpen)
+            while (!api.Menu.IsMenuOpen)
             {
                 //ターゲット設定
-                control.SetTargetFromId(NPCID_KATSUNAGA);
+                control.SetTargetFromId(NPCINDEX_KATSUNAGA);
                 Thread.Sleep(settings.Global.WaitBase);//Wait
-                fface.Windower.SendKeyPress(FFACETools.KeyCode.EnterKey);
+                api.ThirdParty.KeyPress(Keys.RETURN);
             }
             control.WaitOpenDialog("何を教えてもらおう？", false);
             control.SetDialogOptionIndex(0, true);
             control.WaitOpenDialog(REGEX_FISHEDLIST_DIALOG, false);
-            if (fface.Menu.IsOpen &&
-                MiscTool.IsRegexString(fface.Menu.GetDialogText().Question, REGEX_FISHEDLIST_DIALOG))
+            if (api.Menu.IsMenuOpen &&
+                MiscTool.IsRegexString(api.Dialog.GetDialog().Question, REGEX_FISHEDLIST_DIALOG))
             {
                 int pageCurrent = 0;
                 int pageMax = 99;
                 for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
                 {
                     control.WaitOpenDialog(REGEX_FISHEDLIST_DIALOG, false);
-                    List<string> oArgs = MiscTool.GetRegexString(fface.Menu.GetDialogText().Question, REGEX_FISHEDLIST_DIALOG);
+                    List<string> oArgs = MiscTool.GetRegexString(api.Dialog.GetDialog().Question, REGEX_FISHEDLIST_DIALOG);
                     pageCurrent = int.Parse(oArgs[1]);
                     pageMax = int.Parse(oArgs[2]);
-                    string[] options = fface.Menu.GetDialogText().Options;
-                    for (int j = 1; j < 17 - (19 - fface.Menu.DialogOptionCount); j++)
+                    string[] options = api.Dialog.GetDialog().Options.ToArray();
+                    for (int j = 1; j < 17 - (19 - api.Dialog.DialogOptionCount); j++)
                     {
                         if (MiscTool.IsRegexString(options[j], REGEX_FISHEDLIST_OPTIONS))
                         {
@@ -2595,9 +2566,9 @@ namespace EnjoyFishing
             if (!isRod(iRodName)) return false;
             setMessage(string.Format("{0}を装備", iRodName));
             //鞄にアイテムが存在するかチェック
-            int rodId = FFACE.ParseResources.GetItemId(iRodName);
-            uint rodCnt = fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Inventory) +
-                            fface.Item.GetItemCount(rodId, FFACETools.InventoryType.Wardrobe);
+            uint rodId = resource.GetItem(iRodName).ItemID;
+            int rodCnt = control.GetInventoryItemCount(rodId, InventoryType.Inventory) +
+                         control.GetInventoryItemCount(rodId, InventoryType.Wardrobe);
             //アイテムの装備
             if (rodCnt > 0)
             {
@@ -2609,7 +2580,7 @@ namespace EnjoyFishing
                         EventFished(FishResultStatusKind.Unknown);
                         return true;
                     }
-                    fface.Windower.SendString(string.Format("/equip Range {0}", iRodName));
+                    api.ThirdParty.SendString(string.Format("/equip Range {0}", iRodName));
                     Thread.Sleep(settings.Global.WaitEquip);
                 }
             }
@@ -2627,9 +2598,9 @@ namespace EnjoyFishing
             if (!isBait(iBaitName)) return false;
             setMessage(string.Format("{0}を装備", iBaitName));
             //鞄にアイテムが存在するかチェック
-            int baitId = FFACE.ParseResources.GetItemId(iBaitName);
-            uint baitCnt = fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Inventory) +
-                            fface.Item.GetItemCount(baitId, FFACETools.InventoryType.Wardrobe);
+            uint baitId = resource.GetItem(iBaitName).ItemID;
+            int baitCnt = control.GetInventoryItemCount(baitId, InventoryType.Inventory) +
+                          control.GetInventoryItemCount(baitId, InventoryType.Wardrobe);
             //アイテムの装備
             if (baitCnt > 0)
             {
@@ -2641,7 +2612,7 @@ namespace EnjoyFishing
                         EventFished(FishResultStatusKind.Unknown);
                         return true;
                     }
-                    fface.Windower.SendString(string.Format("/equip Ammo {0}", iBaitName));
+                    api.ThirdParty.SendString(string.Format("/equip Ammo {0}", iBaitName));
                     Thread.Sleep(settings.Global.WaitEquip);
                 }
             }
@@ -2678,28 +2649,28 @@ namespace EnjoyFishing
             bool moveOkFlg = false;
             if (settings.UseItemizer)
             {
-                if (!moveOkFlg && control.GetItem(iItemName, FFACETools.InventoryType.Satchel))
+                if (!moveOkFlg && control.GetItemizer(iItemName, InventoryType.Satchel))
                 {
                     moveOkFlg = true;
-                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Satchel.ToString()));
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Satchel.ToString()));
                     Thread.Sleep(1000);
                 }
-                if (!moveOkFlg && control.GetItem(iItemName, FFACETools.InventoryType.Sack))
+                if (!moveOkFlg && control.GetItemizer(iItemName, InventoryType.Sack))
                 {
                     moveOkFlg = true;
-                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Sack.ToString()));
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Sack.ToString()));
                     Thread.Sleep(1000);
                 }
-                if (!moveOkFlg && control.GetItem(iItemName, FFACETools.InventoryType.Case))
+                if (!moveOkFlg && control.GetItemizer(iItemName, InventoryType.Case))
                 {
                     moveOkFlg = true;
-                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Case.ToString()));
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Case.ToString()));
                     Thread.Sleep(1000);
                 }
-                if (!moveOkFlg && control.GetItem(iItemName, FFACETools.InventoryType.Wardrobe))
+                if (!moveOkFlg && control.GetItemizer(iItemName, InventoryType.Wardrobe))
                 {
                     moveOkFlg = true;
-                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Wardrobe.ToString()));
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Wardrobe.ToString()));
                     Thread.Sleep(1000);
                 }
             }
@@ -2716,24 +2687,24 @@ namespace EnjoyFishing
             if (settings.UseItemizer)
             {
                 if (!moveOkFlg && settings.Fishing.NoBaitNoRodSatchel)
-                    if (control.GetItem(iItemName, FFACETools.InventoryType.Satchel))
+                    if (control.GetItemizer(iItemName, InventoryType.Satchel))
                     {
                         moveOkFlg = true;
-                        setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Satchel.ToString()));
+                        setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Satchel.ToString()));
                         Thread.Sleep(1000);
                     }
                 if (!moveOkFlg && settings.Fishing.NoBaitNoRodSack)
-                    if (control.GetItem(iItemName, FFACETools.InventoryType.Sack))
+                    if (control.GetItemizer(iItemName, InventoryType.Sack))
                     {
                         moveOkFlg = true;
-                        setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Sack.ToString()));
+                        setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Sack.ToString()));
                         Thread.Sleep(1000);
                     }
                 if (!moveOkFlg && settings.Fishing.NoBaitNoRodCase)
-                    if (control.GetItem(iItemName, FFACETools.InventoryType.Case))
+                    if (control.GetItemizer(iItemName, InventoryType.Case))
                     {
                         moveOkFlg = true;
-                        setMessage(string.Format("{0}を{1}から取り出しました", iItemName, FFACETools.InventoryType.Case.ToString()));
+                        setMessage(string.Format("{0}を{1}から取り出しました", iItemName, InventoryType.Case.ToString()));
                         Thread.Sleep(1000);
                     }
             }
@@ -2745,12 +2716,12 @@ namespace EnjoyFishing
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">移動先</param>
         /// <returns>成功した場合Truwを返す</returns>
-        private bool putItem(string iItemName, FFACETools.InventoryType iInventoryType)
+        private bool putItem(string iItemName, InventoryType iInventoryType)
         {
             if (control.GetInventoryCountByType(iInventoryType) >= control.GetInventoryMaxByType(iInventoryType)) return false;
-            if (control.IsExistItem(iItemName, FFACETools.InventoryType.Inventory))
+            if (control.IsExistItem(iItemName, InventoryType.Inventory))
             {
-                control.PutItem(iItemName, iInventoryType);
+                control.PutItemizer(iItemName, iInventoryType);
                 setMessage(string.Format("{0}を{1}に移動しました", iItemName, iInventoryType.ToString()));
                 Thread.Sleep(1000);
                 return true;
@@ -2766,9 +2737,9 @@ namespace EnjoyFishing
             bool moveOkFlg = false;
             if (settings.UseItemizer)
             {
-                if (!moveOkFlg && settings.Fishing.InventoryFullSatchel) moveOkFlg = putFish(FFACETools.InventoryType.Satchel);
-                if (!moveOkFlg && settings.Fishing.InventoryFullSack) moveOkFlg = putFish(FFACETools.InventoryType.Sack);
-                if (!moveOkFlg && settings.Fishing.InventoryFullCase) moveOkFlg = putFish(FFACETools.InventoryType.Case);
+                if (!moveOkFlg && settings.Fishing.InventoryFullSatchel) moveOkFlg = putFish(InventoryType.Satchel);
+                if (!moveOkFlg && settings.Fishing.InventoryFullSack) moveOkFlg = putFish(InventoryType.Sack);
+                if (!moveOkFlg && settings.Fishing.InventoryFullCase) moveOkFlg = putFish(InventoryType.Case);
             }
             return moveOkFlg;
         }
@@ -2777,16 +2748,16 @@ namespace EnjoyFishing
         /// </summary>
         /// <param name="iInventoryType"></param>
         /// <returns></returns>
-        private bool putFish(FFACETools.InventoryType iInventoryType)
+        private bool putFish(InventoryType iInventoryType)
         {
             //short lastCnt = control.GetInventoryCountByType(InventoryType.Inventory);
             if (control.GetInventoryCountByType(iInventoryType) >= control.GetInventoryMaxByType(iInventoryType)) return false;
             List<FishDBFishModel> fishes = FishDB.SelectFishList(this.RodName, string.Empty, string.Empty);
             foreach (FishDBFishModel fish in fishes)
             {
-                if (control.IsExistItem(fish.FishName, FFACETools.InventoryType.Inventory))
+                if (control.IsExistItem(fish.FishName, InventoryType.Inventory))
                 {
-                    control.PutItem(fish.FishName, iInventoryType);
+                    control.PutItemizer(fish.FishName, iInventoryType);
                     setMessage(string.Format("{0}を{1}に移動しました", fish.FishName, iInventoryType.ToString()));
                     Thread.Sleep(1000);
                     return true;
@@ -2804,41 +2775,41 @@ namespace EnjoyFishing
             {
                 logger.Debug("装備着替え開始");
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRod))
-                    fface.Windower.SendString(string.Format("/equip range {0}", settings.Fishing.EquipRod));
+                    api.ThirdParty.SendString(string.Format("/equip range {0}", settings.Fishing.EquipRod));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipBait))
-                    fface.Windower.SendString(string.Format("/equip ammo {0}", settings.Fishing.EquipBait));
+                    api.ThirdParty.SendString(string.Format("/equip ammo {0}", settings.Fishing.EquipBait));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipMain))
-                    fface.Windower.SendString(string.Format("/equip main {0}", settings.Fishing.EquipMain));
+                    api.ThirdParty.SendString(string.Format("/equip main {0}", settings.Fishing.EquipMain));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipSub))
-                    fface.Windower.SendString(string.Format("/equip sub {0}", settings.Fishing.EquipSub));
+                    api.ThirdParty.SendString(string.Format("/equip sub {0}", settings.Fishing.EquipSub));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipHead))
-                    fface.Windower.SendString(string.Format("/equip head {0}", settings.Fishing.EquipHead));
+                    api.ThirdParty.SendString(string.Format("/equip head {0}", settings.Fishing.EquipHead));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipBody))
-                    fface.Windower.SendString(string.Format("/equip body {0}", settings.Fishing.EquipBody));
+                    api.ThirdParty.SendString(string.Format("/equip body {0}", settings.Fishing.EquipBody));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipHands))
-                    fface.Windower.SendString(string.Format("/equip hands {0}", settings.Fishing.EquipHands));
+                    api.ThirdParty.SendString(string.Format("/equip hands {0}", settings.Fishing.EquipHands));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipLegs))
-                    fface.Windower.SendString(string.Format("/equip legs {0}", settings.Fishing.EquipLegs));
+                    api.ThirdParty.SendString(string.Format("/equip legs {0}", settings.Fishing.EquipLegs));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipFeet))
-                    fface.Windower.SendString(string.Format("/equip feet {0}", settings.Fishing.EquipFeet));
+                    api.ThirdParty.SendString(string.Format("/equip feet {0}", settings.Fishing.EquipFeet));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipNeck))
-                    fface.Windower.SendString(string.Format("/equip neck {0}", settings.Fishing.EquipNeck));
+                    api.ThirdParty.SendString(string.Format("/equip neck {0}", settings.Fishing.EquipNeck));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipWaist))
-                    fface.Windower.SendString(string.Format("/equip waist {0}", settings.Fishing.EquipWaist));
+                    api.ThirdParty.SendString(string.Format("/equip waist {0}", settings.Fishing.EquipWaist));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipBack))
-                    fface.Windower.SendString(string.Format("/equip back {0}", settings.Fishing.EquipBack));
+                    api.ThirdParty.SendString(string.Format("/equip back {0}", settings.Fishing.EquipBack));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipEarLeft))
-                    fface.Windower.SendString(string.Format("/equip ear1 {0}", settings.Fishing.EquipEarLeft));
+                    api.ThirdParty.SendString(string.Format("/equip ear1 {0}", settings.Fishing.EquipEarLeft));
                 if (settings.Fishing.EquipEarLeft == settings.Fishing.EquipEarRight) 
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipEarRight))
-                    fface.Windower.SendString(string.Format("/equip ear2 {0}", settings.Fishing.EquipEarRight));
+                    api.ThirdParty.SendString(string.Format("/equip ear2 {0}", settings.Fishing.EquipEarRight));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
-                    fface.Windower.SendString(string.Format("/equip ring1 {0}", settings.Fishing.EquipRingLeft));
+                    api.ThirdParty.SendString(string.Format("/equip ring1 {0}", settings.Fishing.EquipRingLeft));
                 if (settings.Fishing.EquipRingLeft == settings.Fishing.EquipRingRight) 
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
-                    fface.Windower.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));
+                    api.ThirdParty.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));
                 Thread.Sleep(500);
                 //イベント発生
                 EventFished(FishResultStatusKind.Unknown);
