@@ -826,6 +826,8 @@ namespace EnjoyFishing
             setRunningStatus(RunningStatusKind.Running);
             setFishingStatus(FishingStatusKind.Normal);
             setMessage(string.Empty);
+            //チャットクリア
+            chat.Reset();
             //スレッド開始
             thTimeElapsed = new Thread(threadthTimeElapsed);
             thTimeElapsed.Start();
