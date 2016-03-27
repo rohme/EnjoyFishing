@@ -262,7 +262,7 @@ namespace EnjoyFishing
             bool firsttime = true;
 
             logger.Debug("ハラキリスレッド開始");
-            chat.Clear();
+            chat.Reset();
             while (this.RunningStatus == RunningStatusKind.Running)
             {
                 //未入力チェック

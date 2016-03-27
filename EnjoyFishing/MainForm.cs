@@ -332,6 +332,7 @@ namespace EnjoyFishing
             updatedb = new UpdateDBTool(settings);
             updatedb.ReceiveMessage += new UpdateDBTool.ReceiveMessageEventHandler(this.UpdateDBTool_ReceiveMessage);
             updatedb.NewerVersion += new UpdateDBTool.NewerVersionEventHandler(this.UpdateDBTool_NewerVersion);
+            logger.Info("初期化完了");
         }
         #endregion
 
@@ -3224,7 +3225,7 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void PolTool_ChangeStatus(object sender, PolTool.ChangeStatusEventArgs e)
         {
-            logger.Info("POLステータスが{0}に変更された", e.PolStatus);
+            logger.Debug("POLステータスが{0}に変更された", e.PolStatus);
             if (e.PolStatus == PolTool.PolStatusKind.LoggedIn)
             {
                 //プレイヤーが描画されるまで待機
@@ -3274,11 +3275,11 @@ namespace EnjoyFishing
                 switch (cmd[0])
                 {
                     case "start":
-                        Console.WriteLine(cmd[0]);
+                        logger.Debug("コマンド受信 {0}", cmd[0]);
                         if(!fishingFlg) startFishing();
                         break;
                     case "stop":
-                        Console.WriteLine(cmd[0]);
+                        logger.Debug("コマンド受信 {0}", cmd[0]);
                         if (fishingFlg) stopFishing(true);
                         break;
                 }

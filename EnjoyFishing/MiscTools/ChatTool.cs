@@ -12,12 +12,12 @@ namespace MiscTools
 {
     public class ChatTool
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         private const int MAX_CHATLINE_INDEX = 100;//保持するチャット行数
         private const int CHAT_INTERVAL = 100;//チャット取得インターバル
         private const string REGEX_EMINENCE1 = "エミネンス・レコード：『(.*)』……";
         private const string REGEX_EMINENCE2 = "進行度：([0-9]*)/([0-9]*)";
 
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private List<EliteAPI.ChatEntry> chatLines = new List<EliteAPI.ChatEntry>();
         private int maxIndex = 0;
         private int currentIndex = 0;
@@ -28,6 +28,8 @@ namespace MiscTools
         public ChatTool(EliteAPI iEliteAPI)
         {
             api = iEliteAPI;
+            EliteAPI.ChatEntry cl;
+            while ((cl = api.Chat.GetNextChatLine()) != null) { Thread.Sleep(1); }
             Start();
         }
         #endregion
@@ -120,6 +122,7 @@ namespace MiscTools
         /// </summary>
         public void Reset()
         {
+            this.chatLines.Clear();
             this.currentIndex = this.maxIndex;
         }
         #endregion
@@ -162,10 +165,6 @@ namespace MiscTools
             return false;
         }
 
-        public void Clear()
-        {
-            chatLines.Clear();
-        }
         /// <summary>
         /// チャット監視メインスレッド
         /// </summary>
@@ -187,8 +186,6 @@ namespace MiscTools
         /// </summary>
         private void updateChatLine()
         {
-            //int currChatLineIndex = 0;
-            //int lastEminenceIndex = -1;
             if (api == null || api.Player.LoginStatus != (int)LoginStatus.LoggedIn) return;
 
             EliteAPI.ChatEntry cl;
@@ -219,7 +216,7 @@ namespace MiscTools
         }
         private void AddChatLines(EliteAPI.ChatEntry iCl)
         {
-            logger.Trace("チャット追加：{0}", iCl.Text);
+            logger.Trace("チャットバッファに追加：idx1:{0} idx2:{1} {2}", iCl.Index1, iCl.Index2, iCl.Text);
             chatLines.Add(iCl);
 
             //コマンド受信イベント処理

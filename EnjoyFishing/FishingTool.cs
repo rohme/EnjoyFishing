@@ -1043,7 +1043,7 @@ namespace EnjoyFishing
                         setMessage("スニークをかけます");
                         castSneak();
                         interrupt.SneakWarning = false;
-                        chat.Clear();
+                        chat.Reset();
                     }
                 }
                 //鞄1

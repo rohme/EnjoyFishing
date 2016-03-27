@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using EliteMMO.API;
 using EnjoyFishing;
+using NLog;
 
 namespace MiscTools
 {
@@ -19,6 +20,7 @@ namespace MiscTools
             CharacterLoginScreen,
             LoggedIn,
         }
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private PolStatusKind _Status = PolStatusKind.Unknown;
         private EliteAPI _EliteAPI;
         private int _ProcessID = 0;
@@ -52,11 +54,12 @@ namespace MiscTools
                 ChangeStatus(this, e);
             }
         }
-        private void EventChangeStatus(PolStatusKind iFishResultStatus)
+        private void EventChangeStatus(PolStatusKind iPolStatus)
         {
+            logger.Trace("PolStatus変更:{0}", iPolStatus);
             //返すデータの設定
             ChangeStatusEventArgs e = new ChangeStatusEventArgs();
-            e.PolStatus = iFishResultStatus;
+            e.PolStatus = iPolStatus;
             //イベントの発生
             OnChangeStatus(e);
         }

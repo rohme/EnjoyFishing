@@ -62,7 +62,7 @@ namespace MiscTools
         /// <returns>True:見つかった False:見つからなかった</returns>
         public bool WaitChat(ChatTool iChatTool, string iRegexString, int iStartChatIndex, bool iWithEnter)
         {
-            logger.Debug("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter);
+            logger.Trace("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter);
             List<EliteAPI.ChatEntry> arrChatLine;
             int currChatIndex = iStartChatIndex;
             for (int i = 0; (i < this.MaxLoopCount); i++)
@@ -98,7 +98,7 @@ namespace MiscTools
         /// <returns>True:ダイアログが表示された False:ダイアログが表示されなかった</returns>
         public bool WaitOpenDialog(string iDialogString, bool iEnter)
         {
-            logger.Debug("DialogString={0} Enter={1}", iDialogString, iEnter);
+            logger.Trace("DialogString={0} Enter={1}", iDialogString, iEnter);
             for (int i = 0; (i < this.MaxLoopCount); i++)
             {
                 Regex reg = new Regex(iDialogString, RegexOptions.IgnoreCase);
@@ -124,7 +124,7 @@ namespace MiscTools
         /// <returns></returns>
         public bool SetDialogOptionIndex(short iIdx, bool iWithEnter)
         {
-            logger.Debug("iIdx={0} iWithEnter={1}", iIdx, iWithEnter);
+            logger.Trace("iIdx={0} iWithEnter={1}", iIdx, iWithEnter);
             for (int i = 0; i < this.MaxLoopCount; i++)
             {
                 if (api.Dialog.DialogIndex == iIdx)
@@ -502,7 +502,7 @@ namespace MiscTools
         /// <returns>True:ターゲット完了 False:ターゲット出来なかった</returns>
         public bool SetTargetFromId(int iIndex, bool iWithEnter = false)
         {
-            logger.Debug("Index={0} WithEnter={1}", iIndex, iWithEnter);
+            logger.Trace("Index={0} WithEnter={1}", iIndex, iWithEnter);
             for (int i= 0; i < this.MaxLoopCount; i++)
             {
                 if(api.Target.GetTargetInfo().TargetIndex == iIndex)
