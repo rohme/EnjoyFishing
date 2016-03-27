@@ -18,16 +18,16 @@ namespace EnjoyFishing
         private const string URL_API_CHECK_VERSION = "/api/enjoyfishing/checkversion";
         private const string URL_API_ENABLE_NAME = "/api/enjoyfishing/enablename";
         private const string URL_API_STATUS = "/api/enjoyfishing/status";
-        private const string URL_API_ROD =  "/api/enjoyfishing/rod";
+        private const string URL_API_ROD = "/api/enjoyfishing/rod";
         private const string URL_API_UPLOAD_HISTORY = "/api/enjoyfishing/uploadhistory";
-        
+
 
         private Settings settings;
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private FishDB fishDB;
         private FishHistoryDB historyDB;
         private string serverName = string.Empty;
- 
+
         #region メンバ
         #endregion
 
@@ -41,7 +41,7 @@ namespace EnjoyFishing
             public string Message;
             public Color Color;
             public bool Bold;
-         }
+        }
         public delegate void ReceiveMessageEventHandler(object sender, ReceiveMessageEventArgs e);
         public event ReceiveMessageEventHandler ReceiveMessage;
         protected virtual void OnReceiveMessage(ReceiveMessageEventArgs e)
@@ -188,7 +188,7 @@ namespace EnjoyFishing
                 EventReceiveMessage(string.Format("{0}", response), 0xFFFF0000);
                 return false;
             }
-            
+
             //履歴データの送信
             EventReceiveMessage("== 履歴データの送信 ==", 0xFFFFFFFF, true);
             string[] xmlFileNames = Directory.GetFiles(FishHistoryDB.PATH_FISHHISTORYDB);
@@ -295,7 +295,7 @@ namespace EnjoyFishing
                 status = (UpdateDBApiStatusModel)serializer.Deserialize(ms);
                 if (status.Result.Success == "true")
                 {
-                    foreach(UpdateDBApiStatusStatusModel rod in status.Status)
+                    foreach (UpdateDBApiStatusStatusModel rod in status.Status)
                     {
                         logger.Info("竿:{0} 更新日:{1}", rod.RodName, rod.LastUpdate);
                         if (!File.Exists(Path.Combine(FishDB.PATH_FISHDB, rod.RodName + ".xml")) ||
@@ -380,7 +380,7 @@ namespace EnjoyFishing
             oResponse = "";
 
             logger.Debug("{0}", iUrl);
-            
+
             try
             {
                 HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
@@ -434,7 +434,7 @@ namespace EnjoyFishing
                 //リクエスト作成
                 HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
                 webreq.UserAgent = GetUserAgent();
-                
+
                 webreq.Method = "POST";
                 webreq.ContentType = "application/x-www-form-urlencoded";
                 webreq.ContentLength = postDataBytes.Length;
@@ -609,7 +609,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameRodModel(): this(string.Empty)
+        public UpdateDBApiEnableNameRodModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameRodModel(string iName)
@@ -631,7 +631,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameFishModel(): this(string.Empty)
+        public UpdateDBApiEnableNameFishModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameFishModel(string iName)
@@ -652,7 +652,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameBaitModel(): this(string.Empty)
+        public UpdateDBApiEnableNameBaitModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameBaitModel(string iName)
@@ -673,7 +673,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameZoneModel(): this(string.Empty)
+        public UpdateDBApiEnableNameZoneModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameZoneModel(string iName)
@@ -694,7 +694,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameHarakiriItemModel(): this(string.Empty)
+        public UpdateDBApiEnableNameHarakiriItemModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameHarakiriItemModel(string iName)

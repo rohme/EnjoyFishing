@@ -46,7 +46,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public FishHistoryDBModel SelectDayly(string iPlayerName, DateTime iYmd)
         {
-            return SelectDayly(iPlayerName,iYmd, FishResultStatusKind.Unknown, string.Empty);
+            return SelectDayly(iPlayerName, iYmd, FishResultStatusKind.Unknown, string.Empty);
         }
         /// <summary>
         /// 日付別の履歴を取得
@@ -100,7 +100,7 @@ namespace EnjoyFishing
             logger.Trace("Player={0} Ymd={1} ResultStatus={2} Fish={3}", iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBModel history = SelectDayly(iPlayerName, iYmd, iResultStatus, iFishName);
             FishHistoryDBSummaryModel ret = new FishHistoryDBSummaryModel();
-            foreach(FishHistoryDBFishModel fish in history.Fishes)
+            foreach (FishHistoryDBFishModel fish in history.Fishes)
             {
                 ret.Add(fish);
             }
@@ -179,7 +179,7 @@ namespace EnjoyFishing
                         }
                     }
                 }
-            } 
+            }
         }
         /// <summary>
         /// xmlファイルをコンバートする（1.0.5→1.1.0）

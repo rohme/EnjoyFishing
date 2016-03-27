@@ -92,7 +92,7 @@ namespace EnjoyFishing
             }
             //履歴DBに保存
             FishHistoryDB historyDB = new FishHistoryDB(iPlayerName, iEarthDate);
-            if(historyDB.AddHarakiri(iPlayerName, new FishHistoryDBHarakiriModel(iEarthDate.ToString("yyyy/MM/dd HH:mm:ss"),iVanaDate,iFishName,iItemName)))
+            if (historyDB.AddHarakiri(iPlayerName, new FishHistoryDBHarakiriModel(iEarthDate.ToString("yyyy/MM/dd HH:mm:ss"), iVanaDate, iFishName, iItemName)))
             {
                 //ハラキリDBに保存
                 return putHarakiriDB(harakiriDB);

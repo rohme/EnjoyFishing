@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using EliteMMO.API;
 using EnjoyFishing;
+using NLog;
 
 namespace MiscTools
 {
@@ -28,7 +28,7 @@ namespace MiscTools
         private ChatTool chat = null;
         private ResourceTool resource = null;
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         #region メンバ
         public int MaxLoopCount { get; set; }
         public bool UseEnternity { get; set; }
@@ -317,7 +317,7 @@ namespace MiscTools
         public int GetInventoryItemCount(uint iItemID, InventoryType iInventoryType)
         {
             int ret = 0;
-            for(int i = 0; i < 80; i++)
+            for (int i = 0; i < 80; i++)
             {
                 var item = api.Inventory.GetContainerItem((int)iInventoryType, i);
                 if (item.Id == iItemID) ret += (int)item.Count;
@@ -401,7 +401,7 @@ namespace MiscTools
         /// <param name="iItemName"></param>
         /// <param name="iInventoryType"></param>
         /// <returns></returns>
-        public int GetInventoryFirstItemIndex(string iItemName,InventoryType iInventoryType)
+        public int GetInventoryFirstItemIndex(string iItemName, InventoryType iInventoryType)
         {
             uint id = resource.GetItem(iItemName).ItemID;
             return GetInventoryFirstItemIndex(id, iInventoryType);
@@ -414,7 +414,7 @@ namespace MiscTools
         /// <returns></returns>
         public int GetInventoryFirstItemIndex(uint iItemID, InventoryType iInventoryType)
         {
-            for(int i = 1; i <= 80; i++)
+            for (int i = 1; i <= 80; i++)
             {
                 var item = api.Inventory.GetContainerItem((int)iInventoryType, i);
                 if (item.Id == iItemID)
@@ -503,9 +503,9 @@ namespace MiscTools
         public bool SetTargetFromId(int iIndex, bool iWithEnter = false)
         {
             logger.Trace("Index={0} WithEnter={1}", iIndex, iWithEnter);
-            for (int i= 0; i < this.MaxLoopCount; i++)
+            for (int i = 0; i < this.MaxLoopCount; i++)
             {
-                if(api.Target.GetTargetInfo().TargetIndex == iIndex)
+                if (api.Target.GetTargetInfo().TargetIndex == iIndex)
                     return true;
                 else
                     api.Target.SetTarget(iIndex);

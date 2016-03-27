@@ -261,11 +261,11 @@ namespace EnjoyFishing
         /// <summary>
         /// 地球時間
         /// </summary>
-        public DateTime EarthDateTime{ get { return DateTime.Now; } }
+        public DateTime EarthDateTime { get { return DateTime.Now; } }
         /// <summary>
         /// ヴァナ曜日
         /// </summary>
-        public Weekday DayType{ get { return (Weekday)api.VanaTime.CurrentWeekDay; } }
+        public Weekday DayType { get { return (Weekday)api.VanaTime.CurrentWeekDay; } }
         /// <summary>
         /// プレイヤーステータス
         /// </summary>
@@ -302,7 +302,7 @@ namespace EnjoyFishing
         {
             get
             {
-                if (api.Player.Status== (uint)Status.FishBite)
+                if (api.Player.Status == (uint)Status.FishBite)
                 {
                     return api.Fish.Stamina;
                 }
@@ -487,7 +487,7 @@ namespace EnjoyFishing
         /// </summary>
         public string RodName
         {
-            get 
+            get
             {
                 var rodId = api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id;
                 string rodName = resource.GetItem(rodId).Name[1];
@@ -516,7 +516,7 @@ namespace EnjoyFishing
                 {
                     return RodName;
                 }
-                else 
+                else
                 {
                     return string.Format("{0}[{1}]", RodName, remain);
                 }
@@ -527,7 +527,7 @@ namespace EnjoyFishing
         /// </summary>
         public string BaitName
         {
-            get 
+            get
             {
                 var baitId = api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id;
                 string baitName = resource.GetItem(baitId).Name[1];
@@ -606,7 +606,7 @@ namespace EnjoyFishing
         {
             get
             {
-                return(api.Player.HasKeyItem((uint)KeyItem.Serpent_Rumors)) ? HasKeyItemKind.Yes : HasKeyItemKind.No;
+                return (api.Player.HasKeyItem((uint)KeyItem.Serpent_Rumors)) ? HasKeyItemKind.Yes : HasKeyItemKind.No;
             }
         }
         /// <summary>
@@ -793,7 +793,7 @@ namespace EnjoyFishing
             resource = iResource;
             settings = iSettings;
             FishDB = new FishDB();
-            fishHistoryDB = new FishHistoryDB(this.PlayerName,this.EarthDateTime);
+            fishHistoryDB = new FishHistoryDB(this.PlayerName, this.EarthDateTime);
             FishHistoryDBModel history = fishHistoryDB.SelectDayly(this.PlayerName, this.EarthDateTime);
             this.TimeElapsed = history.TimeElapsed;
             control = new EliteAPIControl(pol, resource, chat);
@@ -1161,7 +1161,7 @@ namespace EnjoyFishing
                 //ヴァナ時間
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 while (settings.Fishing.VanaTime &&
-                       this.RunningStatus == RunningStatusKind.Running && 
+                       this.RunningStatus == RunningStatusKind.Running &&
                        !isHourInRange(this.VanaDateTime, settings.Fishing.VanaTimeFrom, settings.Fishing.VanaTimeTo))
                 {
                     setFishingStatus(FishingStatusKind.Wait);
@@ -1172,7 +1172,7 @@ namespace EnjoyFishing
                 //地球時間
                 if (this.RunningStatus != RunningStatusKind.Running) break;
                 while (settings.Fishing.EarthTime &&
-                       this.RunningStatus == RunningStatusKind.Running && 
+                       this.RunningStatus == RunningStatusKind.Running &&
                        !isHourInRange(this.EarthDateTime, settings.Fishing.EarthTimeFrom, settings.Fishing.EarthTimeTo))
                 {
                     setFishingStatus(FishingStatusKind.Wait);
@@ -1317,14 +1317,14 @@ namespace EnjoyFishing
                     setFishingStatus(FishingStatusKind.Error);
                     setMessage("エリアが切り替わったので停止");
                     return false;
-                } 
+                }
                 while (chat.GetNextChatLine(out cl))
                 {
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
                     logger.Debug("Chat:{0} ChatKbn:{1}", cl.Text, chatKbn);
-                    
+
                     if (chatKbn == ChatKbnKind.BaitSmallFish || chatKbn == ChatKbnKind.BaitLargeFish ||
                         chatKbn == ChatKbnKind.BaitItem || chatKbn == ChatKbnKind.BaitMonster)//魚がかかった
                     {
@@ -1387,7 +1387,7 @@ namespace EnjoyFishing
                         }
                         setMessage(string.Format("格闘中：{0}", GetViewFishName(oFish.FishName, oFish.FishType, oFish.FishCount, oFish.Critical, oFish.ItemType)));
                         //釣り格闘
-                        
+
                         while (api.Fish.Stamina > 0 && this.PlayerStatus == Status.FishBite)
                         {
                             //強制HP0
@@ -1448,7 +1448,7 @@ namespace EnjoyFishing
                                         timeUpOkFlg = true;
                                         break;
                                     }
-                                    else if ( chatKbnTimeout == ChatKbnKind.CatchSingle ||  //{0}は(.*)を手にいれた！"
+                                    else if (chatKbnTimeout == ChatKbnKind.CatchSingle ||  //{0}は(.*)を手にいれた！"
                                               chatKbnTimeout == ChatKbnKind.CatchMultiple ||//{0}は(.*)を([0-9]*)尾手にいれた！"
                                               chatKbnTimeout == ChatKbnKind.CatchMonster || //{0}はモンスターを釣り上げた！"
                                               chatKbnTimeout == ChatKbnKind.CatchKeyItem || //だいじなもの:(.*)を手にいれた！"
@@ -1475,7 +1475,7 @@ namespace EnjoyFishing
                             fishedFlg = true;
                             api.ThirdParty.KeyPress(Keys.RETURN);
                             Thread.Sleep(settings.Global.WaitBase);
-                        } 
+                        }
                     }
                     else if (chatKbn == ChatKbnKind.CatchSingle)//釣れた
                     {
@@ -1705,7 +1705,7 @@ namespace EnjoyFishing
                 {
                     setMessage("FishDBデータベースへの登録に失敗");
                     return false;
-                } 
+                }
 
             }
             //FishHistoryDBに登録
@@ -1715,10 +1715,11 @@ namespace EnjoyFishing
                 return false;
             }
             //釣れた魚を登録
-            if(iFish.Result== FishResultStatusKind.Catch &&
-               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish)){
-                   settings.CaughtFishesUpdate(iFish.FishName, true);
-                   EventCaughtFishesUpdate(iFish.FishName);
+            if (iFish.Result == FishResultStatusKind.Catch &&
+               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish))
+            {
+                settings.CaughtFishesUpdate(iFish.FishName, true);
+                EventCaughtFishesUpdate(iFish.FishName);
             }
             return true;
         }
@@ -1751,14 +1752,14 @@ namespace EnjoyFishing
                 (settings.Fishing.IgnoreLargeFish && (iFishType == FishDBFishTypeKind.LargeFish || iFishType == FishDBFishTypeKind.UnknownLargeFish)) ||
                 (settings.Fishing.IgnoreItem && (iFishType == FishDBFishTypeKind.Item || iFishType == FishDBFishTypeKind.UnknownItem)) ||
                 (settings.Fishing.IgnoreMonster && iFishType == FishDBFishTypeKind.UnknownMonster))
-            { 
+            {
                 return false;
             }
             //学習モード
             if (settings.Fishing.Learning && (iFishType == FishDBFishTypeKind.UnknownSmallFish ||
                                               iFishType == FishDBFishTypeKind.UnknownLargeFish ||
                                               iFishType == FishDBFishTypeKind.UnknownItem ||
-                                              iFishType == FishDBFishTypeKind.UnknownMonster||
+                                              iFishType == FishDBFishTypeKind.UnknownMonster ||
                                               iFishType == FishDBFishTypeKind.Unknown))
             {
                 return true;
@@ -1799,8 +1800,8 @@ namespace EnjoyFishing
             switch (iCl.ChatType)
             {
                 case (int)ChatMode.RcvdTell:
-                //case ChatMode.SentTell:
-                    if(settings.Fishing.ChatTell) interrupt.ChatReceive = true;
+                    //case ChatMode.SentTell:
+                    if (settings.Fishing.ChatTell) interrupt.ChatReceive = true;
                     return ChatKbnKind.Tell;
                 case (int)ChatMode.RcvdSay:
                 case (int)ChatMode.SentSay:
@@ -1981,7 +1982,7 @@ namespace EnjoyFishing
             string count = string.Empty;
             if (iFishCount > 1)
             {
-                count = string.Format("x{0}",iFishCount);
+                count = string.Format("x{0}", iFishCount);
             }
             string type = string.Empty;
             if (iItemType == FishDBItemTypeKind.Key)
@@ -2012,8 +2013,8 @@ namespace EnjoyFishing
             }
             else if (iFrom > iTo)
             {
-                if ((iTarget.Hour >= iFrom && iTarget.Hour <= 23 ) ||
-                    (iTarget.Hour >= 0 && iTarget.Hour <= iTo ) )
+                if ((iTarget.Hour >= iFrom && iTarget.Hour <= 23) ||
+                    (iTarget.Hour >= 0 && iTarget.Hour <= iTo))
                 {
                     return true;
                 }
@@ -2149,7 +2150,7 @@ namespace EnjoyFishing
                 {
                     wardrobe = true;
                     //ワードローブに竿があるか確認
-                    if (control.GetInventoryItemCount(breakRodID,InventoryType.Wardrobe) == 0)
+                    if (control.GetInventoryItemCount(breakRodID, InventoryType.Wardrobe) == 0)
                     {
                         setMessage(string.Format("竿の修理：{0}が見つからなかったので停止", breakRodName));
                         return false;
@@ -2236,7 +2237,7 @@ namespace EnjoyFishing
                 !control.IsExistItem(iBreakRodName, InventoryType.Inventory)) return false;
             //メニュー閉じる
             bool maxLoop = true;
-            for (int i = 0; i < Constants.MAX_LOOP_COUNT ; i++)
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 if (!api.Menu.IsMenuOpen)
                 {
@@ -2353,7 +2354,7 @@ namespace EnjoyFishing
             var cl = new EliteAPI.ChatEntry();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
-                if(!chat.GetNextChatLine(out cl)) break;
+                if (!chat.GetNextChatLine(out cl)) break;
                 //チャット区分の取得
                 List<string> chatKbnArgs = new List<string>();
                 ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);
@@ -2453,7 +2454,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public bool useItem(string iItemname)
         {
-            api.ThirdParty.SendString(string.Format("/item {0} <me>",iItemname));
+            api.ThirdParty.SendString(string.Format("/item {0} <me>", iItemname));
             var cl = new EliteAPI.ChatEntry();
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
@@ -2802,13 +2803,13 @@ namespace EnjoyFishing
                     api.ThirdParty.SendString(string.Format("/equip back {0}", settings.Fishing.EquipBack));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipEarLeft))
                     api.ThirdParty.SendString(string.Format("/equip ear1 {0}", settings.Fishing.EquipEarLeft));
-                if (settings.Fishing.EquipEarLeft == settings.Fishing.EquipEarRight) 
+                if (settings.Fishing.EquipEarLeft == settings.Fishing.EquipEarRight)
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipEarRight))
                     api.ThirdParty.SendString(string.Format("/equip ear2 {0}", settings.Fishing.EquipEarRight));
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingLeft))
                     api.ThirdParty.SendString(string.Format("/equip ring1 {0}", settings.Fishing.EquipRingLeft));
-                if (settings.Fishing.EquipRingLeft == settings.Fishing.EquipRingRight) 
+                if (settings.Fishing.EquipRingLeft == settings.Fishing.EquipRingRight)
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 if (!string.IsNullOrEmpty(settings.Fishing.EquipRingRight))
                     api.ThirdParty.SendString(string.Format("/equip ring2 {0}", settings.Fishing.EquipRingRight));

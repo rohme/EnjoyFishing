@@ -14,7 +14,7 @@ namespace MiscTools
 {
     public class PolTool
     {
-        public enum PolStatusKind:int
+        public enum PolStatusKind : int
         {
             Unknown,
             CharacterLoginScreen,
@@ -108,7 +108,7 @@ namespace MiscTools
                 {
                     List<Process> pols = GetPolProcess();
                     bool polFoundFlg = false;
-                    foreach(Process pol in pols)
+                    foreach (Process pol in pols)
                     {
                         if (pol.Id == _ProcessID)
                         {

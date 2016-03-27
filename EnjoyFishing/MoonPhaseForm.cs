@@ -41,7 +41,7 @@ namespace EnjoyFishing
             for (int i = 0; i <= 4; i++)
             {
                 gridMoonPhase.Columns[i].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                gridMoonPhase.Columns[i].HeaderCell.Style.Font = new Font(gridMoonPhase.Font,gridMoonPhase.Font.Style | FontStyle.Bold);
+                gridMoonPhase.Columns[i].HeaderCell.Style.Font = new Font(gridMoonPhase.Font, gridMoonPhase.Font.Style | FontStyle.Bold);
             }
             MoonPhase last = EliteAPIControl.GetMoonPhaseFromVanaTime(v1);
             for (int i = 0; i < 360; i++)

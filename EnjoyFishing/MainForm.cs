@@ -383,7 +383,7 @@ namespace EnjoyFishing
             //起動時に更新
             if (settings.Global.UpdateDB.Enable && settings.Global.UpdateDB.AutoUpdate)
             {
-                btnExecUpdateDB_Click(this,new EventArgs());
+                btnExecUpdateDB_Click(this, new EventArgs());
             }
         }
         /// <summary>
@@ -939,10 +939,10 @@ namespace EnjoyFishing
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             unload();
-            
+
             //PolTool停止
-            pol.SystemAbort(); 
-            
+            pol.SystemAbort();
+
             System.Environment.Exit(0);//プログラム終了
         }
         /// <summary>
@@ -1040,7 +1040,7 @@ namespace EnjoyFishing
                 fishingFlg = false;
                 btnExecFishing.Text = "開　始";
                 bool ret = fishing.FishingAbort();
-                if(iShowStopMessage) setMessage("停止しました");
+                if (iShowStopMessage) setMessage("停止しました");
 
                 //ハラキリボタン有効化
                 btnExecHarakiri.Enabled = true;
@@ -1329,8 +1329,8 @@ namespace EnjoyFishing
                 harakiriFlg = false;
                 btnExecHarakiri.Text = "開　始";
                 bool ret = harakiri.HarakiriAbort();
-                if(iShowStopMessage) setMessage("停止しました");
-                
+                if (iShowStopMessage) setMessage("停止しました");
+
                 //釣りボタン有効化
                 btnExecFishing.Enabled = true;
                 //釣った魚初期化ボタン有効化
@@ -1732,7 +1732,7 @@ namespace EnjoyFishing
             ret += "ビビキー湾 " + getToolTipGuild(iFishing, GuildTimeTableKind.BIBIKI) + "\n";
             ret += "白門　　　 " + getToolTipGuild(iFishing, GuildTimeTableKind.WHITEGATE) + "\n";
             ret += "機船　　　 " + getToolTipGuild(iFishing, GuildTimeTableKind.SHIP) + "\n";
-            */ 
+            */
             return ret;
         }
         private string getToolTipGuild(FishingTool iFishing, GuildTimeTableKind iKind)
@@ -2232,7 +2232,7 @@ namespace EnjoyFishing
                 chkSneakFishing.Enabled = false;
                 txtSneakFishingRemain.Enabled = false;
             }
-            
+
         }
         /// <summary>
         /// 設定保存
@@ -2528,7 +2528,7 @@ namespace EnjoyFishing
                 updateFishingInfoRealTime();
                 //ステータスバー情報更新
                 updateStatusBar(fishing);
-                Thread.Sleep(settings.Global.WaitBase);   
+                Thread.Sleep(settings.Global.WaitBase);
             }
         }
         /// <summary>
@@ -2559,7 +2559,7 @@ namespace EnjoyFishing
                 //Playerステータス
                 lblPlayerStatus.Text = iFishing.PlayerStatus.ToString();
                 //HP
-                lblHP.Text = string.Format("{0}%",iFishing.HpPercent);
+                lblHP.Text = string.Format("{0}%", iFishing.HpPercent);
                 barHP.Value = iFishing.HpPercent;
                 //残り時間
                 lblRemainTime.Text = string.Format("{0}s", iFishing.RemainTimeCurrent);
@@ -3276,7 +3276,7 @@ namespace EnjoyFishing
                 {
                     case "start":
                         logger.Debug("コマンド受信 {0}", cmd[0]);
-                        if(!fishingFlg) startFishing();
+                        if (!fishingFlg) startFishing();
                         break;
                     case "stop":
                         logger.Debug("コマンド受信 {0}", cmd[0]);

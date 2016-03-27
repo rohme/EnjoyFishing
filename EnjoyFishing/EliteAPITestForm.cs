@@ -45,7 +45,7 @@ namespace EnjoyFishing
             dicStatus.Add("エリア", string.Format("{0}({1})", api.Player.ZoneId.ToString("D"), resource.GetZoneName(api.Player.ZoneId)));
             dicStatus.Add("天気", string.Format("{0}({1})", api.Weather.CurrentWeather.ToString("D"), resource.GetWeatherName(api.Weather.CurrentWeather)));
             string statusEffectsStr = string.Empty;
-            foreach(var statusEffect in api.Player.Buffs)
+            foreach (var statusEffect in api.Player.Buffs)
             {
                 if (statusEffect != (int)EliteMMO.API.StatusEffect.Unknown)
                 {
@@ -159,7 +159,7 @@ namespace EnjoyFishing
                 gridChat.Rows[gridChat.Rows.Count - 1].Cells[3].Value = cl.Length;
                 gridChat.Rows[gridChat.Rows.Count - 1].Cells[4].Value = (ChatMode)cl.ChatType;
                 gridChat.Rows[gridChat.Rows.Count - 1].Cells[5].Value = cl.Text;
-                gridChat.FirstDisplayedScrollingRowIndex = gridChat.RowCount-1;
+                gridChat.FirstDisplayedScrollingRowIndex = gridChat.RowCount - 1;
             }
         }
 

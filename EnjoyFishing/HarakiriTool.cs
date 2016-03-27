@@ -79,10 +79,10 @@ namespace EnjoyFishing
             get;
             private set;
         }
-        public string HarakiriFishName 
-        { 
-            get; 
-            set; 
+        public string HarakiriFishName
+        {
+            get;
+            set;
         }
         #endregion
 
@@ -331,7 +331,8 @@ namespace EnjoyFishing
                 control.SetTargetFromId(NPCID_ZALDON);
                 Thread.Sleep(settings.Global.WaitChat);//Wait
                 //プレイヤーステータスがstandingになるまで待機
-                while(api.Player.Status != (uint)Status.Standing){
+                while (api.Player.Status != (uint)Status.Standing)
+                {
                     Thread.Sleep(settings.Global.WaitBase);//wait
                 }
                 //アイテムトレード
@@ -343,7 +344,7 @@ namespace EnjoyFishing
                 var cl = new EliteAPI.ChatEntry();
                 while (this.RunningStatus == RunningStatusKind.Running)
                 {
-                    if (!chat.GetNextChatLine(out cl)) 
+                    if (!chat.GetNextChatLine(out cl))
                     {
                         noResponseCount++;
                         if (noResponseCount > 10)
@@ -354,8 +355,8 @@ namespace EnjoyFishing
                             break;
                         }
                         Thread.Sleep(settings.Global.WaitChat);//wait
-                        continue; 
-                    } 
+                        continue;
+                    }
                     //チャット区分の取得
                     List<string> chatKbnArgs = new List<string>();
                     ChatKbnKind chatKbn = getChatKbnFromChatline(cl, out chatKbnArgs);

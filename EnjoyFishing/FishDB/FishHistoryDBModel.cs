@@ -187,7 +187,6 @@ namespace EnjoyFishing
                     else result.TotalPercent = 0;
                 }
             }
-                        
         }
     }
     public class FishHistoryDBSummaryResultModel
@@ -290,6 +289,5 @@ namespace EnjoyFishing
                 return string.Compare(iFish1.FishName, iFish2.FishName);
             }
         }
-
     }
 }

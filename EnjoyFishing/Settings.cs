@@ -58,9 +58,9 @@ namespace EnjoyFishing
             this.UseItemizer = false;
 
             //設定読み込み
-            if (iPlayerName.Length > 0) 
-            { 
-                Load(iPlayerName); 
+            if (iPlayerName.Length > 0)
+            {
+                Load(iPlayerName);
             }
             else
             {
@@ -216,7 +216,7 @@ namespace EnjoyFishing
 
                 xmlSettings.Player.Add(player);
             }
-            
+
 
             //設定の保存
             for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
@@ -458,7 +458,7 @@ namespace EnjoyFishing
         public int ID3 = 0;
         [XmlAttribute("id4")]
         public int ID4 = 0;
-        public SettingsPlayerFishListWantedModel() : this(string.Empty, 0, 0, 0, 0) {}
+        public SettingsPlayerFishListWantedModel() : this(string.Empty, 0, 0, 0, 0) { }
         public SettingsPlayerFishListWantedModel(string iFishName, int iID1, int iID2, int iID3, int iID4)
         {
             this.FishName = iFishName;
@@ -474,7 +474,7 @@ namespace EnjoyFishing
         }
         public bool Compare(string iFishName, int iID1, int iID2, int iID3, int iID4)
         {
-            if (this.FishName == iFishName && 
+            if (this.FishName == iFishName &&
                 this.ID1 == iID1 && this.ID2 == iID2 && this.ID3 == iID3 && this.ID4 == iID4) return true;
             return false;
         }

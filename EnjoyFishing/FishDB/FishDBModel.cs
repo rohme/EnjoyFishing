@@ -88,7 +88,7 @@ namespace EnjoyFishing
             this.ZoneNames = new List<string>();
             this.BaitNames = new List<string>();
         }
-       public FishDBIdModel GetId(int iID1, int iID2, int iID3, int iID4)
+        public FishDBIdModel GetId(int iID1, int iID2, int iID3, int iID4)
         {
             foreach (FishDBIdModel id in this.IDs)
             {
@@ -176,7 +176,7 @@ namespace EnjoyFishing
             if (other == null) return false;
             return (this.ID1 == other.ID1 && this.ID2 == other.ID2 && this.ID3 == other.ID3 && this.ID4 == other.ID4);
         }
-       public static int SortCountCritical(FishDBIdModel iID1, FishDBIdModel iID2)
+        public static int SortCountCritical(FishDBIdModel iID1, FishDBIdModel iID2)
         {
             //1番目のキー：ItemTypeでソート
             if (iID1.ItemType > iID1.ItemType)

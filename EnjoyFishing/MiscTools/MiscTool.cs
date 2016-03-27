@@ -164,7 +164,7 @@ namespace MiscTools
             Assembly asm = Assembly.GetExecutingAssembly();
             AssemblyName asmn = asm.GetName();
             return asmn.Name;
-        }        
+        }
         /// <summary>
         /// アプリケーションバージョンの取得
         /// </summary>

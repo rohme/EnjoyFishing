@@ -35,11 +35,11 @@ namespace EnjoyFishing
         /// </summary>
         public FishDB()
         {
-            foreach(RodDBRodModel rod in SelectRod())
+            foreach (RodDBRodModel rod in SelectRod())
             {
                 this._Rods.Add(rod.RodName);
             }
-            foreach(BaitDBBaitModel bait in SelectBait())
+            foreach (BaitDBBaitModel bait in SelectBait())
             {
                 this._Baits.Add(bait.BaitName);
             }
@@ -54,7 +54,7 @@ namespace EnjoyFishing
         public List<GearDBGearModel> Gears { get { return _Gears; } }
         public List<EminenceDBEminenceModel> Eminences { get { return _Eminences; } }
         #endregion
-        
+
         #region FishDB
         /// <summary>
         /// 指定された竿の魚情報を取得する
@@ -195,7 +195,8 @@ namespace EnjoyFishing
                     foundFlg = true;
                     fishDB.Fishes[fishIdx].FishName = iFishName;
                     fishDB.Fishes[fishIdx].FishType = iFishType;
-                    if (!fishDB.Fishes[fishIdx].IDs.Contains(iID)) {
+                    if (!fishDB.Fishes[fishIdx].IDs.Contains(iID))
+                    {
                         logger.Info("IDの追加 竿={0} 魚={1} ID={2}", iRodName, iFishName, iID);
                         fishDB.Fishes[fishIdx].IDs.Add(iID);
                     }
@@ -829,10 +830,10 @@ namespace EnjoyFishing
             }
             return string.Format("{0}{1:000}-{2:000}-{3:000}-{4:000}", tmpFishName, iID1, iID2, iID3, iID4);
         }        /// <summary>
-        /// xmlファイルのバージョン番号を取得する
-        /// </summary>
-        /// <param name="iXmlFileName"></param>
-        /// <returns></returns>
+                 /// xmlファイルのバージョン番号を取得する
+                 /// </summary>
+                 /// <param name="iXmlFileName"></param>
+                 /// <returns></returns>
         private string getXmlVersion(string iXmlFileName)
         {
             try

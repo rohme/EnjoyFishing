@@ -94,7 +94,7 @@ namespace EnjoyFishing
         {
             logger.Fatal(e, title);
             string msg = string.Format("補足されないエラーが発生しました。\r詳細はログファイルを参照してください。\r\r{0}\r{1}", e.Message, e.StackTrace);
-            MessageBox.Show(msg, title, MessageBoxButtons.OK,MessageBoxIcon.Stop);
+            MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
         }
     }
 }

@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EliteMMO.API;
-using NLog;
 using EnjoyFishing;
+using NLog;
 
 namespace MiscTools
 {
