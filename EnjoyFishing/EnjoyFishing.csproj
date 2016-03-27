@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,11 +27,10 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -39,7 +39,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -65,8 +65,13 @@
     <ApplicationManifest>EnjoyFishing.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FFACETools">
-      <HintPath>..\..\FFACEToolsJP\bin\Debug\FFACETools.dll</HintPath>
+    <Reference Include="EliteMMO.API, Version=1.2.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\EliteMMO.API.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.3\lib\net40\NLog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,7 +87,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="FishDB\FishHistoryDBModel1_0_5.cs" />
+    <Compile Include="ResourceTool.cs" />
     <Compile Include="MoonPhaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -90,11 +97,11 @@
       <DependentUpon>MoonPhaseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UpdateDBTool.cs" />
-    <Compile Include="FFACETestForm.cs">
+    <Compile Include="EliteAPITestForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FFACETestForm.Designer.cs">
-      <DependentUpon>FFACETestForm.cs</DependentUpon>
+    <Compile Include="EliteAPITestForm.Designer.cs">
+      <DependentUpon>EliteAPITestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FishDB\FishDBModel1_0_0.cs" />
     <Compile Include="FishDB\FishHistoryDBModel1_0_0.cs" />
@@ -120,8 +127,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="MiscTools\ChatTool.cs" />
-    <Compile Include="MiscTools\FFACEControl.cs" />
-    <Compile Include="MiscTools\LoggerTool.cs" />
+    <Compile Include="MiscTools\EliteAPIControl.cs" />
     <Compile Include="MiscTools\PolTool.cs" />
     <Compile Include="MiscTools\PolToolForm.cs">
       <SubType>Form</SubType>
@@ -131,8 +137,8 @@
     </Compile>
     <Compile Include="MiscTools\MiscTool.cs" />
     <Compile Include="Settings.cs" />
-    <EmbeddedResource Include="FFACETestForm.resx">
-      <DependentUpon>FFACETestForm.cs</DependentUpon>
+    <EmbeddedResource Include="EliteAPITestForm.resx">
+      <DependentUpon>EliteAPITestForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -147,6 +153,12 @@
     <EmbeddedResource Include="MiscTools\PolToolForm.resx">
       <DependentUpon>PolToolForm.cs</DependentUpon>
     </EmbeddedResource>
+    <Content Include="EliteAPI.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EliteMMO.API.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="FishDB\Bait.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -156,9 +168,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FFACE.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="FishDB\Eminence.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -170,6 +179,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="EnjoyFishing.ico" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
     <None Include="Resources\IMAGE_MOON03.png" />
     <None Include="Resources\IMAGE_MOON04.png" />
     <None Include="Resources\IMAGE_MOON05.png" />

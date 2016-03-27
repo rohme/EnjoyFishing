@@ -18,7 +18,6 @@ namespace EnjoyFishing
         public bool UseEnternity { get; set; }
         public bool UseItemizer { get; set; }
         public bool UseCancel { get; set; }
-        public SettingsArgsModel Args { get; set; }
         //xmlファイルに保存するメンバ
         public SettingsGlobalModel Global { get; set; }
         public SettingsPlayerFormModel Form { get; set; }
@@ -57,12 +56,11 @@ namespace EnjoyFishing
             this.PolProcID = 0;
             this.UseEnternity = false;
             this.UseItemizer = false;
-            this.Args = new SettingsArgsModel();
 
             //設定読み込み
-            if (iPlayerName.Length > 0) 
-            { 
-                Load(iPlayerName); 
+            if (iPlayerName.Length > 0)
+            {
+                Load(iPlayerName);
             }
             else
             {
@@ -218,7 +216,7 @@ namespace EnjoyFishing
 
                 xmlSettings.Player.Add(player);
             }
-            
+
 
             //設定の保存
             for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
@@ -460,7 +458,7 @@ namespace EnjoyFishing
         public int ID3 = 0;
         [XmlAttribute("id4")]
         public int ID4 = 0;
-        public SettingsPlayerFishListWantedModel() : this(string.Empty, 0, 0, 0, 0) {}
+        public SettingsPlayerFishListWantedModel() : this(string.Empty, 0, 0, 0, 0) { }
         public SettingsPlayerFishListWantedModel(string iFishName, int iID1, int iID2, int iID3, int iID4)
         {
             this.FishName = iFishName;
@@ -476,7 +474,7 @@ namespace EnjoyFishing
         }
         public bool Compare(string iFishName, int iID1, int iID2, int iID3, int iID4)
         {
-            if (this.FishName == iFishName && 
+            if (this.FishName == iFishName &&
                 this.ID1 == iID1 && this.ID2 == iID2 && this.ID3 == iID3 && this.ID4 == iID4) return true;
             return false;
         }
@@ -775,18 +773,6 @@ namespace EnjoyFishing
         {
             this.FishName = string.Empty;
             this.Caught = false;
-        }
-    }
-    public class SettingsArgsModel
-    {
-        public bool LoggerEnable { get; set; }
-        public LogLevelKind LoggerLogLevel { get; set; }
-        public bool LoggerVarDumpEnable { get; set; }
-        public SettingsArgsModel()
-        {
-            LoggerEnable = false;
-            LoggerLogLevel = LogLevelKind.INFO;
-            LoggerVarDumpEnable = false;
         }
     }
 }

@@ -1,11 +1,9 @@
-﻿using MiscTools;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -15,14 +13,13 @@ namespace EnjoyFishing
         private const string FILENAME_HARAKIRIDB = "Harakiri.xml";
         private const string VERSION = "1.0.0";
 
-        private LoggerTool logger;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public HarakiriDB(LoggerTool iLogger)
+        public HarakiriDB()
         {
-            logger = iLogger;
         }
 
         /// <summary>
@@ -94,8 +91,8 @@ namespace EnjoyFishing
                 harakiriDB.Fishes[i].Items.Sort(HarakiriDBItemModel.SortTypeCount);
             }
             //履歴DBに保存
-            FishHistoryDB historyDB = new FishHistoryDB(iPlayerName, iEarthDate, logger);
-            if(historyDB.AddHarakiri(iPlayerName, new FishHistoryDBHarakiriModel(iEarthDate.ToString("yyyy/MM/dd HH:mm:ss"),iVanaDate,iFishName,iItemName)))
+            FishHistoryDB historyDB = new FishHistoryDB(iPlayerName, iEarthDate);
+            if (historyDB.AddHarakiri(iPlayerName, new FishHistoryDBHarakiriModel(iEarthDate.ToString("yyyy/MM/dd HH:mm:ss"), iVanaDate, iFishName, iItemName)))
             {
                 //ハラキリDBに保存
                 return putHarakiriDB(harakiriDB);
@@ -110,33 +107,41 @@ namespace EnjoyFishing
         private HarakiriDBModel getHarakiriDB()
         {
             string xmlFilename = Path.Combine(DIRECTORY_HARAKIRIDB, FILENAME_HARAKIRIDB);
-            HarakiriDBModel harakiridb = new HarakiriDBModel();
-            if (!Directory.Exists(DIRECTORY_HARAKIRIDB))
+            try
             {
-                Directory.CreateDirectory(DIRECTORY_HARAKIRIDB);
-            }
-            if (File.Exists(xmlFilename))
-            {
-                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                HarakiriDBModel harakiridb = new HarakiriDBModel();
+                if (!Directory.Exists(DIRECTORY_HARAKIRIDB))
                 {
-                    try
+                    Directory.CreateDirectory(DIRECTORY_HARAKIRIDB);
+                }
+                if (File.Exists(xmlFilename))
+                {
+                    for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                     {
-                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        try
                         {
-                            XmlSerializer serializer = new XmlSerializer(typeof(HarakiriDBModel));
-                            harakiridb = (HarakiriDBModel)serializer.Deserialize(fs);
-                            fs.Close();
+                            using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                XmlSerializer serializer = new XmlSerializer(typeof(HarakiriDBModel));
+                                harakiridb = (HarakiriDBModel)serializer.Deserialize(fs);
+                                fs.Close();
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    catch (IOException)
-                    {
-                        Thread.Sleep(100);
-                        continue;
+                        catch (IOException)
+                        {
+                            Thread.Sleep(100);
+                            continue;
+                        }
                     }
                 }
+                return harakiridb;
             }
-            return harakiridb;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         /// <summary>
         /// xmlへ書き込む
@@ -147,37 +152,45 @@ namespace EnjoyFishing
         private bool putHarakiriDB(HarakiriDBModel iHarakiriDB)
         {
             string xmlFilename = Path.Combine(DIRECTORY_HARAKIRIDB, FILENAME_HARAKIRIDB);
-            if (!Directory.Exists(DIRECTORY_HARAKIRIDB))
+            try
             {
-                Directory.CreateDirectory(DIRECTORY_HARAKIRIDB);
-            }
+                if (!Directory.Exists(DIRECTORY_HARAKIRIDB))
+                {
+                    Directory.CreateDirectory(DIRECTORY_HARAKIRIDB);
+                }
 
-            for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
-            {
-                try
+                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                 {
-                    using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
+                    try
                     {
-                        using (StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false)))
+                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
                         {
-                            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                            ns.Add(String.Empty, String.Empty);
-                            XmlSerializer serializer = new XmlSerializer(typeof(HarakiriDBModel));
-                            serializer.Serialize(sw, iHarakiriDB, ns);
-                            //書き込み
-                            sw.Flush();
-                            sw.Close();
+                            using (StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false)))
+                            {
+                                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                                ns.Add(String.Empty, String.Empty);
+                                XmlSerializer serializer = new XmlSerializer(typeof(HarakiriDBModel));
+                                serializer.Serialize(sw, iHarakiriDB, ns);
+                                //書き込み
+                                sw.Flush();
+                                sw.Close();
+                            }
                         }
+                        break;
                     }
-                    break;
+                    catch (IOException)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
                 }
-                catch (IOException)
-                {
-                    Thread.Sleep(100);
-                    continue;
-                }
+                return true;
             }
-            return true;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の登録中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
     }
 }

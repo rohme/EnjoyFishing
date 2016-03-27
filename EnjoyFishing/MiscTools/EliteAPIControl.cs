@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using FFACETools;
-using MiscTools;
-using System.IO;
 using System.Threading;
+using EliteMMO.API;
+using EnjoyFishing;
+using NLog;
 
 namespace MiscTools
 {
-    public class FFACEControl
+    public class EliteAPIControl
     {
         private const int DEFAULT_MAX_LOOP_COUNT = 100;
         private const bool DEFAULT_USE_ENTERNITY = true;
@@ -24,10 +24,11 @@ namespace MiscTools
         private const string REGEX_ADDON_END = "EnjoyFishing Addon Check End";
 
         private PolTool pol = null;
-        private FFACE fface = null;
+        private EliteAPI api = null;
         private ChatTool chat = null;
-        private LoggerTool logger = null;
-        
+        private ResourceTool resource = null;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         #region メンバ
         public int MaxLoopCount { get; set; }
         public bool UseEnternity { get; set; }
@@ -39,12 +40,12 @@ namespace MiscTools
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public FFACEControl(PolTool iPOL, ChatTool iChat, LoggerTool iLogger)
+        public EliteAPIControl(PolTool iPOL, ResourceTool iResource, ChatTool iChat)
         {
             this.pol = iPOL;
-            this.fface = iPOL.FFACE;
+            this.api = iPOL.EliteAPI;
             this.chat = iChat;
-            this.logger = iLogger;
+            this.resource = iResource;
             this.MaxLoopCount = DEFAULT_MAX_LOOP_COUNT;
             this.UseEnternity = DEFAULT_USE_ENTERNITY;
             this.BaseWait = DEFAULT_BASE_WAIT;
@@ -61,13 +62,13 @@ namespace MiscTools
         /// <returns>True:見つかった False:見つからなかった</returns>
         public bool WaitChat(ChatTool iChatTool, string iRegexString, int iStartChatIndex, bool iWithEnter)
         {
-            logger.Output(LogLevelKind.INFO, "WaitChat", string.Format("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter));
-            List<FFACE.ChatTools.ChatLine> arrChatLine;
+            logger.Trace("RegexString={0} StartChatIndex={1} WithEnter={1}", iRegexString, iStartChatIndex, iWithEnter);
+            List<EliteAPI.ChatEntry> arrChatLine;
             int currChatIndex = iStartChatIndex;
             for (int i = 0; (i < this.MaxLoopCount); i++)
             {
                 arrChatLine = iChatTool.GetChatLine(currChatIndex);
-                foreach (FFACE.ChatTools.ChatLine cl in arrChatLine)
+                foreach (var cl in arrChatLine)
                 {
                     //チャットの判定
                     if (MiscTool.IsRegexString(cl.Text, iRegexString))
@@ -78,12 +79,12 @@ namespace MiscTools
                 }
                 if (!this.UseEnternity && iWithEnter)
                 {
-                    if (this.fface.Target.ID != 0)
-                        this.fface.Windower.SendKeyPress(KeyCode.EnterKey);///Enter
+                    if (api.Target.GetTargetInfo().TargetIndex != 0)
+                        api.ThirdParty.KeyPress(Keys.RETURN);///Enter
                 }
                 System.Threading.Thread.Sleep(this.ChatWait);
             }
-            logger.Output(LogLevelKind.WARN, "WaitChat", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         #endregion
@@ -97,22 +98,22 @@ namespace MiscTools
         /// <returns>True:ダイアログが表示された False:ダイアログが表示されなかった</returns>
         public bool WaitOpenDialog(string iDialogString, bool iEnter)
         {
-            logger.Output(LogLevelKind.INFO, "WaitOpenDialog", string.Format("DialogString={0} Enter={1}", iDialogString, iEnter));
+            logger.Trace("DialogString={0} Enter={1}", iDialogString, iEnter);
             for (int i = 0; (i < this.MaxLoopCount); i++)
             {
                 Regex reg = new Regex(iDialogString, RegexOptions.IgnoreCase);
-                Match ma = reg.Match(this.fface.Menu.DialogText.Question);
-                if (this.fface.Menu.IsOpen && ma.Success)
+                Match ma = reg.Match(api.Dialog.GetDialog().Question);
+                if (api.Menu.IsMenuOpen && ma.Success)
                 {
                     return true;
                 }
                 if (!this.UseEnternity && iEnter)
                 {
-                    this.fface.Windower.SendKeyPress(KeyCode.EnterKey);//ENTER
+                    api.ThirdParty.KeyPress(Keys.RETURN);///Enter
                 }
                 System.Threading.Thread.Sleep(this.BaseWait);
             }
-            logger.Output(LogLevelKind.WARN, "WaitOpenDialog", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         /// <summary>
@@ -123,55 +124,55 @@ namespace MiscTools
         /// <returns></returns>
         public bool SetDialogOptionIndex(short iIdx, bool iWithEnter)
         {
-            logger.Output(LogLevelKind.INFO, "SetDialogOptionIndex", string.Format("iIdx={0} iWithEnter={1}", iIdx, iWithEnter));
+            logger.Trace("iIdx={0} iWithEnter={1}", iIdx, iWithEnter);
             for (int i = 0; i < this.MaxLoopCount; i++)
             {
-                if (this.fface.Menu.DialogOptionIndex == iIdx)
+                if (api.Dialog.DialogIndex == iIdx)
                 {
                     if (iWithEnter)
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.EnterKey);///Enter
+                        api.ThirdParty.KeyPress(Keys.RETURN);///Enter
                     }
                     return true;
                 }
-                else if (this.fface.Menu.DialogOptionIndex > iIdx)
+                else if (api.Dialog.DialogIndex > iIdx)
                 {
-                    if ((this.fface.Menu.DialogOptionIndex - iIdx) >= 3)
+                    if ((api.Dialog.DialogIndex - iIdx) >= 3)
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.LeftArrow);//右矢印
+                        api.ThirdParty.KeyPress(Keys.LEFT);//左矢印
                     }
                     else
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.UpArrow);//上矢印
+                        api.ThirdParty.KeyPress(Keys.UP);//上矢印
                     }
                 }
-                else if (this.fface.Menu.DialogOptionIndex < iIdx)
+                else if (api.Dialog.DialogIndex < iIdx)
                 {
-                    if ((iIdx - this.fface.Menu.DialogOptionIndex) >= 3)
+                    if ((iIdx - api.Dialog.DialogIndex) >= 3)
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.RightArrow);//左矢印
+                        api.ThirdParty.KeyPress(Keys.RIGHT);//右矢印
                     }
                     else
                     {
-                        this.fface.Windower.SendKeyPress(KeyCode.DownArrow);//下矢印
+                        api.ThirdParty.KeyPress(Keys.DOWN);//下矢印
                     }
                 }
                 System.Threading.Thread.Sleep(this.BaseWait);
             }
-            logger.Output(LogLevelKind.WARN, "SetDialogOptionIndex", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         /// <summary>
         /// 選択されたOptionIndexを返す
         /// </summary>
         /// <returns></returns>
-        public short GetSelectedOptionIndex()
+        public ushort GetSelectedOptionIndex()
         {
-            short lastDialogId = this.fface.Menu.DialogID;
-            short lastOptionIndex = 0;
-            while (this.fface.Menu.DialogID == lastDialogId)
+            int lastDialogId = api.Dialog.DialogId;
+            ushort lastOptionIndex = 0;
+            while (api.Dialog.DialogId == lastDialogId)
             {
-                lastOptionIndex = this.fface.Menu.DialogOptionIndex;
+                lastOptionIndex = api.Dialog.DialogIndex;
                 System.Threading.Thread.Sleep(10);
             }
             return lastOptionIndex;
@@ -185,9 +186,9 @@ namespace MiscTools
             if (iTryCount == -1) iTryCount = this.MaxLoopCount;
             for (int i = 0; i < iTryCount; i++)
             {
-                if (fface.Menu.IsOpen)
+                if (api.Menu.IsMenuOpen)
                 {
-                    fface.Windower.SendKeyPress(KeyCode.EscapeKey);
+                    api.ThirdParty.KeyPress(Keys.ESCAPE);
                     Thread.Sleep(this.BaseWait);
                 }
                 else
@@ -198,7 +199,20 @@ namespace MiscTools
             return false;
         }
         #endregion
-        
+
+        #region メニュー関連
+        public string GetMenuHelpName()
+        {
+            var b = Encoding.GetEncoding(1252).GetBytes(api.Menu.HelpName);
+            return Encoding.GetEncoding(932).GetString(b);
+        }
+        public string GetMenuHelpDescription()
+        {
+            var b = Encoding.GetEncoding(1252).GetBytes(api.Menu.HelpDescription);
+            return Encoding.GetEncoding(932).GetString(b);
+        }
+        #endregion
+
         #region Plugin Addon関連
         /// <summary>
         /// 実行中のプラグイン名を取得する
@@ -206,11 +220,11 @@ namespace MiscTools
         /// <returns>プラグイン名</returns>
         public List<string> GetPlugin()
         {
-            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn) return new List<string>();
+            if (api.Player.LoginStatus != (int)LoginStatus.LoggedIn) return new List<string>();
             chat.Reset();
-            fface.Windower.SendString("//plugin_list");
+            api.ThirdParty.SendString("//plugin_list");
             List<string> ret = new List<string>();
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            var cl = new EliteAPI.ChatEntry();
             for (int i = 0; i < this.MaxLoopCount && !MiscTool.IsRegexString(cl.Text, REGEX_PLUGIN_END); i++)
             {
                 while (chat.GetNextChatLine(out cl))
@@ -236,13 +250,13 @@ namespace MiscTools
         /// <returns>アドオン名</returns>
         public List<string> GetAddon()
         {
-            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn) return new List<string>();
+            if (api.Player.LoginStatus != (int)LoginStatus.LoggedIn) return new List<string>();
             chat.Reset();
-            fface.Windower.SendString("//lua list");
+            api.ThirdParty.SendString("//lua list");
             Thread.Sleep(this.BaseWait);
-            fface.Windower.SendString("/echo " + REGEX_ADDON_END);
+            api.ThirdParty.SendString("/echo " + REGEX_ADDON_END);
             List<string> ret = new List<string>();
-            FFACE.ChatTools.ChatLine cl = new FFACE.ChatTools.ChatLine();
+            var cl = new EliteAPI.ChatEntry();
             for (int i = 0; i < this.MaxLoopCount && !MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END); i++)
             {
                 while (chat.GetNextChatLine(out cl))
@@ -269,40 +283,46 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>アイテム数</returns>
-        public short GetInventoryCountByType(InventoryType iInventoryType)
+        public int GetInventoryCountByType(InventoryType iInventoryType)
         {
-            short cnt = 0;
-            if (iInventoryType == InventoryType.Inventory) cnt = fface.Item.InventoryCount;
-            else if (iInventoryType == InventoryType.Safe) cnt = fface.Item.SafeCount;
-            else if (iInventoryType == InventoryType.Storage) cnt = fface.Item.StorageCount;
-            else if (iInventoryType == InventoryType.Locker) cnt = fface.Item.LockerCount;
-            else if (iInventoryType == InventoryType.Satchel) cnt = fface.Item.SatchelCount;
-            else if (iInventoryType == InventoryType.Sack) cnt = fface.Item.SackCount;
-            else if (iInventoryType == InventoryType.Temp) cnt = fface.Item.TemporaryCount;
-            else if (iInventoryType == InventoryType.Case) cnt = fface.Item.CaseCount;
-            else if (iInventoryType == InventoryType.Wardrobe) cnt = fface.Item.WardrobeCount;
-            if (cnt > 0) return cnt;
-            return 0;
+            return api.Inventory.GetContainerCount((int)iInventoryType);
         }
         /// <summary>
         /// 指定された倉庫のアイテムMAX数を取得する
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>アイテムMAX数</returns>
-        public short GetInventoryMaxByType(InventoryType iInventoryType)
+        public int GetInventoryMaxByType(InventoryType iInventoryType)
         {
-            short cnt = 0;
-            if (iInventoryType == InventoryType.Inventory) cnt = fface.Item.InventoryMax;
-            else if (iInventoryType == InventoryType.Safe) cnt = fface.Item.SafeMax;
-            else if (iInventoryType == InventoryType.Storage) cnt = fface.Item.StorageMax;
-            else if (iInventoryType == InventoryType.Locker) cnt = fface.Item.LockerMax;
-            else if (iInventoryType == InventoryType.Satchel) cnt = fface.Item.SatchelMax;
-            else if (iInventoryType == InventoryType.Sack) cnt = fface.Item.SackMax;
-            else if (iInventoryType == InventoryType.Temp) cnt = fface.Item.TemporaryMax;
-            else if (iInventoryType == InventoryType.Case) cnt = fface.Item.CaseMax;
-            else if (iInventoryType == InventoryType.Wardrobe) cnt = fface.Item.WardrobeMax;
-            if (cnt > 0) return cnt;
-            else return 0;
+            return api.Inventory.GetContainerMaxCount((int)iInventoryType);
+        }
+        /// <summary>
+        /// 指定された倉庫タイプに入っているアイテム数を取得
+        /// </summary>
+        /// <param name="iItemName"></param>
+        /// <param name="iInventoryType"></param>
+        /// <returns></returns>
+        public int GetInventoryItemCount(string iItemName, InventoryType iInventoryType)
+        {
+            var item = resource.GetItem(iItemName);
+            if (item.Name[1] != iItemName) return 0;
+            return GetInventoryItemCount(item.ItemID, iInventoryType);
+        }
+        /// <summary>
+        /// 指定された倉庫タイプに入っているアイテム数を取得
+        /// </summary>
+        /// <param name="iItemName"></param>
+        /// <param name="iInventoryType"></param>
+        /// <returns></returns>
+        public int GetInventoryItemCount(uint iItemID, InventoryType iInventoryType)
+        {
+            int ret = 0;
+            for (int i = 0; i < 80; i++)
+            {
+                var item = api.Inventory.GetContainerItem((int)iInventoryType, i);
+                if (item.Id == iItemID) ret += (int)item.Count;
+            }
+            return ret;
         }
         /// <summary>
         /// Itemizerでアイテムを鞄に移動する
@@ -310,14 +330,14 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns></returns>
-        public bool GetItem(string iItemName, InventoryType iInventoryType)
+        public bool GetItemizer(string iItemName, InventoryType iInventoryType)
         {
             //移動元に指定のアイテムが存在するかチェック
             if (!IsExistItem(iItemName, iInventoryType)) return false;
             //移動先に空きがあるかチェック
             if (!IsInventoryFree(InventoryType.Inventory)) return false;
             //Itemizer実行
-            string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), fface.Player.Name);
+            string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), api.Player.Name);
             //string cmd = string.Format("input /gets \"{0}\" {1}", iItemName, iInventoryType.ToString());
             //return ExecScript(cmd, scriptName);
             string cmd = string.Format("windower.send_command(\"input //get {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
@@ -329,14 +349,14 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>成功した場合Trueを返す</returns>
-        public bool PutItem(string iItemName, InventoryType iInventoryType)
+        public bool PutItemizer(string iItemName, InventoryType iInventoryType)
         {
             //移動元に指定のアイテムが存在するかチェック
             if (!IsExistItem(iItemName, InventoryType.Inventory)) return false;
             //移動先に空きがあるかチェック
             if (!IsInventoryFree(iInventoryType)) return false;
             //Itemizer実行
-            string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), fface.Player.Name);
+            string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), api.Player.Name);
             //string cmd = string.Format("input /puts \"{0}\" {1}", iItemName, iInventoryType.ToString());
             //return ExecScript(cmd, scriptName);
             string cmd = string.Format("windower.send_command(\"input //puts {0} {1}\")", iItemName, iInventoryType.ToString().ToLower());
@@ -347,15 +367,14 @@ namespace MiscTools
         /// </summary>
         /// <param name="iItemName"></param>
         /// <returns></returns>
-        public InventoryType GetInventoryTypeFromItemName(string iItemName)
+        public InventoryType? GetInventoryTypeFromItemName(string iItemName)
         {
-            ushort id = (ushort)FFACE.ParseResources.GetItemID(iItemName);
-            if (fface.Item.GetInventoryItemCount(id) > 0) return InventoryType.Inventory;
-            if (fface.Item.GetSackItemCount(id) > 0) return InventoryType.Sack;
-            if (fface.Item.GetSatchelItemCount(id) > 0) return InventoryType.Satchel;
-            if (fface.Item.GetCaseItemCount(id) > 0) return InventoryType.Case;
-            if (fface.Item.GetWardrobeItemCount(id) > 0) return InventoryType.Wardrobe;
-            return InventoryType.None;
+            if (GetInventoryItemCount(iItemName, InventoryType.Inventory) > 0) return InventoryType.Inventory;
+            if (GetInventoryItemCount(iItemName, InventoryType.Sack) > 0) return InventoryType.Sack;
+            if (GetInventoryItemCount(iItemName, InventoryType.Satchel) > 0) return InventoryType.Satchel;
+            if (GetInventoryItemCount(iItemName, InventoryType.Case) > 0) return InventoryType.Case;
+            if (GetInventoryItemCount(iItemName, InventoryType.Wardrobe) > 0) return InventoryType.Wardrobe;
+            return null;
         }
         /// <summary>
         /// 指定した倉庫タイプにアイテムが存在するか否か
@@ -365,12 +384,7 @@ namespace MiscTools
         /// <returns>存在した場合Trueを返す</returns>
         public bool IsExistItem(string iItemName, InventoryType iInventoryType)
         {
-            //アイテムIDの取得
-            int itemId = FFACE.ParseResources.GetItemId(iItemName);
-            if (itemId == 0) return false;
-            //指定のアイテムが存在するかチェック
-            if (fface.Item.GetItemCount(itemId, iInventoryType) > 0) return true;
-            return false;
+            return GetInventoryItemCount(iItemName, iInventoryType) > 0;
         }
         /// <summary>
         /// 指定した倉庫タイプに空きがあるか否か
@@ -379,34 +393,36 @@ namespace MiscTools
         /// <returns>空きがある場合にはTrueを返す</returns>
         public bool IsInventoryFree(InventoryType iInventoryType)
         {
-            switch (iInventoryType)
+            return GetInventoryCountByType(iInventoryType) < GetInventoryMaxByType(iInventoryType);
+        }
+        /// <summary>
+        /// 指定された鞄からアイテムインデックスを取得する
+        /// </summary>
+        /// <param name="iItemName"></param>
+        /// <param name="iInventoryType"></param>
+        /// <returns></returns>
+        public int GetInventoryFirstItemIndex(string iItemName, InventoryType iInventoryType)
+        {
+            uint id = resource.GetItem(iItemName).ItemID;
+            return GetInventoryFirstItemIndex(id, iInventoryType);
+        }
+        /// <summary>
+        /// 指定された鞄からアイテムインデックスを取得する
+        /// </summary>
+        /// <param name="iItemID"></param>
+        /// <param name="iInventoryType"></param>
+        /// <returns></returns>
+        public int GetInventoryFirstItemIndex(uint iItemID, InventoryType iInventoryType)
+        {
+            for (int i = 1; i <= 80; i++)
             {
-                case InventoryType.Inventory:
-                    if (fface.Item.InventoryCount < fface.Item.InventoryMax) return true;
-                    break;
-                case InventoryType.Safe:
-                    if (fface.Item.SafeCount < fface.Item.SafeMax) return true;
-                    break;
-                case InventoryType.Storage:
-                    if (fface.Item.StorageCount < fface.Item.StorageMax) return true;
-                    break;
-                case InventoryType.Locker:
-                    if (fface.Item.LockerCount < fface.Item.LockerMax) return true;
-                    break;
-                case InventoryType.Satchel:
-                    if (fface.Item.SatchelCount < fface.Item.SatchelMax) return true;
-                    break;
-                case InventoryType.Sack:
-                    if (fface.Item.SackCount < fface.Item.SackMax) return true;
-                    break;
-                case InventoryType.Case:
-                    if (fface.Item.CaseCount < fface.Item.CaseMax) return true;
-                    break;
-                case InventoryType.Wardrobe:
-                    if (fface.Item.WardrobeCount < fface.Item.WardrobeMax) return true;
-                    break;
+                var item = api.Inventory.GetContainerItem((int)iInventoryType, i);
+                if (item.Id == iItemID)
+                {
+                    return item.Index;
+                }
             }
-            return false;
+            return 0;
         }
         #endregion
 
@@ -422,7 +438,7 @@ namespace MiscTools
             try
             {
                 string fileName = string.Format("{0}.txt", iScriptName);
-                string fullFileName = Path.Combine(FFACEControl.GetWindowerPath(), "scripts", fileName);
+                string fullFileName = Path.Combine(EliteAPIControl.GetWindowerPath(), "scripts", fileName);
                 //既存スクリプト削除
                 if (File.Exists(fullFileName)) File.Delete(fullFileName);
                 //スクリプトファイル作成
@@ -433,13 +449,13 @@ namespace MiscTools
                 }
                 if (!File.Exists(fullFileName)) return false;
                 //スクリプトファイル実行
-                fface.Windower.SendString(string.Format("//exec {0}", fileName));
+                api.ThirdParty.SendString(string.Format("//exec {0}", fileName));
                 //スクリプト削除
                 //if (File.Exists(fullName)) File.Delete(fullName);
             }
             catch (Exception e)
             {
-                logger.Output(LogLevelKind.ERROR, e.Message);
+                logger.Error(e, "スクリプト実行エラー");
                 return false;
             }
             return true;
@@ -454,7 +470,7 @@ namespace MiscTools
         {
             try
             {
-                string fullName = Path.Combine(FFACEControl.GetWindowerPath(), "scripts", string.Format("{0}.lua", iLuaName));
+                string fullName = Path.Combine(EliteAPIControl.GetWindowerPath(), "scripts", string.Format("{0}.lua", iLuaName));
                 //既存スクリプト削除
                 if (File.Exists(fullName)) File.Delete(fullName);
                 //スクリプトファイル作成
@@ -465,13 +481,13 @@ namespace MiscTools
                 }
                 if (!File.Exists(fullName)) return false;
                 //スクリプトファイル実行
-                fface.Windower.SendString(string.Format("//lua e {0}", iLuaName));
+                api.ThirdParty.SendString(string.Format("//lua e {0}", iLuaName));
                 //スクリプト削除
                 //if (File.Exists(fullName)) File.Delete(fullName);
             }
             catch (Exception e)
             {
-                logger.Output(LogLevelKind.ERROR, e.Message);
+                logger.Error(e, "Lua実行エラー");
                 return false;
             }
             return true;
@@ -482,40 +498,20 @@ namespace MiscTools
         /// <summary>
         /// 指定したNPCをターゲットする
         /// </summary>
-        /// <param name="iId">NpcID</param>
+        /// <param name="iIndex">NpcID</param>
         /// <returns>True:ターゲット完了 False:ターゲット出来なかった</returns>
-        public bool SetTargetFromId(int iId, bool iWithEnter = false)
+        public bool SetTargetFromId(int iIndex, bool iWithEnter = false)
         {
-            logger.Output(LogLevelKind.DEBUG,  "SetTargetFromId", string.Format("Id={0} WithEnter={1}", iId, iWithEnter));
-            //ToDo:FFACEが修正されるまでTABを使用するように暫定対応
-            //for (int i = 0; i < this.MaxLoopCount; i++)
-            //{
-            //    fface.Target.SetNPCTarget(iId);
-            //    System.Threading.Thread.Sleep(this.BaseWait);
-            //    fface.Windower.SendString("/ta <t>");
-            //    System.Threading.Thread.Sleep(this.BaseWait);
-            //    if (iWithEnter)
-            //    {
-            //        fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
-            //        System.Threading.Thread.Sleep(this.ChatWait);//Wait
-            //    }
-            //    if (fface.Target.ID == iId) return true;
-            //}
-            for (int i= 0; i < this.MaxLoopCount; i++)
+            logger.Trace("Index={0} WithEnter={1}", iIndex, iWithEnter);
+            for (int i = 0; i < this.MaxLoopCount; i++)
             {
-                fface.Windower.SendKeyPress(KeyCode.TabKey);//Tab
-                System.Threading.Thread.Sleep(this.BaseWait);
-                if (fface.Target.ID == iId) 
-                {
-                    if (iWithEnter)
-                    {
-                        fface.Windower.SendKeyPress(KeyCode.EnterKey);//Enter
-                        System.Threading.Thread.Sleep(this.ChatWait);//Wait
-                    }
-                    return true; 
-                }
+                if (api.Target.GetTargetInfo().TargetIndex == iIndex)
+                    return true;
+                else
+                    api.Target.SetTarget(iIndex);
+                Thread.Sleep(this.ChatWait);
             }
-            logger.Output(LogLevelKind.WARN, "SetTargetFromId", "タイムアウトしました");
+            logger.Warn("タイムアウトしました");
             return false;
         }
         #endregion
@@ -526,10 +522,9 @@ namespace MiscTools
         /// </summary>
         /// <param name="iStatusEffect">BUFF</param>
         /// <returns>指定したBUFFがかかっていたらTRUEを返す</returns>
-        public bool IsBuff(StatusEffect iStatusEffect)
+        public bool IsBuff(EliteMMO.API.StatusEffect iStatusEffect)
         {
-            if (fface.Player.StatusEffects.Contains(iStatusEffect)) return true;
-            return false;
+            return api.Player.Buffs.Contains((short)iStatusEffect);
         }
         #endregion
 
@@ -537,11 +532,11 @@ namespace MiscTools
         /// <summary>
         /// キー連打
         /// </summary>
-        public void BarrageAnyKey(KeyCode iKeyCode, int iCount)
+        public void BarrageAnyKey(Keys iKeyCode, int iCount)
         {
             for (int i = 0; i < iCount; i++)
             {
-                this.fface.Windower.SendKeyPress(iKeyCode);
+                api.ThirdParty.KeyPress(iKeyCode);
                 System.Threading.Thread.Sleep(100);
             }
         }
@@ -553,11 +548,11 @@ namespace MiscTools
         /// </summary>
         /// <param name="iEarthDate">地球時間</param>
         /// <returns>ヴァナ時間</returns>
-        public static FFACETools.FFACE.TimerTools.VanaTime GetVanaTimeFromEarthTime(DateTime iEarthDate)
+        public static VanaTime GetVanaTimeFromEarthTime(DateTime iEarthDate)
         {
             //地球時間 2002/01/01 00:00:00 = 天晶暦 0886/01/01 00:00:00
             //一年＝３６０日 一ヶ月＝３０日 一日＝２４時間 一時間＝６０分 一分＝６０秒
-            var ret = new FFACE.TimerTools.VanaTime();
+            var ret = new VanaTime();
             DateTime baseDate = new DateTime(2002, 1, 1, 0, 0, 0);
             DateTime nowDate = new DateTime(iEarthDate.Year, iEarthDate.Month, iEarthDate.Day, iEarthDate.Hour, iEarthDate.Minute, iEarthDate.Second);
             long baseTicks = baseDate.Ticks / 10000000L;
@@ -565,7 +560,7 @@ namespace MiscTools
             long vanaTicks = (nowTicks - baseTicks) * 25L;
             //年
             double year = vanaTicks / (360D * 24D * 60D * 60D);
-            ret.Year = (short)(Math.Floor(year) + 886D);
+            ret.Year = (uint)(Math.Floor(year) + 886D);
             //月
             ret.Month = (byte)((vanaTicks % (360D * 24D * 60D * 60D)) / (30D * 24D * 60D * 60D) + 1);
             //日
@@ -589,17 +584,17 @@ namespace MiscTools
         /// </summary>
         /// <param name="iVanaDate"></param>
         /// <returns></returns>
-        public static DateTime GetEarthTimeFromVanaTime(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        public static DateTime GetEarthTimeFromVanaTime(VanaTime iVanaTime)
         {
             //地球時間 2002/01/01 00:00:00 = 天晶暦 0886/01/01 00:00:00
             //一年＝３６０日 一ヶ月＝３０日 一日＝２４時間 一時間＝６０分 一分＝６０秒
             long baseTicks = (886L * 360L * 24L * 60L * 60L) + (30L * 24L * 60L * 60L) + (24L * 60L * 60L);
-            long vanaTicks = (iVanaDate.Year * 12L * 30L * 24L * 60L * 60L) +
-                            (iVanaDate.Month * 30L * 24L * 60L * 60L) +
-                            (iVanaDate.Day * 24L * 60L * 60L) +
-                            (iVanaDate.Hour * 60L * 60L) +
-                            (iVanaDate.Minute * 60L) +
-                            (long)iVanaDate.Second;
+            long vanaTicks = (iVanaTime.Year * 12L * 30L * 24L * 60L * 60L) +
+                            (iVanaTime.Month * 30L * 24L * 60L * 60L) +
+                            (iVanaTime.Day * 24L * 60L * 60L) +
+                            (iVanaTime.Hour * 60L * 60L) +
+                            (iVanaTime.Minute * 60L) +
+                            (long)iVanaTime.Second;
             long addseconds = (((vanaTicks - baseTicks) / 25L));
             DateTime ret = new DateTime(2002, 1, 1, 0, 0, 0);
             ret = ret.AddSeconds(addseconds);
@@ -610,9 +605,9 @@ namespace MiscTools
         /// </summary>
         /// <param name="iVanaDate">ヴァナ日付</param>
         /// <returns>月齢</returns>
-        public static MoonPhase GetMoonPhaseFromVanaTime(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        public static MoonPhase GetMoonPhaseFromVanaTime(VanaTime iVanaTime)
         {
-            long vanaTicks = getVanaTicks(iVanaDate);
+            long vanaTicks = getVanaTicks(iVanaTime);
             double moonPhase = (byte)((vanaTicks % (12D * 7D * 24D * 60D * 60D)) / (7D * 24D * 60D * 60D));
             return (MoonPhase)moonPhase;
         }
@@ -621,9 +616,9 @@ namespace MiscTools
         /// </summary>
         /// <param name="iVanaDate"></param>
         /// <returns></returns>
-        public static Weekday GetWeekdayFromVanaTime(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        public static Weekday GetWeekdayFromVanaTime(VanaTime iVanaTime)
         {
-            long vanaTicks = getVanaTicks(iVanaDate);
+            long vanaTicks = getVanaTicks(iVanaTime);
             double dayType = (byte)((vanaTicks % (8D * 24D * 60D * 60D)) / (24D * 60D * 60D));
             return (Weekday)dayType;
         }
@@ -632,15 +627,15 @@ namespace MiscTools
         /// </summary>
         /// <param name="iVanaDate">ヴァナ日付</param>
         /// <returns>Ticks</returns>
-        private static long getVanaTicks(FFACETools.FFACE.TimerTools.VanaTime iVanaDate)
+        private static long getVanaTicks(VanaTime iVanaTime)
         {
             long baseTicks = (886L * 360L * 24L * 60L * 60L) + (30L * 24L * 60L * 60L) + (24L * 60L * 60L);
-            long vanaTicks = (iVanaDate.Year * 12L * 30L * 24L * 60L * 60L) +
-                            (iVanaDate.Month * 30L * 24L * 60L * 60L) +
-                            (iVanaDate.Day * 24L * 60L * 60L) +
-                            (iVanaDate.Hour * 60L * 60L) +
-                            (iVanaDate.Minute * 60L) +
-                            (long)iVanaDate.Second;
+            long vanaTicks = (iVanaTime.Year * 12L * 30L * 24L * 60L * 60L) +
+                            (iVanaTime.Month * 30L * 24L * 60L * 60L) +
+                            (iVanaTime.Day * 24L * 60L * 60L) +
+                            (iVanaTime.Hour * 60L * 60L) +
+                            (iVanaTime.Minute * 60L) +
+                            (long)iVanaTime.Second;
             return vanaTicks - baseTicks;
         }
         /// <summary>
@@ -649,9 +644,17 @@ namespace MiscTools
         /// <param name="iVanaTime"></param>
         /// <param name="iAddDays"></param>
         /// <returns></returns>
-        public static FFACE.TimerTools.VanaTime addVanaDay(FFACE.TimerTools.VanaTime iVanaTime, int iAddDays = 1)
+        public static VanaTime addVanaDay(VanaTime iVanaTime, int iAddDays = 1)
         {
-            var ret = iVanaTime;
+            var ret = new VanaTime()
+            {
+                Year = iVanaTime.Year,
+                Month = iVanaTime.Month,
+                Day = iVanaTime.Day,
+                Hour = iVanaTime.Hour,
+                Minute = iVanaTime.Minute,
+                Second = iVanaTime.Second,
+            };
             for (int i = 0; i < iAddDays; i++)
             {
                 ret.Day++;
@@ -668,7 +671,20 @@ namespace MiscTools
             }
             return ret;
         }
-
+        public VanaTime GetVanaTime()
+        {
+            VanaTime ret = new VanaTime();
+            ret.Year = api.VanaTime.CurrentYear;
+            ret.Month = api.VanaTime.CurrentMonth;
+            ret.Day = api.VanaTime.CurrentDay;
+            ret.Hour = api.VanaTime.CurrentHour;
+            ret.Minute = api.VanaTime.CurrentMinute;
+            ret.Second = api.VanaTime.CurrentSecond;
+            ret.DayType = (Weekday)api.VanaTime.CurrentDay;
+            ret.MoonPhase = (MoonPhase)api.VanaTime.CurrentMoonPhase;
+            ret.MoonPercent = api.VanaTime.CurrentMoonPercent;
+            return ret;
+        }
         #endregion
 
         #region その他
@@ -694,5 +710,42 @@ namespace MiscTools
             return ret;
         }
         #endregion
+    }
+
+    public struct VanaTime
+    {
+        public uint Year { get; set; }
+        public uint Month { get; set; }
+        public uint Day { get; set; }
+        public uint Hour { get; set; }
+        public uint Minute { get; set; }
+        public uint Second { get; set; }
+        public Weekday DayType { get; set; }
+        public uint MoonPercent { get; set; }
+        public MoonPhase MoonPhase { get; set; }
+
+        public override string ToString()
+        {
+            string vTime = Month + "/" + Day + "/" + Year + ", "
+                         + DayType + ", "
+                         + Hour + ":";
+
+            if (10 > Minute)
+                vTime += "0" + Minute + ", "
+                 + MoonPhase + " (" + MoonPercent + "%)";
+            else
+                vTime += Minute + ", "
+                 + MoonPhase + " (" + MoonPercent + "%)";
+
+            return vTime;
+
+        }
+    }
+    public class Position
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public float H { get; set; }
     }
 }

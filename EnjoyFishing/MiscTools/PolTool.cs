@@ -4,22 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FFACETools;
 using System.Diagnostics;
 using System.Threading;
+using EliteMMO.API;
+using EnjoyFishing;
+using NLog;
 
 namespace MiscTools
 {
     public class PolTool
     {
-        public enum PolStatusKind:int
+        public enum PolStatusKind : int
         {
             Unknown,
             CharacterLoginScreen,
             LoggedIn,
         }
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private PolStatusKind _Status = PolStatusKind.Unknown;
-        private FFACE _FFACE;
+        private EliteAPI _EliteAPI;
         private int _ProcessID = 0;
         private Thread thPol;
 
@@ -51,11 +54,12 @@ namespace MiscTools
                 ChangeStatus(this, e);
             }
         }
-        private void EventChangeStatus(PolStatusKind iFishResultStatus)
+        private void EventChangeStatus(PolStatusKind iPolStatus)
         {
+            logger.Trace("PolStatus変更:{0}", iPolStatus);
             //返すデータの設定
             ChangeStatusEventArgs e = new ChangeStatusEventArgs();
-            e.PolStatus = iFishResultStatus;
+            e.PolStatus = iPolStatus;
             //イベントの発生
             OnChangeStatus(e);
         }
@@ -63,11 +67,11 @@ namespace MiscTools
 
         #region メンバ
         /// <summary>
-        /// FFACE
+        /// EliteAPI
         /// </summary>
-        public FFACE FFACE
+        public EliteAPI EliteAPI
         {
-            get { return _FFACE; }
+            get { return _EliteAPI; }
         }
         /// <summary>
         /// POLステータス
@@ -97,14 +101,14 @@ namespace MiscTools
         /// </summary>
         private void threadPol()
         {
-            FFACETools.LoginStatus lastStatus = FFACETools.LoginStatus.Loading;
+            LoginStatus lastStatus = LoginStatus.Loading;
             while (true)
             {
-                if (_FFACE != null)
+                if (_EliteAPI != null)
                 {
                     List<Process> pols = GetPolProcess();
                     bool polFoundFlg = false;
-                    foreach(Process pol in pols)
+                    foreach (Process pol in pols)
                     {
                         if (pol.Id == _ProcessID)
                         {
@@ -118,17 +122,17 @@ namespace MiscTools
                         continue;
                     }
 
-                    FFACETools.LoginStatus status = _FFACE.Player.GetLoginStatus;
-                    if (status != FFACETools.LoginStatus.Loading)
+                    LoginStatus status = (LoginStatus)_EliteAPI.Player.LoginStatus;
+                    if (status != LoginStatus.Loading)
                     {
                         if (status != lastStatus)
                         {
                             switch (status)
                             {
-                                case FFACETools.LoginStatus.CharacterLoginScreen:
+                                case LoginStatus.CharacterLoginScreen:
                                     changeStatus(PolStatusKind.CharacterLoginScreen);
                                     break;
-                                case FFACETools.LoginStatus.LoggedIn:
+                                case LoginStatus.LoggedIn:
                                     changeStatus(PolStatusKind.LoggedIn);
                                     break;
                             }
@@ -167,7 +171,7 @@ namespace MiscTools
             }
             if (polId > 0)
             {
-                _FFACE = new FFACE(polId);
+                _EliteAPI = new EliteAPI(polId);
                 this._ProcessID = polId;
                 return true;
             }

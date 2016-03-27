@@ -1,8 +1,11 @@
 # ![EnjoyFishing](http://i.imgur.com/pmstLip.png)EnjoyFishing
 
+[![Master status](https://ci.appveyor.com/api/projects/status/x4bkwg1snstpwxp8?svg=true&passingText=master%20-%20OK&failingText=master%20-%20NG)](https://ci.appveyor.com/project/rohme/enjoyfishing)
+[![Develop status](https://ci.appveyor.com/api/projects/status/ton6b0akaxlau57k?svg=true&passingText=develop%20-%20OK&failingText=master%20-%20NG)](https://ci.appveyor.com/project/rohme/enjoyfishing-itsg1)
+
 EnjoyFishingはFF11の釣りを支援するツールです。
 
-![全体イメージ](http://i.imgur.com/QTNxIid.jpg)
+![全体イメージ](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/main.jpg)
 
 ## 目次
 [**主な機能**](#user-content-主な機能)  
@@ -21,6 +24,7 @@ EnjoyFishingはFF11の釣りを支援するツールです。
 [**FFからのEnjoyFishingの制御**](#user-content-ffからのenjoyfishingの制御)  
 [**インストール・アンインストール**](#user-content-インストールアンインストール)  
 [**動かない場合**](#user-content-動かない場合)  
+[**不具合報告**](#user-content-不具合報告)  
 [**今後の予定**](#user-content-今後の予定)  
 [**開発環境**](#user-content-開発環境)  
 [**ソース**](#user-content-ソース)  
@@ -63,7 +67,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 例えば、さびき針でキュスを釣った場合にには、`キュス1匹`・`キュス2匹`・`キュス3匹`・`キュス1匹クリティカル`・`キュス2匹クリティカル`・`キュス3匹クリティカル` と６種類のIDの魚が存在し、それぞれを別々に扱うのがIDモードで、ひと括りに扱うのが名前モードです。
 
 ### 魚リスト
-![魚リスト](http://i.imgur.com/1PtHcee.jpg)
+![魚リスト](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/fishlist.jpg)
 * モード  
     釣る対象の魚をID別・魚名別から選択することができます。  
     また切り替えた場合、魚リストのチェックがすべてクリアされます。
@@ -84,7 +88,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
     - !・・・クリティカルで釣れた魚の場合に表示されます。（IDモードの場合のみ）
 
 ### 釣り設定
-![釣り設定](http://i.imgur.com/QTNxIid.jpg)
+![釣り設定](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/main.jpg)
 
 #### 動作
 * 学習モード  
@@ -179,7 +183,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
     指定できるコマンドは「鞄いっぱい」の時と同様です。
 
 ### 装備・食事
-![装備・食事](http://i.imgur.com/m8R7DDB.jpg)
+![装備・食事](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/equip.jpg)
 * '開始時に着替えを行う'をチェックした場合、開始ボタンを押した時に着替えを行います。
 * 空欄を指定した部位は、着替えを行いません。
 * 腰・左手・右手の右側に使用チェックがありますが、これをチェックすることで装備したエンチャントアイテムを、自動的に使用することができます。
@@ -187,7 +191,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 * エンチャントアイテムの再使用時間・残り回数は見ていませんので注意してください。
 
 ### 情報
-![情報](http://i.imgur.com/uB5iDPx.jpg)
+![情報](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/fishinginfo.jpg)
 * 本日の釣果情報がサマリーで表示されます。
 * 釣果数  
     外道・モンスター以外の魚の釣果数を表示します。  
@@ -207,7 +211,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 
 ### 履歴
 #### 情報
-![履歴](http://i.imgur.com/9VDSYx4.jpg)
+![履歴](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/history.jpg)
 * 日付  
     表示する日付を指定します。
 * 更新  
@@ -220,11 +224,11 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 また、表示列順の入れ替え・列幅の変更・ソートを行うことができます。
 
 #### 合計
-![合計](http://i.imgur.com/tc6lzDq.jpg)
+![合計](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/historysummary.jpg)
 * 表示内容は釣り情報と同じですが、日付・ステータス・魚名での絞込みが可能です。
 
 ### ハラキリ
-![ハラキリ](http://i.imgur.com/ofO1Anv.jpg)
+![ハラキリ](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/harakiri.jpg)
 
 　この機能は、手持ちの魚を自動的にハラキリします。
 
@@ -236,7 +240,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 * アイテム発見時にハラキリを停止させたい場合には、`発見したら停止`にチェックを入れてから開始してください。
 
 ### 釣った魚
-![釣った魚](http://i.imgur.com/3aa2pfP.jpg)
+![釣った魚](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/caughtfishes.jpg)
 
 　この機能は、マウラのKatsunagaから聞ける、今までに釣ったことのある魚を表示します。  
 　EnjoyFishingで釣ったことの無い魚を釣ると、自動的に釣った魚としてチェックされます。  
@@ -253,7 +257,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
     釣ったことのある魚リストをリセットします。
 
 ### DB更新
-![DB更新](http://i.imgur.com/HCIeSK8.jpg)
+![DB更新](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/dbupdate.jpg)
 
 　この機能は、釣りの履歴データをアップロードし、皆さんから収集した履歴データより最新の魚データをダウンロードし、更新します。  
 　アップロードされるデータには、キャラクター情報等、個人を特定するデータは全て削除されてから送信されますので、安心してください。（通信ログにキャラクター名が表示されますが、ファイル名含め内部で全てのキャラクター名は削除されています。）  
@@ -275,7 +279,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 **　みなさんから提供された履歴データは、統計情報として提供されますが、送られてきた生データの公開及び、第三者への譲渡はしません。**  
 
 ### 設定
-![設定](http://i.imgur.com/hu37Vrb.jpg)
+![設定](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/settings.jpg)
 #### 一般
 * 設定の保存  
     設定の保存をキャラクター別にするか、すべてのキャラクターで統一するかを選択できます。
@@ -301,7 +305,7 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 
 ### 月齢カレンダー
 
-![月齢カレンダー](http://i.imgur.com/hVbqjFv.jpg)
+![月齢カレンダー](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/moonphase.jpg)
 
 * ステータスバーの月齢にマウスカーソルを合わせると、現在の月齢の残り時間・次の満月までの時間・次の新月までの時間を表示します。
 * また、月齢をクリックすると、月齢カレンダーを表示します。
@@ -312,8 +316,8 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 * 釣りの停止 `/echo EnjoyFishing Stop`
 
 　大文字小文字は区別していません。  
-　本当は`//EnjoyFishing`でやりたかったんですけど、このコマンドを取ろうとするとFFACEがエラーを吐くので断念・・・。  
-　直ったら/echoでやる方法を変更するかもしれません。
+　本当は`//EnjoyFishing`でやりたかったんですけど、EliteAPIにはコマンドを取得するAPIが実装されていないので断念・・・。  
+　実装されたら/echoでやる方法を変更するかもしれません。
 
 ## インストール・アンインストール
 1. [こちら](https://github.com/rohme/EnjoyFishing/releases)から、最新版のバイナリを取得する。
@@ -321,37 +325,49 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 3. アンインストールは、解凍したディレクトリを削除するだけです。
 
 ## 動かない場合
-* 管理者権限で実行してください。
+* 管理者権限で実行する。
 * セキュリティソフトを一旦切ってから実行してみる。
 * [Windower4](http://windower.net/)をインストールする。
-* 最新の[FFACE](http://www.ffevo.net/)をインストールする。  
-http://delvl.ffevo.net/Lolwutt/FFACE4-Public/tree/master
-* [FFACE](http://www.ffevo.net/)に障害情報が挙がっていないか確認する。  
-http://delvl.ffevo.net/Lolwutt/FFACE4-Public/issues
-* [VisualStudio2013のランタイム](http://www.microsoft.com/ja-JP/download/details.aspx?id=40784)をインストールする。**（必ずx86版を使用してください）**
+* 最新の[EliteAPIとEliteMMO.API](http://www.elitemmonetwork.com/forums/viewforum.php?f=28)をインストールする。
+* [EliteAPIチェッカー](http://www.elitemmonetwork.com/forums/viewtopic.php?f=28&t=329)で、動作要件を満たしているか確認する。
+* [フォーラム](http://www.elitemmonetwork.com/forums/viewforum.php?f=28)に障害情報が挙がっていないか確認する。
+* [VisualStudio2015のランタイム](https://www.microsoft.com/ja-jp/download/details.aspx?id=48145)をインストールする。**（必ずx86版を使用してください）**
 * [.Net4.0](http://www.microsoft.com/ja-JP/download/details.aspx?id=17718)以上をインストールする。
 
-##今後の予定
+## 不具合報告
+* 作るスレか、GitHubにて受け付けています。
+* GitHubより報告する場合は、[こちら](https://github.com/rohme/EnjoyFishing/issues)から、"New issue"ボタンより登録してください。  
+  質問とかでも登録して頂いて結構です。
+
+## 今後の予定
 * 不具合報告があれば修正:smile:
 
 ## 開発環境
-* Windows7 Ultimate 64bit
-* [Microsoft Visual Studio Express 2013 C#](http://www.visualstudio.com/ja-jp/products/visual-studio-express-vs.aspx)
+* Microsoft Windows7 Ultimate 64bit
+* [Microsoft Visual Studio Community 2015](https://www.visualstudio.com/)
 * [.NET Framework 4.0](http://www.microsoft.com/ja-jp/net/)以上
 * [Windower4](http://windower.net/)
-* [FFACE](http://www.ffevo.net/)
-* [FFACETools](https://github.com/h1pp0/FFACETools_ffevo.net/)を修正した[FFACEToolsJP](https://github.com/rohme/FFACEToolsJP)
+* [EliteAPI](http://www.elitemmonetwork.com/forums/viewforum.php?f=28)
+* [EliteMMO.API](http://www.elitemmonetwork.com/forums/viewforum.php?f=28)
 
 ## ソース
 EnjoyFishingは以下のサイトで、GPLv2ライセンスにて公開しています。  
 https://github.com/rohme/  
-障害報告・質問とかあればIssuesに登録して頂いて結構です。
 
 ## 免責事項
 　本ソフトはフリーソフトです。自由にご使用ください。  
 　このソフトウェアを使用したことによって生じたすべての障害・損害・不具合等に関しては、作者は一切の責任を負いません。各自の責任においてご使用ください。  
 
 ## 修正履歴
+* **2015-03-28 Ver1.2.0**
+    - FFACEを捨て去り、EliteAPIに変更
+    - 開発ツールをVisualStudio2015に変更  
+    **[VisualStudio2015のランタイム(x86)](https://www.microsoft.com/ja-jp/download/details.aspx?id=48145)が必要になりますので、インストールをお願いします。**
+    - 竿の自動修復機能の修正
+    - 腰のエンチャントアイテムが使用できなかったのを修正
+    - エミネンスクリアで停止機能の修正
+    - エラー処理関連の修正
+    - ログ出力関連の修正
 * **2015-10-16 Ver1.1.7**
 	- グリッドの魚名称をダブルクリックすると、統計サイトを表示する機能を追加
 	- EliteAPIで代替していた機能をFFACEに戻した（このバージョンではEliteAPIは不要です）

@@ -1,35 +1,33 @@
-﻿using FFACETools;
-using MiscTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
     public class UpdateDBTool
     {
         private const string DUMMY_PLAYER_NAME = "DUMMY";
-        private const string PATH_TEMP = "Temp";
         private const string URL_API_CHECK_VERSION = "/api/enjoyfishing/checkversion";
         private const string URL_API_ENABLE_NAME = "/api/enjoyfishing/enablename";
         private const string URL_API_STATUS = "/api/enjoyfishing/status";
-        private const string URL_API_ROD =  "/api/enjoyfishing/rod";
+        private const string URL_API_ROD = "/api/enjoyfishing/rod";
         private const string URL_API_UPLOAD_HISTORY = "/api/enjoyfishing/uploadhistory";
-        
+
 
         private Settings settings;
-        private LoggerTool logger;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private FishDB fishDB;
         private FishHistoryDB historyDB;
         private string serverName = string.Empty;
- 
+
         #region メンバ
         #endregion
 
@@ -43,7 +41,7 @@ namespace EnjoyFishing
             public string Message;
             public Color Color;
             public bool Bold;
-         }
+        }
         public delegate void ReceiveMessageEventHandler(object sender, ReceiveMessageEventArgs e);
         public event ReceiveMessageEventHandler ReceiveMessage;
         protected virtual void OnReceiveMessage(ReceiveMessageEventArgs e)
@@ -99,13 +97,11 @@ namespace EnjoyFishing
         /// コンストラクタ
         /// </summary>
         /// <param name="iSettings"></param>
-        /// <param name="iLogger"></param>
-        public UpdateDBTool(Settings iSettings, LoggerTool iLogger)
+        public UpdateDBTool(Settings iSettings)
         {
             settings = iSettings;
-            logger = iLogger;
-            fishDB = new FishDB(logger);
-            historyDB = new FishHistoryDB(DUMMY_PLAYER_NAME, DateTime.Today, logger);
+            fishDB = new FishDB();
+            historyDB = new FishHistoryDB(DUMMY_PLAYER_NAME, DateTime.Today);
 
             serverName = "http://" + settings.Global.UpdateDB.ServerName;
         }
@@ -117,7 +113,7 @@ namespace EnjoyFishing
         /// </summary>
         public bool UpdateDB()
         {
-            logger.Output(LogLevelKind.INFO, "DB更新開始");
+            logger.Debug("DB更新開始");
             string response = string.Empty;
             bool httpRet = false;
 
@@ -192,7 +188,7 @@ namespace EnjoyFishing
                 EventReceiveMessage(string.Format("{0}", response), 0xFFFF0000);
                 return false;
             }
-            
+
             //履歴データの送信
             EventReceiveMessage("== 履歴データの送信 ==", 0xFFFFFFFF, true);
             string[] xmlFileNames = Directory.GetFiles(FishHistoryDB.PATH_FISHHISTORYDB);
@@ -244,18 +240,16 @@ namespace EnjoyFishing
                         }
                         history.Harakiri = uploadHarakiri;
                         //一時ディレクトリにXMLファイルを保存
-                        historyDB.PutHistoryDB(DUMMY_PLAYER_NAME, history, PATH_TEMP);
+                        historyDB.PutHistoryDB(DUMMY_PLAYER_NAME, history, Constants.PATH_TEMP);
+                        string uploadFileName = historyDB.GetXmlName(DUMMY_PLAYER_NAME, ymd, Constants.PATH_TEMP);
+                        logger.Debug("コピー {0}→{1}", filename, uploadFileName);
                         //ファイルアップロード
-                        string uploadFileName = historyDB.GetXmlName(DUMMY_PLAYER_NAME, ymd, PATH_TEMP);
-                        logger.Output(LogLevelKind.DEBUG, string.Format("ファイル移動 {0}→{1}", filename, uploadFileName));
-                        //EventReceiveMessage(string.Format("{0}のキャラクター情報を削除", filename));
-
-                        logger.Output(LogLevelKind.INFO, string.Format("{0}を送信中", uploadFileName));
+                        logger.Debug("{0}を送信中", uploadFileName);
                         EventReceiveMessage(string.Format("{0}をアップロード", filename));
                         NameValueCollection nvc = new NameValueCollection();
                         response = string.Empty;
                         httpRet = HttpUploadFile(serverName + URL_API_UPLOAD_HISTORY, uploadFileName, "upfile", "application/xml", nvc, out response);
-                        logger.Output(LogLevelKind.DEBUG, string.Format("Response:\r{0}", response));
+                        logger.Trace("Response:\r{0}", response);
                         if (httpRet)
                         {
                             //レスポンスを取得
@@ -301,16 +295,16 @@ namespace EnjoyFishing
                 status = (UpdateDBApiStatusModel)serializer.Deserialize(ms);
                 if (status.Result.Success == "true")
                 {
-                    foreach(UpdateDBApiStatusStatusModel rod in status.Status)
+                    foreach (UpdateDBApiStatusStatusModel rod in status.Status)
                     {
-                        logger.Output(LogLevelKind.DEBUG, string.Format("竿:{0} 更新日:{1}", rod.RodName, rod.LastUpdate));
-                        if (DateTime.Parse(rod.LastUpdate) > DateTime.Parse(settings.Global.UpdateDB.LastUpdate))
+                        logger.Info("竿:{0} 更新日:{1}", rod.RodName, rod.LastUpdate);
+                        if (!File.Exists(Path.Combine(FishDB.PATH_FISHDB, rod.RodName + ".xml")) ||
+                            DateTime.Parse(rod.LastUpdate) > DateTime.Parse(settings.Global.UpdateDB.LastUpdate))
                         {
                             //竿魚情報取得
                             EventReceiveMessage(string.Format("{0}のダウンロード", rod.RodName));
                             string url = serverName + URL_API_ROD + "/" + WebUtility.HtmlEncode(rod.RodName);
                             string response2 = string.Empty;
-                            logger.Output(LogLevelKind.DEBUG, string.Format("HTTP:{0}", url));
                             bool httpRet2 = Http(url, out response2);
                             //登録処理
                             if (httpRet2)
@@ -322,29 +316,24 @@ namespace EnjoyFishing
                                 {
                                     foreach (FishDBFishModel fish in res2.Rod.Fishes)
                                     {
-                                        //public bool AddFish(string iRodName, string iFishName, FishDBFishTypeKind iFishType, FishDBIdModel iID, string iZoneName, string iBaitName)
                                         //IDの追加
                                         foreach (var id in fish.IDs)
                                         {
                                             FishDBIdModel idm = new FishDBIdModel(id.ID1, id.ID2, id.ID3, id.ID4, id.Count, id.Critical, id.ItemType);
                                             fishDB.AddFish(res2.Rod.RodName, fish.FishName, fish.FishType, idm, fish.ZoneNames[0], fish.BaitNames[0]);
-                                            Thread.Sleep(1);
                                         }
                                         //エリアの追加
                                         foreach (var zone in fish.ZoneNames)
                                         {
                                             FishDBIdModel idm = new FishDBIdModel(fish.IDs[0].ID1, fish.IDs[0].ID2, fish.IDs[0].ID3, fish.IDs[0].ID4, fish.IDs[0].Count, fish.IDs[0].Critical, fish.IDs[0].ItemType);
                                             fishDB.AddFish(res2.Rod.RodName, fish.FishName, fish.FishType, idm, zone, fish.BaitNames[0]);
-                                            Thread.Sleep(1);
                                         }
                                         //エサの追加
                                         foreach (var bait in fish.BaitNames)
                                         {
                                             FishDBIdModel idm = new FishDBIdModel(fish.IDs[0].ID1, fish.IDs[0].ID2, fish.IDs[0].ID3, fish.IDs[0].ID4, fish.IDs[0].Count, fish.IDs[0].Critical, fish.IDs[0].ItemType);
                                             fishDB.AddFish(res2.Rod.RodName, fish.FishName, fish.FishType, idm, fish.ZoneNames[0], bait);
-                                            Thread.Sleep(1);
                                         }
-                                        Thread.Sleep(1);
                                     }
                                 }
                                 else
@@ -373,9 +362,8 @@ namespace EnjoyFishing
             //最終更新日の設定
             settings.Global.UpdateDB.LastUpdate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
 
-            logger.Output(LogLevelKind.INFO, "DB更新終了");
             EventReceiveMessage("データベースの更新が完了しました", 0xFFFFFFFF, true);
-
+            logger.Debug("DB更新終了");
             return true;
         }
         #endregion
@@ -390,6 +378,9 @@ namespace EnjoyFishing
         public static bool Http(string iUrl, out string oResponse)
         {
             oResponse = "";
+
+            logger.Debug("{0}", iUrl);
+
             try
             {
                 HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
@@ -404,10 +395,12 @@ namespace EnjoyFishing
                 st.Close();
                 webresp.Close();
                 oResponse = htmlSource;
+                logger.Trace("Response:\r{0}", oResponse);
                 return true;
             }
             catch (Exception e)
             {
+                logger.Error(e);
                 oResponse = e.Message;
                 return false;
             }
@@ -422,6 +415,10 @@ namespace EnjoyFishing
         public static bool HttpPost(string iUrl, NameValueCollection iPostNVC, out string oResponse)
         {
             oResponse = "";
+
+            logger.Debug("{0}", iUrl);
+            foreach (string key in iPostNVC.Keys) logger.Debug("{0}={1}", key, iPostNVC[key]);
+
             try
             {
                 //POSTデータ作成
@@ -437,7 +434,7 @@ namespace EnjoyFishing
                 //リクエスト作成
                 HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(iUrl);
                 webreq.UserAgent = GetUserAgent();
-                
+
                 webreq.Method = "POST";
                 webreq.ContentType = "application/x-www-form-urlencoded";
                 webreq.ContentLength = postDataBytes.Length;
@@ -450,11 +447,13 @@ namespace EnjoyFishing
                 Stream resStream = webresp.GetResponseStream();
                 StreamReader sr = new StreamReader(resStream, Encoding.UTF8);
                 oResponse = sr.ReadToEnd();
+                logger.Trace("Response:\r{0}", oResponse);
                 sr.Close();
                 return true;
             }
             catch (Exception e)
             {
+                logger.Error(e);
                 oResponse = e.Message;
                 return false;
             }
@@ -471,7 +470,8 @@ namespace EnjoyFishing
         /// <returns></returns>
         public static bool HttpUploadFile(string iUrl, string iUploadFilename, string paramName, string iContentType, NameValueCollection iPostNVC, out string oResponse)
         {
-            Console.WriteLine(string.Format("Uploading {0} to {1}", iUploadFilename, iUrl));
+            logger.Debug("{0}を{1}へアップロード", iUploadFilename, iUrl);
+
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
 
@@ -519,19 +519,19 @@ namespace EnjoyFishing
                 webresp = webreq.GetResponse();
                 Stream stream2 = webresp.GetResponseStream();
                 StreamReader reader2 = new StreamReader(stream2);
-                //Console.WriteLine(string.Format("File uploaded, server response is: {0}", reader2.ReadToEnd()));
                 oResponse = reader2.ReadToEnd();
+                logger.Debug("Response:\r{0}", oResponse);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine("Error uploading file", ex);
                 if (webresp != null)
                 {
                     webresp.Close();
                     webresp = null;
                 }
-                oResponse = ex.Message;
+                logger.Error(e);
+                oResponse = e.Message;
                 return false;
             }
             finally
@@ -609,7 +609,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameRodModel(): this(string.Empty)
+        public UpdateDBApiEnableNameRodModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameRodModel(string iName)
@@ -631,7 +631,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameFishModel(): this(string.Empty)
+        public UpdateDBApiEnableNameFishModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameFishModel(string iName)
@@ -652,7 +652,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameBaitModel(): this(string.Empty)
+        public UpdateDBApiEnableNameBaitModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameBaitModel(string iName)
@@ -673,7 +673,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameZoneModel(): this(string.Empty)
+        public UpdateDBApiEnableNameZoneModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameZoneModel(string iName)
@@ -694,7 +694,7 @@ namespace EnjoyFishing
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
-        public UpdateDBApiEnableNameHarakiriItemModel(): this(string.Empty)
+        public UpdateDBApiEnableNameHarakiriItemModel() : this(string.Empty)
         {
         }
         public UpdateDBApiEnableNameHarakiriItemModel(string iName)

@@ -1,73 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using MiscTools;
-using FFACETools;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace EnjoyFishing
 {
     static class EnjoyFishing
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
+            // エラーハンドラ
+            Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+            Thread.GetDomain().UnhandledException += new UnhandledExceptionEventHandler(Program_UnhandledException);
+
+            logger.Info("===== {0} {1} =====", MiscTool.GetAppAssemblyName(), MiscTool.GetAppVersion());
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainForm());
 
-            //コマンドライン引数の処理
-            SettingsArgsModel ARGS = new SettingsArgsModel();
-            foreach (string arg in args)
-            {
-                string argLower = arg.ToLower();
-                if (argLower.Equals("/d"))
-                {
-                    ARGS.LoggerEnable = true;
-                    ARGS.LoggerLogLevel = LogLevelKind.INFO;
-                }
-                if (argLower.Equals("/vd"))
-                {
-                    ARGS.LoggerVarDumpEnable = true;
-                }
-                if (MiscTool.IsRegexString(argLower, "/ll:([0-4])"))
-                {
-                    List<string> reg = MiscTool.GetRegexString(argLower, "/ll:([0-4])");
-                    ARGS.LoggerLogLevel = (LogLevelKind)int.Parse(reg[0]);
-                }
-            }
-
-            //POL設定
+            // POL設定
             PolTool pol = new PolTool();
             if (PolTool.GetPolProcess().Count < 1)
             {
-                MessageBox.Show("FF11を起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                System.Environment.Exit(0);//プログラム終了
+                string msg = "FF11を起動してください。";
+                logger.Warn(msg);
+                MessageBox.Show(msg, MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                System.Environment.Exit(1); // プログラム終了
             }
             if (!pol.NewPol())
             {
-                System.Environment.Exit(0);//プログラム終了
+                System.Environment.Exit(1); // プログラム終了
             }
-            if (pol.FFACE.Player.GetLoginStatus != LoginStatus.LoggedIn)
+            if (pol.EliteAPI.Player.LoginStatus != (int)LoginStatus.LoggedIn)
             {
-                MessageBox.Show("キャラクター選択後に起動してください。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                System.Environment.Exit(0);//プログラム終了
+                string msg = "キャラクター選択後に起動してください。";
+                logger.Warn(msg);
+                MessageBox.Show(msg, MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                System.Environment.Exit(1); // プログラム終了
             }
-            //シフトキーでテストフォーム表示
+            // シフトキーでテストフォーム表示
             if (Control.ModifierKeys == Keys.Shift)
             {
+                logger.Info("EliteAPIテストモードで起動");
                 //テストモード
-                FFACETestForm testForm = new FFACETestForm(pol);
+                EliteAPITestForm testForm = new EliteAPITestForm(pol);
                 testForm.ShowDialog();
-                System.Environment.Exit(0);//プログラム終了
+                System.Environment.Exit(0); // プログラム終了
             }
-            //メインフォーム表示
-            MainForm mainForm = new MainForm(pol, ARGS);
+            // ResourceTool
+            var resource = new ResourceTool(pol.EliteAPI);
+            // メインフォーム表示
+            MainForm mainForm = new MainForm(pol, resource);
             mainForm.ShowDialog();
+        }
+
+        /// <summary>
+        /// 集約エラーハンドラ(UnhandledException)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void Program_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = e.ExceptionObject as Exception;
+            if (ex != null) ShowError(ex, "UnhandledException");
+            System.Environment.Exit(1); // プログラム終了
+        }
+        /// <summary>
+        /// 集約エラーハンドラ(ThreadException)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            ShowError(e.Exception, "ThreadException");
+            System.Environment.Exit(1); // プログラム終了
+        }
+        /// <summary>
+        /// エラーメッセージの表示
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="title"></param>
+        private static void ShowError(Exception e, string title)
+        {
+            logger.Fatal(e, title);
+            string msg = string.Format("補足されないエラーが発生しました。\r詳細はログファイルを参照してください。\r\r{0}\r{1}", e.Message, e.StackTrace);
+            MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
         }
     }
 }

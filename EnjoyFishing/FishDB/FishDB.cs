@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Xml.Serialization;
-using MiscTools;
-using System.Reflection;
+using System.Text;
 using System.Threading;
-using System.Windows.Forms;
+using System.Xml.Serialization;
 using System.Xml.XPath;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -26,7 +23,7 @@ namespace EnjoyFishing
         public const string FILENAME_EMINENCEDB = "Eminence.xml";
         private const string VERSION = "1.1.0";
 
-        private LoggerTool logger;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private List<string> _Rods = new List<string>();
         private List<string> _Baits = new List<string>();
         private List<GearDBGearModel> _Gears = new List<GearDBGearModel>();
@@ -36,15 +33,13 @@ namespace EnjoyFishing
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="iLogger">LoggerTool</param>
-        public FishDB(LoggerTool iLogger)
+        public FishDB()
         {
-            logger = iLogger;
-            foreach(RodDBRodModel rod in SelectRod())
+            foreach (RodDBRodModel rod in SelectRod())
             {
                 this._Rods.Add(rod.RodName);
             }
-            foreach(BaitDBBaitModel bait in SelectBait())
+            foreach (BaitDBBaitModel bait in SelectBait())
             {
                 this._Baits.Add(bait.BaitName);
             }
@@ -59,7 +54,7 @@ namespace EnjoyFishing
         public List<GearDBGearModel> Gears { get { return _Gears; } }
         public List<EminenceDBEminenceModel> Eminences { get { return _Eminences; } }
         #endregion
-        
+
         #region FishDB
         /// <summary>
         /// 指定された竿の魚情報を取得する
@@ -76,7 +71,6 @@ namespace EnjoyFishing
         /// <returns>魚名称</returns>
         public List<string> SelectAllFishName()
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0}", MethodBase.GetCurrentMethod().Name));
             List<string> ret = new List<string>();
             foreach (string rod in _Rods)
             {
@@ -101,7 +95,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public List<FishDBFishModel> SelectFishList(string iRodName, string iZoneName, string iBaitName)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ZoneName={2} BaitName={3}", MethodBase.GetCurrentMethod().Name ,iRodName, iZoneName, iBaitName));
+            logger.Trace("RodName={0} ZoneName={1} BaitName={2}", iRodName, iZoneName, iBaitName);
             List<FishDBFishModel> ret = new List<FishDBFishModel>();
             FishDBModel fishDB = getFishDB(iRodName);
             foreach (FishDBFishModel fish in fishDB.Fishes)
@@ -130,10 +124,6 @@ namespace EnjoyFishing
                 }
             }
             ret.Sort(FishDBFishModel.SortTypeName);
-            foreach (FishDBFishModel v in ret)
-            {
-                logger.VarDump(v);
-            }
             return ret;
         }
         /// <summary>
@@ -148,7 +138,7 @@ namespace EnjoyFishing
         /// <returns></returns>
         public FishDBFishModel SelectFishFromIDZone(string iRodName, int iID1, int iID2, int iID3, int iID4, string iZoneName, bool iWithUnknownFish)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} ID1={2} ID2={3} ID3={4} ID4={5} ZoneName={6} WithUnknownFish={7}", MethodBase.GetCurrentMethod().Name, iRodName, iID1, iID2, iID3, iID4, iZoneName, iWithUnknownFish));
+            logger.Trace("RodName={0} ID1={1} ID2={2} ID3={3} ID4={4} ZoneName={5} WithUnknownFish={6}", iRodName, iID1, iID2, iID3, iID4, iZoneName, iWithUnknownFish);
             FishDBModel fishDB = getFishDB(iRodName);
             foreach (FishDBFishModel fish in fishDB.Fishes)
             {
@@ -162,7 +152,6 @@ namespace EnjoyFishing
                     if (fish.IDs.Contains(new FishDBIdModel(iID1, iID2, iID3, iID4)) &&
                         fish.ZoneNames.Contains(iZoneName))
                     {
-                        logger.VarDump(fish);
                         return fish;
                     }
                 }
@@ -171,8 +160,7 @@ namespace EnjoyFishing
         }
         public bool AddFish(string iRodName, string iFishName, FishDBFishTypeKind iFishType, FishDBIdModel iID, string iZoneName, string iBaitName)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} FishName={2} FishType={3} ID={4} ZoneName={5} BaitName={6}", 
-                MethodBase.GetCurrentMethod().Name, iRodName, iFishName, iFishType, iID, iZoneName, iBaitName));
+            logger.Trace("RodName={0} Fish={1} Type={2} ID={3} Zone={4} Bait={5}", iRodName, iFishName, iFishType, iID, iZoneName, iBaitName);
             FishDBModel fishDB = getFishDB(iRodName);
             fishDB.Version = VERSION;
             fishDB.RodName = iRodName;
@@ -196,7 +184,6 @@ namespace EnjoyFishing
                     }
                     break;
                 }
-
             }
 
             //更新処理
@@ -208,14 +195,27 @@ namespace EnjoyFishing
                     foundFlg = true;
                     fishDB.Fishes[fishIdx].FishName = iFishName;
                     fishDB.Fishes[fishIdx].FishType = iFishType;
-                    if (!fishDB.Fishes[fishIdx].IDs.Contains(iID)) fishDB.Fishes[fishIdx].IDs.Add(iID);
-                    if (!fishDB.Fishes[fishIdx].ZoneNames.Contains(iZoneName)) fishDB.Fishes[fishIdx].ZoneNames.Add(iZoneName);
-                    if (!fishDB.Fishes[fishIdx].BaitNames.Contains(iBaitName)) fishDB.Fishes[fishIdx].BaitNames.Add(iBaitName);
+                    if (!fishDB.Fishes[fishIdx].IDs.Contains(iID))
+                    {
+                        logger.Info("IDの追加 竿={0} 魚={1} ID={2}", iRodName, iFishName, iID);
+                        fishDB.Fishes[fishIdx].IDs.Add(iID);
+                    }
+                    if (!fishDB.Fishes[fishIdx].ZoneNames.Contains(iZoneName))
+                    {
+                        logger.Info("エリアの追加 竿={0} 魚={1} エリア={2}", iRodName, iFishName, iZoneName);
+                        fishDB.Fishes[fishIdx].ZoneNames.Add(iZoneName);
+                    }
+                    if (!fishDB.Fishes[fishIdx].BaitNames.Contains(iBaitName))
+                    {
+                        logger.Info("エサの追加 竿={0} 魚={1} エサ={2}", iRodName, iFishName, iBaitName);
+                        fishDB.Fishes[fishIdx].BaitNames.Add(iBaitName);
+                    }
                 }
             }
             //新規追加処理
             if (!foundFlg)
             {
+                logger.Info("魚の追加 竿={0} 魚={1} 魚タイプ={2} ID={3} エリア={4} エサ={5}", iRodName, iFishName, iFishType, iID, iZoneName, iBaitName);
                 FishDBFishModel fish = new FishDBFishModel();
                 fish.FishName = iFishName;
                 fish.FishType = iFishType;
@@ -241,7 +241,7 @@ namespace EnjoyFishing
         /// <returns>True:成功</returns>
         public bool DeleteFish(string iRodName, string iFishName)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} RodName={1} FishName={2}", MethodBase.GetCurrentMethod().Name, iRodName, iFishName));
+            logger.Trace("RodName={0} FishName={1}", iRodName, iFishName);
             FishDBModel fishDB = getFishDB(iRodName);
             //xmlに存在すれば削除する
             for (int i = 0; i < fishDB.Fishes.Count; i++)
@@ -265,7 +265,6 @@ namespace EnjoyFishing
             string[] xmlFileNames = Directory.GetFiles(PATH_FISHDB);
             foreach (string xmlFileName in xmlFileNames)
             {
-                //string filename = Path.GetFileName(xmlFileName);
                 List<string> regGroupStr = new List<string>();
                 if (MiscTool.GetRegexString(xmlFileName, PATH_FISHDB + "\\\\(.*)\\.xml$", out regGroupStr))
                 {
@@ -275,13 +274,13 @@ namespace EnjoyFishing
                     for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
                     {
                         string version = getXmlVersion(xmlFileName);
-                        if (version == VERSION)
+                        if (string.IsNullOrEmpty(version) || version == VERSION)
                         {
                             break;
                         }
                         if (version == "1.0.0")////1.0.0→1.0.5
                         {
-                            logger.Output(LogLevelKind.INFO, string.Format("FishDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName));
+                            logger.Info("FishDBのコンバート 1.0.0→1.0.5 {0}", xmlFileName);
                             convert1_0_0to1_0_5(xmlFileName, rodName);
                         }
                     }
@@ -355,7 +354,6 @@ namespace EnjoyFishing
             putFishDB(iRodName, fishdb1_0_5);
         }
 
-
         /// <summary>
         /// xmlの内容を全て取得する
         /// </summary>
@@ -363,28 +361,36 @@ namespace EnjoyFishing
         private FishDBModel getFishDB(string iRodName)
         {
             string xmlFilename = PATH_FISHDB + @"\" + iRodName + ".xml";
-            FishDBModel fishdb = new FishDBModel(iRodName);
-            if (File.Exists(xmlFilename))
+            try
             {
-                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                FishDBModel fishdb = new FishDBModel(iRodName);
+                if (File.Exists(xmlFilename))
                 {
-                    try
+                    for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                     {
-                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        try
                         {
-                            XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel));
-                            fishdb = (FishDBModel)serializer.Deserialize(fs);
+                            using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel));
+                                fishdb = (FishDBModel)serializer.Deserialize(fs);
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    catch (IOException)
-                    {
-                        Thread.Sleep(100);
-                        continue;
+                        catch (IOException)
+                        {
+                            Thread.Sleep(100);
+                            continue;
+                        }
                     }
                 }
+                return fishdb;
             }
-            return fishdb;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         /// <summary>
         /// xmlの内容を全て取得する(1.0.0)
@@ -393,28 +399,36 @@ namespace EnjoyFishing
         private FishDBModel1_0_0 getFishDB1_0_0(string iRodName)
         {
             string xmlFilename = PATH_FISHDB + @"\" + iRodName + ".xml";
-            FishDBModel1_0_0 fishdb = new FishDBModel1_0_0(iRodName);
-            if (File.Exists(xmlFilename))
+            try
             {
-                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+                FishDBModel1_0_0 fishdb = new FishDBModel1_0_0(iRodName);
+                if (File.Exists(xmlFilename))
                 {
-                    try
+                    for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                     {
-                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        try
                         {
-                            XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel1_0_0));
-                            fishdb = (FishDBModel1_0_0)serializer.Deserialize(fs);
+                            using (FileStream fs = new FileStream(xmlFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel1_0_0));
+                                fishdb = (FishDBModel1_0_0)serializer.Deserialize(fs);
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    catch (IOException)
-                    {
-                        Thread.Sleep(100);
-                        continue;
+                        catch (IOException)
+                        {
+                            Thread.Sleep(100);
+                            continue;
+                        }
                     }
                 }
+                return fishdb;
             }
-            return fishdb;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         /// <summary>
         /// xmlに登録内容を書き出す
@@ -424,32 +438,39 @@ namespace EnjoyFishing
         private bool putFishDB(string iRodName, FishDBModel iFishDB)
         {
             string xmlFilename = PATH_FISHDB + @"\" + iRodName + ".xml";
-            for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
+            try
             {
-                try 
+                for (int i = 0; i < Constants.FILELOCK_RETRY_COUNT; i++)
                 {
-                    using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
+                    try
                     {
-                        StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
-                        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                        ns.Add(String.Empty, String.Empty);
-                        XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel));
-                        serializer.Serialize(sw, iFishDB, ns);
-                        //書き込み
-                        sw.Flush();
-                        sw = null;
-                        fs.Close();
+                        using (FileStream fs = new FileStream(xmlFilename, FileMode.Create, FileAccess.Write, FileShare.None))//ファイルロック
+                        {
+                            StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                            ns.Add(String.Empty, String.Empty);
+                            XmlSerializer serializer = new XmlSerializer(typeof(FishDBModel));
+                            serializer.Serialize(sw, iFishDB, ns);
+                            //書き込み
+                            sw.Flush();
+                            sw = null;
+                            fs.Close();
+                        }
+                        break;
                     }
-                    break;
+                    catch (IOException)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
                 }
-                catch (IOException)
-                {
-                    Thread.Sleep(100);
-                    continue;
-                }
+                return true;
             }
-
-            return true;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の登録中にエラーが発生しました。", xmlFilename);
+                throw e;
+            }
         }
         #endregion
 
@@ -469,7 +490,7 @@ namespace EnjoyFishing
         /// <returns>竿の一覧</returns>
         public List<RodDBRodModel> SelectRod(string iSearchString)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
+            logger.Trace("SearchString={0}", iSearchString);
             List<RodDBRodModel> ret = new List<RodDBRodModel>();
             RodDBModel roddb = getRodDB();
             if (iSearchString == string.Empty)
@@ -487,7 +508,6 @@ namespace EnjoyFishing
                 }
             }
             ret.Sort(RodDBModel.SortTypeName);
-            logger.VarDump(ret);
             return ret;
         }
         /// <summary>
@@ -496,16 +516,24 @@ namespace EnjoyFishing
         /// <returns>RodDBModel</returns>
         private RodDBModel getRodDB()
         {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_RODDB;
-            RodDBModel roddb = new RodDBModel();
-            if (File.Exists(xmlFilename))
+            try
             {
-                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
-                XmlSerializer serializer = new XmlSerializer(typeof(RodDBModel));
-                roddb = (RodDBModel)serializer.Deserialize(fs);
-                fs.Close();
+                string xmlFilename = PATH_FISHDB + @"\" + FILENAME_RODDB;
+                RodDBModel roddb = new RodDBModel();
+                if (File.Exists(xmlFilename))
+                {
+                    FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
+                    XmlSerializer serializer = new XmlSerializer(typeof(RodDBModel));
+                    roddb = (RodDBModel)serializer.Deserialize(fs);
+                    fs.Close();
+                }
+                return roddb;
             }
-            return roddb;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_RODDB);
+                throw e;
+            }
         }
         /// <summary>
         /// Rod.xmlに登録内容を書き出す
@@ -514,17 +542,25 @@ namespace EnjoyFishing
         /// <returns>True：成功</returns>
         private bool putRodDB(RodDBModel iRodDB)
         {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_RODDB;
-            StreamWriter sw = new StreamWriter(xmlFilename, false, new UTF8Encoding(false));
-            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add(String.Empty, String.Empty);
-            XmlSerializer serializer = new XmlSerializer(typeof(RodDBModel));
-            serializer.Serialize(sw, iRodDB, ns);
-            //書き込み
-            sw.Flush();
-            sw.Close();
-            sw = null;
-            return true;
+            try
+            {
+                string xmlFilename = PATH_FISHDB + @"\" + FILENAME_RODDB;
+                StreamWriter sw = new StreamWriter(xmlFilename, false, new UTF8Encoding(false));
+                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                ns.Add(String.Empty, String.Empty);
+                XmlSerializer serializer = new XmlSerializer(typeof(RodDBModel));
+                serializer.Serialize(sw, iRodDB, ns);
+                //書き込み
+                sw.Flush();
+                sw.Close();
+                sw = null;
+                return true;
+            }
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の登録中にエラーが発生しました。", FILENAME_RODDB);
+                throw e;
+            }
         }
         #endregion
 
@@ -544,7 +580,7 @@ namespace EnjoyFishing
         /// <returns>餌の一覧</returns>
         public List<BaitDBBaitModel> SelectBait(string iSearchString)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
+            logger.Trace("SearchString={0}", iSearchString);
             List<BaitDBBaitModel> ret = new List<BaitDBBaitModel>();
             BaitDBModel Baitdb = getBaitDB();
             if (iSearchString == string.Empty)
@@ -562,7 +598,6 @@ namespace EnjoyFishing
                 }
             }
             ret.Sort(BaitDBModel.SortTypeName);
-            logger.VarDump(ret);
             return ret;
         }
         /// <summary>
@@ -571,16 +606,24 @@ namespace EnjoyFishing
         /// <returns>BaitDBModel</returns>
         private BaitDBModel getBaitDB()
         {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_BAITDB;
-            BaitDBModel Baitdb = new BaitDBModel();
-            if (File.Exists(xmlFilename))
+            try
             {
-                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
-                XmlSerializer serializer = new XmlSerializer(typeof(BaitDBModel));
-                Baitdb = (BaitDBModel)serializer.Deserialize(fs);
-                fs.Close();
+                string xmlFilename = PATH_FISHDB + @"\" + FILENAME_BAITDB;
+                BaitDBModel Baitdb = new BaitDBModel();
+                if (File.Exists(xmlFilename))
+                {
+                    FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
+                    XmlSerializer serializer = new XmlSerializer(typeof(BaitDBModel));
+                    Baitdb = (BaitDBModel)serializer.Deserialize(fs);
+                    fs.Close();
+                }
+                return Baitdb;
             }
-            return Baitdb;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_BAITDB);
+                throw e;
+            }
         }
         /// <summary>
         /// Bait.xmlに登録内容を書き出す
@@ -589,17 +632,25 @@ namespace EnjoyFishing
         /// <returns>True：成功</returns>
         private bool putBaitDB(BaitDBModel iBaitDB)
         {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_BAITDB;
-            StreamWriter sw = new StreamWriter(xmlFilename, false, new UTF8Encoding(false));
-            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add(String.Empty, String.Empty);
-            XmlSerializer serializer = new XmlSerializer(typeof(BaitDBModel));
-            serializer.Serialize(sw, iBaitDB, ns);
-            //書き込み
-            sw.Flush();
-            sw.Close();
-            sw = null;
-            return true;
+            try
+            {
+                string xmlFilename = PATH_FISHDB + @"\" + FILENAME_BAITDB;
+                StreamWriter sw = new StreamWriter(xmlFilename, false, new UTF8Encoding(false));
+                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                ns.Add(String.Empty, String.Empty);
+                XmlSerializer serializer = new XmlSerializer(typeof(BaitDBModel));
+                serializer.Serialize(sw, iBaitDB, ns);
+                //書き込み
+                sw.Flush();
+                sw.Close();
+                sw = null;
+                return true;
+            }
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の登録中にエラーが発生しました。", FILENAME_BAITDB);
+                throw e;
+            }
         }
         #endregion
 
@@ -619,7 +670,7 @@ namespace EnjoyFishing
         /// <returns>装備の一覧</returns>
         public List<GearDBGearModel> SelectGear(string iSearchString, GearDBPositionKind iPosition)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
+            logger.Trace("SearchString={0}", iSearchString);
             List<GearDBGearModel> ret = new List<GearDBGearModel>();
             GearDBModel gearDB = getGearDB();
             if (iSearchString == string.Empty && iPosition == GearDBPositionKind.Unknown)
@@ -639,7 +690,6 @@ namespace EnjoyFishing
                 }
             }
             ret.Sort(GearDBModel.SortTypeName);
-            logger.VarDump(ret);
             return ret;
         }
         /// <summary>
@@ -648,16 +698,24 @@ namespace EnjoyFishing
         /// <returns>GearDBModel</returns>
         private GearDBModel getGearDB()
         {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_GEARDB;
-            GearDBModel gearDB = new GearDBModel();
-            if (File.Exists(xmlFilename))
+            try
             {
-                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
-                XmlSerializer serializer = new XmlSerializer(typeof(GearDBModel));
-                gearDB = (GearDBModel)serializer.Deserialize(fs);
-                fs.Close();
+                string xmlFilename = PATH_FISHDB + @"\" + FILENAME_GEARDB;
+                GearDBModel gearDB = new GearDBModel();
+                if (File.Exists(xmlFilename))
+                {
+                    FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
+                    XmlSerializer serializer = new XmlSerializer(typeof(GearDBModel));
+                    gearDB = (GearDBModel)serializer.Deserialize(fs);
+                    fs.Close();
+                }
+                return gearDB;
             }
-            return gearDB;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_GEARDB);
+                throw e;
+            }
         }
         #endregion
 
@@ -677,7 +735,7 @@ namespace EnjoyFishing
         /// <returns>装備の一覧</returns>
         public List<EminenceDBEminenceModel> SelectEminence(string iSearchString)
         {
-            logger.Output(LogLevelKind.DEBUG, string.Format("{0} SearchString={1}", MethodBase.GetCurrentMethod().Name, iSearchString));
+            logger.Trace("SearchString={0}", iSearchString);
             List<EminenceDBEminenceModel> ret = new List<EminenceDBEminenceModel>();
             EminenceDBModel eminenceDB = getEminenceDB();
             if (iSearchString == string.Empty)
@@ -694,7 +752,6 @@ namespace EnjoyFishing
                     }
                 }
             }
-            logger.VarDump(ret);
             return ret;
         }
         /// <summary>
@@ -703,16 +760,24 @@ namespace EnjoyFishing
         /// <returns>GearDBModel</returns>
         private EminenceDBModel getEminenceDB()
         {
-            string xmlFilename = PATH_FISHDB + @"\" + FILENAME_EMINENCEDB;
-            EminenceDBModel eminenceDB = new EminenceDBModel();
-            if (File.Exists(xmlFilename))
+            try
             {
-                FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
-                XmlSerializer serializer = new XmlSerializer(typeof(EminenceDBModel));
-                eminenceDB = (EminenceDBModel)serializer.Deserialize(fs);
-                fs.Close();
+                string xmlFilename = PATH_FISHDB + @"\" + FILENAME_EMINENCEDB;
+                EminenceDBModel eminenceDB = new EminenceDBModel();
+                if (File.Exists(xmlFilename))
+                {
+                    FileStream fs = new FileStream(xmlFilename, System.IO.FileMode.Open);
+                    XmlSerializer serializer = new XmlSerializer(typeof(EminenceDBModel));
+                    eminenceDB = (EminenceDBModel)serializer.Deserialize(fs);
+                    fs.Close();
+                }
+                return eminenceDB;
             }
-            return eminenceDB;
+            catch (Exception e)
+            {
+                logger.Fatal("{0}の取得中にエラーが発生しました。", FILENAME_EMINENCEDB);
+                throw e;
+            }
         }
         #endregion
 
@@ -765,24 +830,30 @@ namespace EnjoyFishing
             }
             return string.Format("{0}{1:000}-{2:000}-{3:000}-{4:000}", tmpFishName, iID1, iID2, iID3, iID4);
         }        /// <summary>
-        /// xmlファイルのバージョン番号を取得する
-        /// </summary>
-        /// <param name="iXmlFileName"></param>
-        /// <returns></returns>
+                 /// xmlファイルのバージョン番号を取得する
+                 /// </summary>
+                 /// <param name="iXmlFileName"></param>
+                 /// <returns></returns>
         private string getXmlVersion(string iXmlFileName)
         {
-            XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
-            XPathNavigator xNavi = xmlDoc.CreateNavigator();
-            string ret = string.Empty;
             try
             {
-                ret = xNavi.SelectSingleNode("/Rod/@version").Value;
+                XPathDocument xmlDoc = new XPathDocument(iXmlFileName);
+                XPathNavigator xNavi = xmlDoc.CreateNavigator();
+                try
+                {
+                    return xNavi.SelectSingleNode("/Rod/@version").Value;
+                }
+                catch (NullReferenceException)
+                {
+                    return "1.0.0";
+                }
             }
-            catch (NullReferenceException)
+            catch (Exception e)
             {
-                ret = "1.0.0";
+                logger.Fatal("{0}のバージョン取得中にエラーが発生しました。", iXmlFileName);
+                throw e;
             }
-            return ret;
         }
     }
 }

@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Threading;
-using System.Media;
-using FFACETools;
-using MiscTools;
-using EnjoyFishing.Properties;
-using System.IO;
 using System.Diagnostics;
+using System.Drawing;
+using System.Media;
+using System.Threading;
+using System.Windows.Forms;
+using EliteMMO.API;
+using EnjoyFishing.Properties;
+using MiscTools;
+using NLog;
 
 namespace EnjoyFishing
 {
@@ -154,13 +151,14 @@ namespace EnjoyFishing
         #endregion
 
         private PolTool pol;
-        private FFACE fface;
-        private LoggerTool logger;
+        private ResourceTool resource;
+        private EliteAPI api;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private Settings settings;
         private ChatTool chat;
         private FishingTool fishing;
         private HarakiriTool harakiri;
-        private FFACEControl control;
+        private EliteAPIControl control;
         private FishDB fishDB;
         private FishHistoryDB fishHistoryDB;
         private HarakiriDB harakiriDB;
@@ -177,7 +175,6 @@ namespace EnjoyFishing
         private bool harakiriFlg = false;//ハラキリ中のフラグ
         private bool updatedbFlg = false;//DB更新中のフラグ
         private bool caughtFishesFlg = false;//釣った魚取得中フラグ
-        private SettingsArgsModel args = new SettingsArgsModel();
         private Dictionary<string, SettingsPlayerFishListWantedModel> fishListKey = new Dictionary<string, SettingsPlayerFishListWantedModel>();
 
         #region Delegate
@@ -276,72 +273,66 @@ namespace EnjoyFishing
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MainForm(PolTool iPol, SettingsArgsModel iArgs)
+        public MainForm(PolTool iPol, ResourceTool iResource)
         {
             startupFlg = true;
             InitializeComponent();
-            args = iArgs;
-            constructor(iPol);
+            constructor(iPol, iResource);
         }
         /// <summary>
         /// コンストラクタ処理部
         /// </summary>
         /// <param name="iPol"></param>
-        private void constructor(PolTool iPol)
+        private void constructor(PolTool iPol, ResourceTool iResource)
         {
             //PolTool初期設定
             pol = iPol;
             pol.ChangeStatus += new PolTool.ChangeStatusEventHandler(this.PolTool_ChangeStatus);
-            //FFACE初期設定
-            fface = iPol.FFACE;
-            //LoggerTool初期設定
-            logger = new LoggerTool(MiscTool.GetAppAssemblyName(), pol.FFACE.Player.Name);
-            logger.Enable = args.LoggerEnable;
-            logger.OutputLogLevel = args.LoggerLogLevel;
-            logger.EnableVarDump = args.LoggerVarDumpEnable;
-            logger.Output(LogLevelKind.INFO, string.Format("===== {0} {1} =====", MiscTool.GetAppAssemblyName(), MiscTool.GetAppVersion()));
-            logger.Output(LogLevelKind.INFO, string.Format("デバッグログ:{0} ログレベル：{1} 変数出力：{2}", args.LoggerEnable, args.LoggerLogLevel, args.LoggerVarDumpEnable));
-            logger.Output(LogLevelKind.INFO, string.Format("プロセス({0})にアタッチしました", pol.ProcessID));
+            //ResourceTool設定
+            resource = iResource;
+            //EliteAPI初期設定
+            api = iPol.EliteAPI;
             //Settings初期設定
-            settings = new Settings(iPol.FFACE.Player.Name);
+            settings = new Settings(api.Player.Name);
             //ChatTool初期設定
-            chat = new ChatTool(iPol.FFACE);
+            chat = new ChatTool(iPol.EliteAPI);
             chat.ReceivedCommand += new ChatTool.ReceivedCommandEventHandler(this.ChatTool_ReceivedCommand);
-            logger.Output(LogLevelKind.DEBUG, "ChatTool起動");
+            logger.Debug("ChatTool起動");
             //FishingTool初期設定
-            fishing = new FishingTool(iPol, chat, settings, logger);
+            fishing = new FishingTool(iPol, resource, chat, settings);
             fishing.Fished += new FishingTool.FishedEventHandler(this.FishingTool_Fished);
             fishing.ChangeMessage += new FishingTool.ChangeMessageEventHandler(this.FishingTool_ChangeMessage);
             fishing.ChangeStatus += new FishingTool.ChangeStatusEventHandler(this.FishingTool_ChangeStatus);
             fishing.CaughtFishesUpdate += new FishingTool.CaughtFishesUpdateEventHandler(this.FishingTool_CaughtFishesUpdate);
-            logger.Output(LogLevelKind.DEBUG, "FishingTool起動");
+            logger.Debug("FishingTool起動");
             //HarakiriTool初期設定
-            harakiri = new HarakiriTool(iPol, chat, settings, logger);
+            harakiri = new HarakiriTool(iPol, resource, chat, settings);
             harakiri.HarakiriOnce += new HarakiriTool.HarakiriOnceEventHandler(this.HarakiriTool_HarakiriOnce);
             harakiri.ChangeMessage += new HarakiriTool.ChangeMessageEventHandler(this.HarakiriTool_ChangeMessage);
             harakiri.ChangeStatus += new HarakiriTool.ChangeStatusEventHandler(this.HarakiriTool_ChangeStatus);
-            logger.Output(LogLevelKind.DEBUG, "HarakiriTool起動");
-            //FFACEControl初期設定
-            control = new FFACEControl(pol, chat, logger);
+            logger.Debug("HarakiriTool起動");
+            //EliteAPIControl初期設定
+            control = new EliteAPIControl(pol, resource, chat);
             control.MaxLoopCount = Constants.MAX_LOOP_COUNT;
             control.UseEnternity = settings.UseEnternity;
             control.BaseWait = settings.Global.WaitBase;
             control.ChatWait = settings.Global.WaitChat;
-            logger.Output(LogLevelKind.DEBUG, "FFACEControl起動");
+            logger.Debug("EliteAPIControl起動");
             //監視スレッド起動
             thMonitor = new Thread(threadMonitor);
             thMonitor.Start();
-            logger.Output(LogLevelKind.DEBUG, "監視スレッド起動");
+            logger.Debug("監視スレッド起動");
             //DB
-            fishDB = new FishDB(logger);
-            fishHistoryDB = new FishHistoryDB(fishing.PlayerName, fishing.EarthDateTime, logger);
-            harakiriDB = new HarakiriDB(logger);
+            fishDB = new FishDB();
+            fishHistoryDB = new FishHistoryDB(fishing.PlayerName, fishing.EarthDateTime);
+            harakiriDB = new HarakiriDB();
             //古いデータをコンバート
             converter();
             //DB更新
-            updatedb = new UpdateDBTool(settings, logger);
+            updatedb = new UpdateDBTool(settings);
             updatedb.ReceiveMessage += new UpdateDBTool.ReceiveMessageEventHandler(this.UpdateDBTool_ReceiveMessage);
             updatedb.NewerVersion += new UpdateDBTool.NewerVersionEventHandler(this.UpdateDBTool_NewerVersion);
+            logger.Info("初期化完了");
         }
         #endregion
 
@@ -392,7 +383,7 @@ namespace EnjoyFishing
             //起動時に更新
             if (settings.Global.UpdateDB.Enable && settings.Global.UpdateDB.AutoUpdate)
             {
-                btnExecUpdateDB_Click(this,new EventArgs());
+                btnExecUpdateDB_Click(this, new EventArgs());
             }
         }
         /// <summary>
@@ -948,10 +939,10 @@ namespace EnjoyFishing
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             unload();
-            
+
             //PolTool停止
-            pol.SystemAbort(); 
-            
+            pol.SystemAbort();
+
             System.Environment.Exit(0);//プログラム終了
         }
         /// <summary>
@@ -961,34 +952,31 @@ namespace EnjoyFishing
         {
             //設定保存
             saveSettings();
-            logger.Output(LogLevelKind.DEBUG, "設定保存終了");
+            logger.Debug("設定保存終了");
             //メインスレッド停止
             if (thFishing != null && thFishing.IsAlive) thFishing.Abort();
             thFishing = null;
-            logger.Output(LogLevelKind.DEBUG, "メインスレッド停止");
+            logger.Debug("メインスレッド停止");
             //DB更新スレッド停止
             if (thUpdateDB != null && thUpdateDB.IsAlive) thUpdateDB.Abort();
             //監視スレッド停止
             if (thMonitor != null && thMonitor.IsAlive) thMonitor.Abort();
             thMonitor = null;
-            logger.Output(LogLevelKind.DEBUG, "監視スレッド停止");
-            //FFACEControl停止
+            logger.Debug("監視スレッド停止");
+            //EliteAPIControl停止
             control = null;
             //HarakiriTool停止
             if (harakiri != null) harakiri.SystemAbort();
             harakiri = null;
-            logger.Output(LogLevelKind.DEBUG, "HarakiriTool停止");
+            logger.Debug("HarakiriTool停止");
             //FishingTool停止
             if (fishing != null) fishing.SystemAbort();
             fishing = null;
-            logger.Output(LogLevelKind.DEBUG, "FishingTool停止");
+            logger.Debug("FishingTool停止");
             //ChatTool停止
             if (chat != null) chat.SystemAbort();
             chat = null;
-            logger.Output(LogLevelKind.DEBUG, "ChatTool停止");
-
-
-            logger.Output(string.Format("===== {0} {1} 終了=====", MiscTool.GetAppAssemblyName(), MiscTool.GetAppVersion()));
+            logger.Debug("ChatTool停止");
         }
         /// <summary>
         /// 開始ボタン クリックイベント
@@ -1019,7 +1007,7 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "釣り開始");
+                logger.Info("釣り開始");
                 fishingFlg = true;
                 btnExecFishing.Text = "停　止";
 
@@ -1048,11 +1036,11 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "釣り停止");
+                logger.Info("釣り停止");
                 fishingFlg = false;
                 btnExecFishing.Text = "開　始";
                 bool ret = fishing.FishingAbort();
-                if(iShowStopMessage) setMessage("停止しました");
+                if (iShowStopMessage) setMessage("停止しました");
 
                 //ハラキリボタン有効化
                 btnExecHarakiri.Enabled = true;
@@ -1086,11 +1074,11 @@ namespace EnjoyFishing
         private void btnUpdateFishList_Click(object sender, EventArgs e)
         {
             //ログイン中ではない場合、再稼動させる
-            if (!loginFlg && fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
+            if (!loginFlg && fishing.LoginStatus == LoginStatus.LoggedIn)
             {
-                logger.Output(string.Format("再起動開始"));
+                logger.Debug("再稼動開始");
                 startupFlg = true;
-                constructor(pol);
+                constructor(pol, resource);
                 initForm();
                 startupFlg = false;
                 loginFlg = true;
@@ -1144,10 +1132,10 @@ namespace EnjoyFishing
             //選択解除
             lstFish.SelectedIndex = -1;
 
-            logger.Output(LogLevelKind.DEBUG, "セットされてる魚");
+            logger.Debug("セットされてる魚");
             foreach (SettingsPlayerFishListWantedModel wanted in settings.FishList.Wanted)
             {
-                logger.Output(LogLevelKind.DEBUG, string.Format("Name={0} ID1={1} ID2={2} ID3={3} ID4={4}", wanted.FishName, wanted.ID1, wanted.ID2, wanted.ID3, wanted.ID4));
+                logger.Debug("Name={0} ID1={1} ID2={2} ID3={3} ID4={4}", wanted.FishName, wanted.ID1, wanted.ID2, wanted.ID3, wanted.ID4);
             }
         }
         /// <summary>
@@ -1304,7 +1292,7 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "ハラキリ開始");
+                logger.Info("ハラキリ開始");
                 harakiriFlg = true;
                 btnExecHarakiri.Text = "停　止";
 
@@ -1337,12 +1325,12 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "ハラキリ停止");
+                logger.Info("ハラキリ停止");
                 harakiriFlg = false;
                 btnExecHarakiri.Text = "開　始";
                 bool ret = harakiri.HarakiriAbort();
-                if(iShowStopMessage) setMessage("停止しました");
-                
+                if (iShowStopMessage) setMessage("停止しました");
+
                 //釣りボタン有効化
                 btnExecFishing.Enabled = true;
                 //釣った魚初期化ボタン有効化
@@ -1404,7 +1392,7 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "釣った魚の初期化開始");
+                logger.Info("釣った魚の初期化開始");
                 caughtFishesFlg = true;
                 btnUpdateCaughtFishes.Text = "停　止";
 
@@ -1431,7 +1419,7 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "釣った魚の更新停止");
+                logger.Info("釣った魚の更新停止");
                 caughtFishesFlg = false;
                 btnUpdateCaughtFishes.Text = "初期化";
 
@@ -1519,8 +1507,6 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "DB更新開始");
-                //setMessage("データベースを更新しています");
                 updatedbFlg = true;
                 btnExecUpdateDB.Text = "停　止";
                 txtUpdateDBLog.Text = string.Empty;
@@ -1540,7 +1526,6 @@ namespace EnjoyFishing
             }
             else
             {
-                logger.Output(LogLevelKind.INFO, "DB更新停止");
                 updatedbFlg = false;
                 btnExecUpdateDB.Text = "更　新";
 
@@ -1590,7 +1575,7 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void lblMoonPhase_Click(object sender, EventArgs e)
         {
-            MoonPhaseForm frmMoonPhase = new MoonPhaseForm(fface);
+            MoonPhaseForm frmMoonPhase = new MoonPhaseForm(pol);
             frmMoonPhase.ShowDialog();
         }
         /// <summary>
@@ -1704,21 +1689,25 @@ namespace EnjoyFishing
         private List<MoonPhaseDay> getMoonPhaseList(FishingTool iFishing)
         {
             var ret = new List<MoonPhaseDay>();
-            //var vanadate = iFishing.VanaDateTime;
 
-            FFACE.TimerTools.VanaTime v = new FFACE.TimerTools.VanaTime();
-            v.Year = iFishing.VanaDateTime.Year;
-            v.Month = iFishing.VanaDateTime.Month;
-            v.Day = iFishing.VanaDateTime.Day;
+            var v1 = new VanaTime()
+            {
+                Year = api.VanaTime.CurrentYear,
+                Month = api.VanaTime.CurrentMonth,
+                Day = api.VanaTime.CurrentDay,
+                Hour = 0,
+                Minute = 0,
+                Second = 0,
+            };
 
-            MoonPhase last = FFACEControl.GetMoonPhaseFromVanaTime(v);
+            MoonPhase last = EliteAPIControl.GetMoonPhaseFromVanaTime(v1);
             for (int i = 0; i < (12 * 7); i++)
             {
-                v = FFACEControl.addVanaDay(v);
-                MoonPhase m = FFACEControl.GetMoonPhaseFromVanaTime(v);
+                var v2 = EliteAPIControl.addVanaDay(v1, i);
+                MoonPhase m = EliteAPIControl.GetMoonPhaseFromVanaTime(v2);
                 if (last != m)
                 {
-                    ret.Add(new MoonPhaseDay(m, FFACEControl.GetEarthTimeFromVanaTime(v)));
+                    ret.Add(new MoonPhaseDay(m, EliteAPIControl.GetEarthTimeFromVanaTime(v2)));
                 }
                 last = m;
             }
@@ -1743,7 +1732,7 @@ namespace EnjoyFishing
             ret += "ビビキー湾 " + getToolTipGuild(iFishing, GuildTimeTableKind.BIBIKI) + "\n";
             ret += "白門　　　 " + getToolTipGuild(iFishing, GuildTimeTableKind.WHITEGATE) + "\n";
             ret += "機船　　　 " + getToolTipGuild(iFishing, GuildTimeTableKind.SHIP) + "\n";
-            */ 
+            */
             return ret;
         }
         private string getToolTipGuild(FishingTool iFishing, GuildTimeTableKind iKind)
@@ -1751,12 +1740,11 @@ namespace EnjoyFishing
             string ret = string.Empty;
             //開店・閉店
             string openClose = string.Empty;
-            FFACE.TimerTools.VanaTime currVanaTime = iFishing.VanaDateTime;
-            FFACE.TimerTools.VanaTime v = iFishing.VanaDateTime;
-            if (currVanaTime.Hour >= dicTimeTable[iKind].Open && currVanaTime.Hour < dicTimeTable[iKind].Close)
+            var v = control.GetVanaTime();
+            if (v.Hour >= dicTimeTable[iKind].Open && v.Hour < dicTimeTable[iKind].Close)
             {
                 openClose = "Open";
-                if (v.Hour >= dicTimeTable[iKind].Close) v = FFACEControl.addVanaDay(v);
+                if (v.Hour >= dicTimeTable[iKind].Close) v = EliteAPIControl.addVanaDay(v);
                 v.Hour = dicTimeTable[iKind].Close;
                 v.Minute = 0;
                 v.Second = 0;
@@ -1764,12 +1752,12 @@ namespace EnjoyFishing
             else
             {
                 openClose = "Close";
-                if (v.Hour >= dicTimeTable[iKind].Close) v = FFACEControl.addVanaDay(v);
+                if (v.Hour >= dicTimeTable[iKind].Close) v = EliteAPIControl.addVanaDay(v);
                 v.Hour = dicTimeTable[iKind].Open;
                 v.Minute = 0;
                 v.Second = 0;
             }
-            var remain = FFACEControl.GetEarthTimeFromVanaTime(v) - DateTime.Now;
+            var remain = EliteAPIControl.GetEarthTimeFromVanaTime(v) - DateTime.Now;
 
             ret = string.Format("{0,-5} {1,2}分 {2}", openClose, remain.Hours * 60 + remain.Minutes, v);
             return ret;
@@ -1790,7 +1778,7 @@ namespace EnjoyFishing
             else
             {
                 this.Cursor = Cursors.WaitCursor;
-                logger.Output(LogLevelKind.DEBUG, "魚リストの更新");
+                logger.Debug("魚リストの更新");
                 fishListKey = new Dictionary<string, SettingsPlayerFishListWantedModel>();
                 lstFish.BeginUpdate();
                 lstFish.Items.Clear();
@@ -1868,7 +1856,7 @@ namespace EnjoyFishing
             else
             {
                 this.Cursor = Cursors.WaitCursor;
-                logger.Output(LogLevelKind.DEBUG, "履歴の更新");
+                logger.Debug("履歴の更新");
                 //詳細タブの設定
                 //結果コンボボックスの更新
                 FishResultStatusKind lastSelectedResult = FishResultStatusKind.Catch;
@@ -1999,7 +1987,7 @@ namespace EnjoyFishing
             else
             {
                 this.Cursor = Cursors.WaitCursor;
-                logger.Output(LogLevelKind.DEBUG, "釣り情報の更新");
+                logger.Debug("釣り情報の更新");
                 FishHistoryDBSummaryModel sum = fishHistoryDB.GetSummary(fishing.PlayerName, iYmd, iResult, iFishName);
                 DataTable tbl = new DataTable();
                 tbl.Columns.Add("Result", typeof(string));
@@ -2103,7 +2091,7 @@ namespace EnjoyFishing
             else
             {
                 this.Cursor = Cursors.WaitCursor;
-                logger.Output(LogLevelKind.DEBUG, "ハラキリ情報の更新");
+                logger.Debug("ハラキリ情報の更新");
                 HarakiriDBModel sum = harakiriDB.GetSummary();
                 DataTable tbl = new DataTable();
                 tbl.Columns.Add("FishName", typeof(string));
@@ -2148,7 +2136,7 @@ namespace EnjoyFishing
             else
             {
                 this.Cursor = Cursors.WaitCursor;
-                logger.Output(LogLevelKind.DEBUG, "釣った魚情報の更新");
+                logger.Debug("釣った魚情報の更新");
                 DataTable tbl = new DataTable();
                 tbl.Columns.Add("No", typeof(int));
                 tbl.Columns.Add("Caught", typeof(string));
@@ -2190,8 +2178,8 @@ namespace EnjoyFishing
             settings.UseItemizer = addons.Contains("Itemizer");
             settings.UseEnternity = addons.Contains("enternity");
             settings.UseCancel = addons.Contains("Cancel");
-            logger.Output(LogLevelKind.DEBUG, "使用中のアドオン");
-            foreach (string addon in addons) logger.Output(LogLevelKind.DEBUG, addon);
+            logger.Debug("使用中のアドオン");
+            foreach (string addon in addons) logger.Debug(" {0}", addon);
 
 
             if (settings.UseItemizer)
@@ -2244,7 +2232,7 @@ namespace EnjoyFishing
                 chkSneakFishing.Enabled = false;
                 txtSneakFishingRemain.Enabled = false;
             }
-            
+
         }
         /// <summary>
         /// 設定保存
@@ -2513,7 +2501,7 @@ namespace EnjoyFishing
             lblMessage.Text = iMessage;
             if (settings.Etc.MessageEcho && iMessage != string.Empty)
             {
-                fface.Windower.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
+                api.ThirdParty.SendString(string.Format("/echo EnjoyFishing {0}", iMessage));
             }
         }
         /// <summary>
@@ -2540,7 +2528,7 @@ namespace EnjoyFishing
                 updateFishingInfoRealTime();
                 //ステータスバー情報更新
                 updateStatusBar(fishing);
-                Thread.Sleep(settings.Global.WaitBase);   
+                Thread.Sleep(settings.Global.WaitBase);
             }
         }
         /// <summary>
@@ -2555,7 +2543,7 @@ namespace EnjoyFishing
             }
             else
             {
-                FFACE.TimerTools.VanaTime vt = fface.Timer.GetVanaTime();
+                var vt = control.GetVanaTime();
                 //月齢
                 lblMoonPhase.Image = dicMoonPhaseImage[iFishing.MoonPhase];
                 //ヴァナ時間
@@ -2571,7 +2559,7 @@ namespace EnjoyFishing
                 //Playerステータス
                 lblPlayerStatus.Text = iFishing.PlayerStatus.ToString();
                 //HP
-                lblHP.Text = string.Format("{0}%",iFishing.HpPercent);
+                lblHP.Text = string.Format("{0}%", iFishing.HpPercent);
                 barHP.Value = iFishing.HpPercent;
                 //残り時間
                 lblRemainTime.Text = string.Format("{0}s", iFishing.RemainTimeCurrent);
@@ -3237,20 +3225,20 @@ namespace EnjoyFishing
         /// <param name="e"></param>
         private void PolTool_ChangeStatus(object sender, PolTool.ChangeStatusEventArgs e)
         {
-            logger.Output(string.Format("POLステータスが{0}に変更された", e.PolStatus));
+            logger.Debug("POLステータスが{0}に変更された", e.PolStatus);
             if (e.PolStatus == PolTool.PolStatusKind.LoggedIn)
             {
                 //プレイヤーが描画されるまで待機
-                logger.Output(LogLevelKind.DEBUG, "プレイヤーのIsRendered待機");
-                while (fface.NPC.IsRendered(fface.Player.ID) == false)
+                logger.Debug("プレイヤーのIsRendered待機");
+                while ((api.Player.Render0000 & 0x200) != 0x200)
                 {
                     Thread.Sleep(100);
                 }
                 Thread.Sleep(10000);
                 //初期化
-                logger.Output(LogLevelKind.DEBUG, "再起動開始");
+                logger.Debug("再起動開始");
                 startupFlg = true;
-                constructor(pol);
+                constructor(pol, resource);
                 initForm();
                 startupFlg = false;
                 //画面ロック解除
@@ -3287,11 +3275,11 @@ namespace EnjoyFishing
                 switch (cmd[0])
                 {
                     case "start":
-                        Console.WriteLine(cmd[0]);
-                        if(!fishingFlg) startFishing();
+                        logger.Debug("コマンド受信 {0}", cmd[0]);
+                        if (!fishingFlg) startFishing();
                         break;
                     case "stop":
-                        Console.WriteLine(cmd[0]);
+                        logger.Debug("コマンド受信 {0}", cmd[0]);
                         if (fishingFlg) stopFishing(true);
                         break;
                 }
@@ -3504,6 +3492,7 @@ namespace EnjoyFishing
                     txtUpdateDBLog.SelectionFont = new System.Drawing.Font("Meiryo UI", 9, FontStyle.Regular);
                 }
                 txtUpdateDBLog.SelectedText = e.Message;
+                logger.Info(e.Message);
                 //最終行へスクロール
                 txtUpdateDBLog.ScrollToCaret();
             }
@@ -3534,7 +3523,9 @@ namespace EnjoyFishing
         private void threadNewerVersion(object iUrl)
         {
             string url = (string)iUrl;
-            DialogResult res = MessageBox.Show("新しいバージョンがリリースされています。\nリリースページを表示しますか？", MiscTool.GetAppTitle() + " 新バージョンのリリース", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            string msg = "新しいバージョンがリリースされています。\nリリースページを表示しますか？";
+            logger.Info(msg);
+            DialogResult res = MessageBox.Show(msg, MiscTool.GetAppTitle() + " 新バージョンのリリース", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (res == DialogResult.Yes)
             {
                 System.Diagnostics.Process.Start(url);

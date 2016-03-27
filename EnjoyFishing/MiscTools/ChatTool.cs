@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FFACETools;
+using EliteMMO.API;
+using EnjoyFishing;
+using NLog;
+
 namespace MiscTools
 {
     public class ChatTool
@@ -14,25 +17,19 @@ namespace MiscTools
         private const string REGEX_EMINENCE1 = "エミネンス・レコード：『(.*)』……";
         private const string REGEX_EMINENCE2 = "進行度：([0-9]*)/([0-9]*)";
 
-        private List<FFACE.ChatTools.ChatLine> chatLines = new List<FFACE.ChatTools.ChatLine>();
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private List<EliteAPI.ChatEntry> chatLines = new List<EliteAPI.ChatEntry>();
         private int maxIndex = 0;
         private int currentIndex = 0;
         private Thread thChat;
-        private FFACE fface;
-        private string lastIndex1 = ""; //一行目か判定用
+        private EliteAPI api;
 
         #region コンストラクタ
-        public ChatTool(FFACE iFFACE)
+        public ChatTool(EliteAPI iEliteAPI)
         {
-            fface = iFFACE;
-
-            //過去のチャットをクリア
-            FFACE.ChatTools.ChatLine cl = fface.Chat.GetNextLine();
-            while (cl != null)
-            {
-                cl = fface.Chat.GetNextLine();
-            }
-
+            api = iEliteAPI;
+            EliteAPI.ChatEntry cl;
+            while ((cl = api.Chat.GetNextChatLine()) != null) { Thread.Sleep(1); }
             Start();
         }
         #endregion
@@ -125,6 +122,7 @@ namespace MiscTools
         /// </summary>
         public void Reset()
         {
+            this.chatLines.Clear();
             this.currentIndex = this.maxIndex;
         }
         #endregion
@@ -134,14 +132,14 @@ namespace MiscTools
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public List<FFACE.ChatTools.ChatLine> GetChatLine(int index, bool iAddIndex = true)
+        public List<EliteAPI.ChatEntry> GetChatLine(int index, bool iAddIndex = true)
         {
-            List<FFACE.ChatTools.ChatLine> ret = new List<FFACE.ChatTools.ChatLine>();
+            List<EliteAPI.ChatEntry> ret = new List<EliteAPI.ChatEntry>();
             for (int i = 0; i < chatLines.Count; i++)
             {
-                if (chatLines[i].Index > index)
+                if (chatLines[i].Index1 > index)
                 {
-                    if (iAddIndex) this.currentIndex = chatLines[i].Index;
+                    if (iAddIndex) this.currentIndex = chatLines[i].Index1;
                     ret.Add(chatLines[i]);
                 }
             }
@@ -152,20 +150,21 @@ namespace MiscTools
         /// </summary>
         /// <param name="oChatLine">チャットライン</param>
         /// <returns>True：次のチャットがある場合</returns>
-        public bool GetNextChatLine(out FFACE.ChatTools.ChatLine oChatLine)
+        public bool GetNextChatLine(out EliteAPI.ChatEntry oChatLine)
         {
             for (int i = 0; i < chatLines.Count; i++)
             {
-                if (chatLines[i].Index > this.currentIndex)
+                if (chatLines[i].Index1 > this.currentIndex)
                 {
-                    this.currentIndex = chatLines[i].Index;
+                    this.currentIndex = chatLines[i].Index1;
                     oChatLine = chatLines[i];
                     return true;
                 }
             }
-            oChatLine = new FFACE.ChatTools.ChatLine();
+            oChatLine = new EliteAPI.ChatEntry();
             return false;
         }
+
         /// <summary>
         /// チャット監視メインスレッド
         /// </summary>
@@ -174,8 +173,8 @@ namespace MiscTools
             Thread.Sleep(2000);
             while (true)
             {
-                if (fface != null && 
-                    fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
+                if (api != null &&
+                    api.Player.LoginStatus == (int)LoginStatus.LoggedIn)
                 {
                     updateChatLine();
                 }
@@ -187,91 +186,47 @@ namespace MiscTools
         /// </summary>
         private void updateChatLine()
         {
-            try
+            if (api == null || api.Player.LoginStatus != (int)LoginStatus.LoggedIn) return;
+
+            EliteAPI.ChatEntry cl;
+            EliteAPI.ChatEntry buff = null;
+            while ((cl = api.Chat.GetNextChatLine()) != null)
             {
-                int currChatLineIndex = 0;
-                int lastEminenceIndex = -1;
-                if (fface != null && fface.Player.GetLoginStatus == LoginStatus.LoggedIn)
+                if (buff == null)
                 {
-                    if (fface.Chat.IsNewLine)
-                    {
-                        FFACE.ChatTools.ChatLine cl = fface.Chat.GetNextLine();
-                        while (cl != null)
-                        {
-                            //既に登録されているチャットか判定
-                            bool foundFlg = false;
-                            foreach (var chkCl in chatLines)
-                            {
-                                if (chkCl.RawString[4] == cl.RawString[4] &&
-                                    chkCl.RawString[5] == cl.RawString[5] &&
-                                    chkCl.Type == cl.Type
-                                    )
-                                {
-                                    foundFlg = true;
-                                    break;
-                                }
-                            }
-                            if(!foundFlg)
-                            {
-                                //コマンド受信イベント処理
-                                if(cl.Type == ChatMode.Echo && cl.Text.Length > 0){
-                                    string[] cmd = cl.Text.Split(' ');
-                                    if (cmd[0].ToLower() == "enjoyfishing" && cmd.Length > 1)
-                                    {
-                                        List<string> retcmd = new List<string>();
-                                        for (int i = 1; i < cmd.Length; i++)
-                                        {
-                                            retcmd.Add(cmd[i].ToLower());
-                                        }
-                                        EventReceivedCommand(retcmd);
-                                    }
-                                }
-                                //チャットが複数行に渡ってある場合、一行にまとめる処理
-                                string[] stArrayData = cl.RawString[12].Split(',');
-                                if (cl.RawString[4] != lastIndex1) //1行目か否か
-                                {
-                                    //エミネンス
-                                    if (lastEminenceIndex > 0)
-                                    {
-                                        if (MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
-                                        {
-                                            chatLines[lastEminenceIndex].Text = chatLines[lastEminenceIndex].Text + cl.Text;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        chatLines.Add(cl);
-                                        currChatLineIndex = chatLines.Count - 1;
-                                    }
-                                    if (MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE1))
-                                    {
-                                        lastEminenceIndex = currChatLineIndex;
-                                    }
-                                    else
-                                    {
-                                        lastEminenceIndex = -1;
-                                    }
-                                }
-                                else
-                                {
-                                    chatLines[currChatLineIndex].Text = chatLines[currChatLineIndex].Text + cl.Text;
-                                }
-                            }
-                            lastIndex1 = cl.RawString[4];
-                            maxIndex = cl.Index;
-                            cl = fface.Chat.GetNextLine();
-                        }
-                        if (chatLines.Count > MAX_CHATLINE_INDEX)
-                        {
-                            chatLines.RemoveRange(0, chatLines.Count - MAX_CHATLINE_INDEX);
-                        }
-                    }
+                    buff = cl;
+                    continue;
+                }
+                if (buff.Index1 == cl.Index1 || MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
+                {
+                    buff.Text += cl.Text;
+                }
+                else
+                {
+                    AddChatLines(buff);
+                    buff = cl;
                 }
             }
-            catch(NullReferenceException e)
+            if (buff != null) AddChatLines(buff);
+
+            if (chatLines.Count > MAX_CHATLINE_INDEX)
             {
-                Console.WriteLine("ChatTool " + e.Message);
-                return;
+                chatLines.RemoveRange(0, chatLines.Count - MAX_CHATLINE_INDEX);
+            }
+        }
+        private void AddChatLines(EliteAPI.ChatEntry iCl)
+        {
+            logger.Trace("チャットバッファに追加：idx1:{0} idx2:{1} {2}", iCl.Index1, iCl.Index2, iCl.Text);
+            chatLines.Add(iCl);
+
+            //コマンド受信イベント処理
+            if (iCl.ChatType == (int)ChatMode.Echo && iCl.Text.Length > 0)
+            {
+                string[] cmd = iCl.Text.Split(' ');
+                if (cmd.Length >= 1 && cmd[0].ToLower() == "enjoyfishing" && cmd.Length > 1)
+                {
+                    EventReceivedCommand(cmd.ToList().GetRange(1, cmd.Length - 1));
+                }
             }
         }
     }

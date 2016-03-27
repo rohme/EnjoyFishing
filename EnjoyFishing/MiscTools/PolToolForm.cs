@@ -17,7 +17,7 @@ namespace MiscTools
         public List<Process> PolList { get; set; }
 
         private const string LIST_FORMAT = "{0,5} : {1}";
-        
+
         public SelectPolForm()
         {
             InitializeComponent();
