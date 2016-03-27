@@ -304,9 +304,9 @@ namespace MiscTools
         /// <returns></returns>
         public int GetInventoryItemCount(string iItemName, InventoryType iInventoryType)
         {
-            if (!resource.Items.Any(x => x.Value.Name[1] == iItemName)) return 0;
-            var id = resource.Items.First(x => x.Value.Name[1] == iItemName).Key;
-            return GetInventoryItemCount(id, iInventoryType);
+            var item = resource.GetItem(iItemName);
+            if (item.Name[1] != iItemName) return 0;
+            return GetInventoryItemCount(item.ItemID, iInventoryType);
         }
         /// <summary>
         /// 指定された倉庫タイプに入っているアイテム数を取得

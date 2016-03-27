@@ -213,19 +213,6 @@ namespace EnjoyFishing
         private string WindowerPath { get; set; }
         private SortedDictionary<uint, string> ItemNames = new SortedDictionary<uint, string>();
 
-        //public Dictionary<uint, ItemModel> Items { get; set; }
-        public Dictionary<uint, EliteAPI.IItem> Items { get; set; }
-
-        //public ItemModel GetItem(string iName)
-        //{
-        //    if (!this.Items.Any(x => x.Value.Name == iName)) return new ItemModel();
-        //    return GetItem(this.Items.First(x => x.Value.Name == iName).Value.ID);
-        //}
-        //public ItemModel GetItem(uint iID)
-        //{
-        //    if (!this.Items.ContainsKey(iID) || iID == 65535) return new ItemModel();
-        //    return this.Items[iID];
-        //}
         public EliteAPI.IItem GetItem(string iName)
         {
             if (!this.ItemNames.ContainsValue(iName)) return new EliteAPI.IItem() { Name = new string[3] };
