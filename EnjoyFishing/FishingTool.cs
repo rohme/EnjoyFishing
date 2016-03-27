@@ -2384,7 +2384,7 @@ namespace EnjoyFishing
             //腰
             if (settings.Fishing.UseWaist && !string.IsNullOrEmpty(settings.Fishing.EquipWaist))
             {
-                List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipWaist, GearDBPositionKind.Rings);
+                List<GearDBGearModel> item = FishDB.SelectGear(settings.Fishing.EquipWaist, GearDBPositionKind.Waist);
                 if (item.Count > 0 && item[0].BuffID > 0)
                 {
                     if (!control.IsBuff((EliteMMO.API.StatusEffect)item[0].BuffID))
