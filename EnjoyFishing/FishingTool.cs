@@ -23,11 +23,11 @@ namespace EnjoyFishing
             {ChatKbnKind.BaitLargeFish, "何かがかかったようだ！！！$"},
             {ChatKbnKind.BaitItem, "何かがひっかかったようだ。"},
             {ChatKbnKind.BaitMonster, "何かが食らいついてきた！！"},
+            {ChatKbnKind.CatchKeyItem, "だいじなもの:(.*)を手にいれた！"},
+            {ChatKbnKind.CatchTempItem, "{0}はテンポラリアイテム:(.*)を手にいれた！"},
             {ChatKbnKind.CatchSingle, "{0}は(.*)を手にいれた！"},
             {ChatKbnKind.CatchMultiple, "{0}は(.*)を([0-9]*)尾手にいれた！"},
             {ChatKbnKind.CatchMonster, "{0}はモンスターを釣り上げた！"},
-            {ChatKbnKind.CatchKeyItem, "だいじなもの:(.*)を手にいれた！"},
-            {ChatKbnKind.CatchTempItem, "テンポラリアイテム:(.*)を手にいれた！"},
             {ChatKbnKind.LineBreak, "釣り糸が切れてしまった。"},
             {ChatKbnKind.RodBreak, "釣り竿が折れてしまった。"},
             {ChatKbnKind.Timeout, "そろそろ逃げられそうだ……！"},
@@ -38,6 +38,7 @@ namespace EnjoyFishing
             {ChatKbnKind.EnemyAttack1, "(.*)の攻撃→{0}に、(.*)"},
             {ChatKbnKind.EnemyAttack2, "→{0}に、([0-9]*)ダメージ。"},
             {ChatKbnKind.EnemyAttack3, "(.*)は、遠隔攻撃を実行→{0}に、ミス。(.*)"},
+            {ChatKbnKind.EnemyAttack4, "……魚を(.*)食べられてしまった。"},
             {ChatKbnKind.SneakWarning1, "スニークの効果がきれそうだ。"},
             {ChatKbnKind.SneakWarning2, "{0}は、スニークの効果がきれた。"},
             {ChatKbnKind.ShipWarning1, "まもなく(.*)へ到着します。"},//汽船航路・外洋航路・銀海航路
@@ -95,6 +96,7 @@ namespace EnjoyFishing
             EnemyAttack1,
             EnemyAttack2,
             EnemyAttack3,
+            EnemyAttack4,
             SneakWarning1,
             SneakWarning2,
             ShipWarning1,
@@ -1452,7 +1454,7 @@ namespace EnjoyFishing
                                               chatKbnTimeout == ChatKbnKind.CatchMultiple ||//{0}は(.*)を([0-9]*)尾手にいれた！"
                                               chatKbnTimeout == ChatKbnKind.CatchMonster || //{0}はモンスターを釣り上げた！"
                                               chatKbnTimeout == ChatKbnKind.CatchKeyItem || //だいじなもの:(.*)を手にいれた！"
-                                              chatKbnTimeout == ChatKbnKind.CatchTempItem ||//テンポラリアイテム:(.*)を手にいれた！"
+                                              chatKbnTimeout == ChatKbnKind.CatchTempItem ||//{0}はテンポラリアイテム:(.*)を手にいれた！
                                               chatKbnTimeout == ChatKbnKind.LineBreak ||    //釣り糸が切れてしまった。"
                                               chatKbnTimeout == ChatKbnKind.RodBreak ||     //釣り竿が折れてしまった。"
                                               chatKbnTimeout == ChatKbnKind.Timeout ||      //そろそろ逃げられそうだ……！"
@@ -1833,6 +1835,7 @@ namespace EnjoyFishing
                 if (v.Key == ChatKbnKind.CatchSingle ||
                     v.Key == ChatKbnKind.CatchMultiple ||
                     v.Key == ChatKbnKind.CatchMonster ||
+                    v.Key == ChatKbnKind.CatchTempItem ||
                     v.Key == ChatKbnKind.InventoryFull ||
                     v.Key == ChatKbnKind.EnemyAttack1 ||
                     v.Key == ChatKbnKind.EnemyAttack2 ||
@@ -1854,7 +1857,7 @@ namespace EnjoyFishing
                 {
                     oArgs = MiscTool.GetRegexString(iCl.Text, searchStr);
                     //敵から攻撃受けた
-                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2 || v.Key == ChatKbnKind.EnemyAttack3)
+                    if (v.Key == ChatKbnKind.EnemyAttack1 || v.Key == ChatKbnKind.EnemyAttack2 || v.Key == ChatKbnKind.EnemyAttack3 || v.Key == ChatKbnKind.EnemyAttack4)
                     {
                         interrupt.EnemyAttack = true;
                     }
