@@ -1,4 +1,4 @@
-# ![EnjoyFishing](http://i.imgur.com/pmstLip.png)EnjoyFishing
+# ![Icon](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/icon.png)EnjoyFishing
 
 [![Master status](https://ci.appveyor.com/api/projects/status/x4bkwg1snstpwxp8?svg=true&passingText=master%20-%20OK&failingText=master%20-%20NG)](https://ci.appveyor.com/project/rohme/enjoyfishing)
 [![Develop status](https://ci.appveyor.com/api/projects/status/ton6b0akaxlau57k?svg=true&passingText=develop%20-%20OK&failingText=master%20-%20NG)](https://ci.appveyor.com/project/rohme/enjoyfishing-itsg1)
@@ -359,7 +359,11 @@ https://github.com/rohme/
 　このソフトウェアを使用したことによって生じたすべての障害・損害・不具合等に関しては、作者は一切の責任を負いません。各自の責任においてご使用ください。  
 
 ## 修正履歴
-* **2015-03-28 Ver1.2.0**
+* **2016-03-29 Ver1.2.1**
+    - チャットにタイムスタンプを表示していても動作するように修正  
+    （標準のタイムスタンプや、WindowerのTimeStampアドオンでも動作します。）
+    - MMM水産課で釣った魚が、テンポラリアイテムとして認識されていなかったのを修正
+* **2016-03-28 Ver1.2.0**
     - FFACEを捨て去り、EliteAPIに変更
     - 開発ツールをVisualStudio2015に変更  
     **[VisualStudio2015のランタイム(x86)](https://www.microsoft.com/ja-jp/download/details.aspx?id=48145)が必要になりますので、インストールをお願いします。**
