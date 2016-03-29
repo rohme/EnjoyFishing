@@ -20,7 +20,8 @@ namespace MiscTools
         private const string REGEX_PLUGIN = "(.*) \\(author: (.*)";
         //private const string REGEX_PLUGIN_END = "=== Done Listing Currently Loaded Plugins ===";
         private const string REGEX_PLUGIN_END = "=== Done Listing (.*)";
-        private const string REGEX_ADDON = "  (.*)";
+        private const string REGEX_ADDON_START = "Currently loaded addons:";
+        private const string REGEX_ADDON = "(.*)";
         private const string REGEX_ADDON_END = "EnjoyFishing Addon Check End";
 
         private PolTool pol = null;
@@ -255,20 +256,29 @@ namespace MiscTools
             api.ThirdParty.SendString("//lua list");
             Thread.Sleep(this.BaseWait);
             api.ThirdParty.SendString("/echo " + REGEX_ADDON_END);
+
             List<string> ret = new List<string>();
             var cl = new EliteAPI.ChatEntry();
+            bool startFlg = false;
             for (int i = 0; i < this.MaxLoopCount && !MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END); i++)
             {
                 while (chat.GetNextChatLine(out cl))
                 {
-                    if (MiscTool.IsRegexString(cl.Text, REGEX_ADDON))
+                    if (!startFlg)
                     {
-                        List<string> reg = MiscTool.GetRegexString(cl.Text, REGEX_ADDON);
-                        ret.Add(reg[0]);
+                        if( MiscTool.IsRegexString(cl.Text, REGEX_ADDON_START)) startFlg = true;
                     }
-                    else if (MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END))
+                    else
                     {
-                        break;
+                        if (MiscTool.IsRegexString(cl.Text, REGEX_ADDON_END))
+                        {
+                            break;
+                        }
+                        else if (MiscTool.IsRegexString(cl.Text, REGEX_ADDON))
+                        {
+                            List<string> reg = MiscTool.GetRegexString(cl.Text, REGEX_ADDON);
+                            ret.Add(reg[0].Trim());
+                        }
                     }
                 }
                 Thread.Sleep(this.BaseWait);

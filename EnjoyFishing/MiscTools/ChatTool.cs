@@ -16,6 +16,7 @@ namespace MiscTools
         private const int CHAT_INTERVAL = 100;//チャット取得インターバル
         private const string REGEX_EMINENCE1 = "エミネンス・レコード：『(.*)』……";
         private const string REGEX_EMINENCE2 = "進行度：([0-9]*)/([0-9]*)";
+        private const string REGEX_TIMESTAMP_HHMM = @"\[([0-9]*):([0-9]*)\] (.*)";
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private List<EliteAPI.ChatEntry> chatLines = new List<EliteAPI.ChatEntry>();
@@ -182,7 +183,7 @@ namespace MiscTools
             }
         }
         /// <summary>
-        /// 取得したチャットをchatLinesに設定
+        /// バッファの更新
         /// </summary>
         private void updateChatLine()
         {
@@ -192,6 +193,8 @@ namespace MiscTools
             EliteAPI.ChatEntry buff = null;
             while ((cl = api.Chat.GetNextChatLine()) != null)
             {
+                //タイムスタンプを削除
+                cl.Text = RemoveTimeStamp(cl.Text);
                 if (buff == null)
                 {
                     buff = cl;
@@ -214,6 +217,10 @@ namespace MiscTools
                 chatLines.RemoveRange(0, chatLines.Count - MAX_CHATLINE_INDEX);
             }
         }
+        /// <summary>
+        /// バッファに追加
+        /// </summary>
+        /// <param name="iCl"></param>
         private void AddChatLines(EliteAPI.ChatEntry iCl)
         {
             logger.Trace("チャットバッファに追加：idx1:{0} idx2:{1} {2}", iCl.Index1, iCl.Index2, iCl.Text);
@@ -227,6 +234,24 @@ namespace MiscTools
                 {
                     EventReceivedCommand(cmd.ToList().GetRange(1, cmd.Length - 1));
                 }
+            }
+        }
+        /// <summary>
+        /// チャットからタイムスタンプを削除
+        /// タイムスタンプの表示形式が[HH:MM]の場合、EliteAPIでタイムスタンプをクリアしてくれない
+        /// </summary>
+        /// <param name="iText"></param>
+        /// <returns></returns>
+        private string RemoveTimeStamp(string iText)
+        {
+            if (MiscTool.IsRegexString(iText, REGEX_TIMESTAMP_HHMM))
+            {
+                var reg = MiscTool.GetRegexString(iText, REGEX_TIMESTAMP_HHMM);
+                return reg[2];
+            }
+            else
+            {
+                return iText;
             }
         }
     }
