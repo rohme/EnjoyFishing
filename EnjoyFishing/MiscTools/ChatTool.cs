@@ -200,7 +200,7 @@ namespace MiscTools
                     buff = cl;
                     continue;
                 }
-                if (buff.Index1 == cl.Index1 || MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
+                if ((buff.Index1 == cl.Index1 && buff.Index2 != cl.Index2) || MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
                 {
                     buff.Text += cl.Text;
                 }
