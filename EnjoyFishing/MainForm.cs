@@ -3272,7 +3272,7 @@ namespace EnjoyFishing
             List<string> cmd = e.Command;
             if (cmd.Count > 0)
             {
-                switch (cmd[0])
+                switch (cmd[0].ToLower())
                 {
                     case "start":
                         logger.Debug("コマンド受信 {0}", cmd[0]);
