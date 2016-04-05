@@ -293,7 +293,7 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>アイテム数</returns>
-        public int GetInventoryCountByType(InventoryType iInventoryType)
+        public int GetInventoryCountByType(StorageContainer iInventoryType)
         {
             return api.Inventory.GetContainerCount((int)iInventoryType);
         }
@@ -302,7 +302,7 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>アイテムMAX数</returns>
-        public int GetInventoryMaxByType(InventoryType iInventoryType)
+        public int GetInventoryMaxByType(StorageContainer iInventoryType)
         {
             return api.Inventory.GetContainerMaxCount((int)iInventoryType);
         }
@@ -312,7 +312,7 @@ namespace MiscTools
         /// <param name="iItemName"></param>
         /// <param name="iInventoryType"></param>
         /// <returns></returns>
-        public int GetInventoryItemCount(string iItemName, InventoryType iInventoryType)
+        public int GetInventoryItemCount(string iItemName, StorageContainer iInventoryType)
         {
             var item = resource.GetItem(iItemName);
             if (item.Name[1] != iItemName) return 0;
@@ -324,7 +324,7 @@ namespace MiscTools
         /// <param name="iItemName"></param>
         /// <param name="iInventoryType"></param>
         /// <returns></returns>
-        public int GetInventoryItemCount(uint iItemID, InventoryType iInventoryType)
+        public int GetInventoryItemCount(uint iItemID, StorageContainer iInventoryType)
         {
             int ret = 0;
             for (int i = 0; i < 80; i++)
@@ -340,12 +340,12 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns></returns>
-        public bool GetItemizer(string iItemName, InventoryType iInventoryType)
+        public bool GetItemizer(string iItemName, StorageContainer iInventoryType)
         {
             //移動元に指定のアイテムが存在するかチェック
             if (!IsExistItem(iItemName, iInventoryType)) return false;
             //移動先に空きがあるかチェック
-            if (!IsInventoryFree(InventoryType.Inventory)) return false;
+            if (!IsInventoryFree(StorageContainer.Inventory)) return false;
             //Itemizer実行
             string scriptName = string.Format("{0}_{1}", MiscTool.GetAppAssemblyName(), api.Player.Name);
             //string cmd = string.Format("input /gets \"{0}\" {1}", iItemName, iInventoryType.ToString());
@@ -359,10 +359,10 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>成功した場合Trueを返す</returns>
-        public bool PutItemizer(string iItemName, InventoryType iInventoryType)
+        public bool PutItemizer(string iItemName, StorageContainer iInventoryType)
         {
             //移動元に指定のアイテムが存在するかチェック
-            if (!IsExistItem(iItemName, InventoryType.Inventory)) return false;
+            if (!IsExistItem(iItemName, StorageContainer.Inventory)) return false;
             //移動先に空きがあるかチェック
             if (!IsInventoryFree(iInventoryType)) return false;
             //Itemizer実行
@@ -377,13 +377,13 @@ namespace MiscTools
         /// </summary>
         /// <param name="iItemName"></param>
         /// <returns></returns>
-        public InventoryType? GetInventoryTypeFromItemName(string iItemName)
+        public StorageContainer? GetInventoryTypeFromItemName(string iItemName)
         {
-            if (GetInventoryItemCount(iItemName, InventoryType.Inventory) > 0) return InventoryType.Inventory;
-            if (GetInventoryItemCount(iItemName, InventoryType.Sack) > 0) return InventoryType.Sack;
-            if (GetInventoryItemCount(iItemName, InventoryType.Satchel) > 0) return InventoryType.Satchel;
-            if (GetInventoryItemCount(iItemName, InventoryType.Case) > 0) return InventoryType.Case;
-            if (GetInventoryItemCount(iItemName, InventoryType.Wardrobe) > 0) return InventoryType.Wardrobe;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Inventory) > 0) return StorageContainer.Inventory;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Sack) > 0) return StorageContainer.Sack;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Satchel) > 0) return StorageContainer.Satchel;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Case) > 0) return StorageContainer.Case;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Wardrobe) > 0) return StorageContainer.Wardrobe;
             return null;
         }
         /// <summary>
@@ -392,7 +392,7 @@ namespace MiscTools
         /// <param name="iItemName">アイテム名</param>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>存在した場合Trueを返す</returns>
-        public bool IsExistItem(string iItemName, InventoryType iInventoryType)
+        public bool IsExistItem(string iItemName, StorageContainer iInventoryType)
         {
             return GetInventoryItemCount(iItemName, iInventoryType) > 0;
         }
@@ -401,7 +401,7 @@ namespace MiscTools
         /// </summary>
         /// <param name="iInventoryType">倉庫タイプ</param>
         /// <returns>空きがある場合にはTrueを返す</returns>
-        public bool IsInventoryFree(InventoryType iInventoryType)
+        public bool IsInventoryFree(StorageContainer iInventoryType)
         {
             return GetInventoryCountByType(iInventoryType) < GetInventoryMaxByType(iInventoryType);
         }
@@ -411,7 +411,7 @@ namespace MiscTools
         /// <param name="iItemName"></param>
         /// <param name="iInventoryType"></param>
         /// <returns></returns>
-        public int GetInventoryFirstItemIndex(string iItemName, InventoryType iInventoryType)
+        public int GetInventoryFirstItemIndex(string iItemName, StorageContainer iInventoryType)
         {
             uint id = resource.GetItem(iItemName).ItemID;
             return GetInventoryFirstItemIndex(id, iInventoryType);
@@ -422,7 +422,7 @@ namespace MiscTools
         /// <param name="iItemID"></param>
         /// <param name="iInventoryType"></param>
         /// <returns></returns>
-        public int GetInventoryFirstItemIndex(uint iItemID, InventoryType iInventoryType)
+        public int GetInventoryFirstItemIndex(uint iItemID, StorageContainer iInventoryType)
         {
             for (int i = 1; i <= 80; i++)
             {
