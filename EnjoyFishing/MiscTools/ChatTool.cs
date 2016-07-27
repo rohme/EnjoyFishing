@@ -29,8 +29,14 @@ namespace MiscTools
         public ChatTool(EliteAPI iEliteAPI)
         {
             api = iEliteAPI;
-            EliteAPI.ChatEntry cl;
-            while ((cl = api.Chat.GetNextChatLine()) != null) { Thread.Sleep(1); }
+            // チャットの初期化
+            EliteAPI.ChatEntry cl = new EliteAPI.ChatEntry();
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                cl = api.Chat.GetNextChatLine();
+                if (cl == null) break;
+                Thread.Sleep(1);
+            }
             Start();
         }
         #endregion
