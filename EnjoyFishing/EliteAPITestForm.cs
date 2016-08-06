@@ -14,6 +14,9 @@ namespace EnjoyFishing
         private ResourceTool resource;
         private EliteAPIControl control;
         private ChatTool chat;
+        int lastCmdTime = 0;
+        string lastCmd = string.Empty;
+
         public EliteAPITestForm(PolTool iPol)
         {
             InitializeComponent();
@@ -99,15 +102,24 @@ namespace EnjoyFishing
             dicStatus.Add("サック", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Sack), control.GetInventoryMaxByType(StorageContainer.Sack)));
             dicStatus.Add("ケース", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Case), control.GetInventoryMaxByType(StorageContainer.Case)));
             dicStatus.Add("ワードローブ", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Wardrobe), control.GetInventoryMaxByType(StorageContainer.Wardrobe)));
+            dicStatus.Add("ワードローブ2", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Wardrobe2), control.GetInventoryMaxByType(StorageContainer.Wardrobe2)));
+            dicStatus.Add("ワードローブ3", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Unknown0000), control.GetInventoryMaxByType(StorageContainer.Unknown0000)));
+            dicStatus.Add("ワードローブ4", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Unknown0001), control.GetInventoryMaxByType(StorageContainer.Unknown0001)));
             dicStatus.Add("装備-竿", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id).Name[1]));
             dicStatus.Add("装備-竿-鞄残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Inventory).ToString());
             dicStatus.Add("装備-竿-ワードローブ残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Wardrobe).ToString());
+            dicStatus.Add("装備-竿-ワードローブ2残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Wardrobe2).ToString());
+            dicStatus.Add("装備-竿-ワードローブ3残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Unknown0000).ToString());
+            dicStatus.Add("装備-竿-ワードローブ4残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Unknown0001).ToString());
             dicStatus.Add("装備-エサ", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id).Name[1]));
             dicStatus.Add("装備-エサ-鞄残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Inventory).ToString());
             dicStatus.Add("装備-エサ-サッチェル残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Satchel).ToString());
             dicStatus.Add("装備-エサ-サック残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Sack).ToString());
             dicStatus.Add("装備-エサ-ケース残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Case).ToString());
             dicStatus.Add("装備-エサ-ワードローブ残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Wardrobe).ToString());
+            dicStatus.Add("装備-エサ-ワードローブ2残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Wardrobe2).ToString());
+            dicStatus.Add("装備-エサ-ワードローブ3残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Unknown0000).ToString());
+            dicStatus.Add("装備-エサ-ワードローブ4残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Ammo).Id, StorageContainer.Unknown0001).ToString());
             dicStatus.Add("装備-メイン", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.Main).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.Main).Id).Name[1]));
             dicStatus.Add("装備-サブ", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.Shield).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.Shield).Id).Name[1]));
             dicStatus.Add("装備-頭", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.Head).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.Head).Id).Name[1]));
@@ -122,6 +134,18 @@ namespace EnjoyFishing
             dicStatus.Add("装備-右耳", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.EarRight).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.EarRight).Id).Name[1]));
             dicStatus.Add("装備-左手", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.RingLeft).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.RingLeft).Id).Name[1]));
             dicStatus.Add("装備-右手", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.RingRight).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.RingRight).Id).Name[1]));
+            //Command
+            int cmdTime = api.ThirdParty.ConsoleIsNewCommand();
+            if (lastCmdTime != cmdTime)
+            {
+                lastCmdTime = cmdTime;
+                lastCmd = string.Empty;
+                for (int i=0;i< api.ThirdParty.ConsoleGetArgCount(); i++)
+                {
+                    lastCmd += api.ThirdParty.ConsoleGetArg(i) + " ";
+                }
+            }
+            dicStatus.Add("コマンド", string.Format("{0}", lastCmd));
 
             refreshStatus(dicStatus);
         }
