@@ -38,6 +38,7 @@ namespace MiscTools
         #endregion
 
         #region イベント
+        #region ChangeStatus
         /// <summary>
         /// ChangeStatusイベントで返されるデータ
         /// </summary>
@@ -63,6 +64,33 @@ namespace MiscTools
             //イベントの発生
             OnChangeStatus(e);
         }
+        #endregion
+        #region ReceivedCommand
+        /// <summary>
+        /// ReceivedCommandイベントで返されるデータ
+        /// </summary>
+        public class ReceivedCommandEventArgs : EventArgs
+        {
+            public List<string> Command;
+        }
+        public delegate void ReceivedCommandEventHandler(object sender, ReceivedCommandEventArgs e);
+        public event ReceivedCommandEventHandler ReceivedCommand;
+        protected virtual void OnReceivedCommand(ReceivedCommandEventArgs e)
+        {
+            if (ReceivedCommand != null)
+            {
+                ReceivedCommand(this, e);
+            }
+        }
+        private void EventReceivedCommand(List<string> iCommand)
+        {
+            //返すデータの設定
+            ReceivedCommandEventArgs e = new ReceivedCommandEventArgs();
+            e.Command = iCommand;
+            //イベントの発生
+            OnReceivedCommand(e);
+        }
+        #endregion
         #endregion
 
         #region メンバ
@@ -102,10 +130,12 @@ namespace MiscTools
         private void threadPol()
         {
             LoginStatus lastStatus = LoginStatus.Loading;
+            int lastCmdTime = 0;
             while (true)
             {
                 if (_EliteAPI != null)
                 {
+                    //Polの監視
                     List<Process> pols = GetPolProcess();
                     bool polFoundFlg = false;
                     foreach (Process pol in pols)
@@ -134,10 +164,27 @@ namespace MiscTools
                                     break;
                                 case LoginStatus.LoggedIn:
                                     changeStatus(PolStatusKind.LoggedIn);
+                                    lastCmdTime = _EliteAPI.ThirdParty.ConsoleIsNewCommand();
                                     break;
                             }
                         }
                         lastStatus = status;
+                    }
+
+                    //コマンドの監視
+                    if(status == LoginStatus.LoggedIn)
+                    {
+                        int cmdTime = _EliteAPI.ThirdParty.ConsoleIsNewCommand();
+                        if (lastCmdTime != cmdTime)
+                        {
+                            lastCmdTime = cmdTime;
+                            List<string> cmd = new List<string>();
+                            for (int i = 0; i < _EliteAPI.ThirdParty.ConsoleGetArgCount(); i++)
+                            {
+                                cmd.Add(_EliteAPI.ThirdParty.ConsoleGetArg(i));
+                            }
+                            EventReceivedCommand(cmd);
+                        }
                     }
                 }
                 Thread.Sleep(100);

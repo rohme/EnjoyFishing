@@ -288,6 +288,7 @@ namespace EnjoyFishing
             //PolTool初期設定
             pol = iPol;
             pol.ChangeStatus += new PolTool.ChangeStatusEventHandler(this.PolTool_ChangeStatus);
+            pol.ReceivedCommand += new PolTool.ReceivedCommandEventHandler(this.PolTool_ReceivedCommand);
             //ResourceTool設定
             resource = iResource;
             //EliteAPI初期設定
@@ -3260,6 +3261,28 @@ namespace EnjoyFishing
                 MessageBox.Show("FF11が終了しました。EnjoyFishingは終了します。", MiscTool.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 unload();
                 System.Environment.Exit(0);//プログラム終了
+            }
+        }
+        /// <summary>
+        /// PolTool ReceivedCommandイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PolTool_ReceivedCommand(object sender, PolTool.ReceivedCommandEventArgs e)
+        {
+            List<string> cmd = e.Command;
+            if(cmd.Count>=1 && (cmd[0].ToLower()=="ef" || cmd[0].ToLower() == "enjoyfishing"))
+            {
+                if (cmd.Count >= 2 && cmd[1].ToLower() == "start")
+                {
+                    logger.Debug("コマンド受信 {0}", cmd[1]);
+                    if (!fishingFlg) startFishing();
+                }
+                else if (cmd.Count >= 2 && cmd[1].ToLower() == "stop")
+                {
+                    logger.Debug("コマンド受信 {0}", cmd[1]);
+                    if (fishingFlg) stopFishing(true);
+                }
             }
         }
         /// <summary>

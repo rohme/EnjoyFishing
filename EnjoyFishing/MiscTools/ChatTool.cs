@@ -236,7 +236,7 @@ namespace MiscTools
             if (iCl.ChatType == (int)ChatMode.Echo && iCl.Text.Length > 0)
             {
                 string[] cmd = iCl.Text.Split(' ');
-                if (cmd.Length >= 1 && cmd[0].ToLower() == "enjoyfishing" && cmd.Length > 1)
+                if (cmd.Length > 1 && cmd[0].ToLower() == "enjoyfishing")
                 {
                     EventReceivedCommand(cmd.ToList().GetRange(1, cmd.Length - 1));
                 }
