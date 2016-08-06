@@ -29,8 +29,14 @@ namespace MiscTools
         public ChatTool(EliteAPI iEliteAPI)
         {
             api = iEliteAPI;
-            EliteAPI.ChatEntry cl;
-            while ((cl = api.Chat.GetNextChatLine()) != null) { Thread.Sleep(1); }
+            // チャットの初期化
+            EliteAPI.ChatEntry cl = new EliteAPI.ChatEntry();
+            for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
+            {
+                cl = api.Chat.GetNextChatLine();
+                if (cl == null) break;
+                Thread.Sleep(1);
+            }
             Start();
         }
         #endregion
@@ -200,7 +206,7 @@ namespace MiscTools
                     buff = cl;
                     continue;
                 }
-                if (buff.Index1 == cl.Index1 || MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
+                if ((buff.Index1 == cl.Index1 && buff.Index2 != cl.Index2) || MiscTool.IsRegexString(cl.Text, REGEX_EMINENCE2))
                 {
                     buff.Text += cl.Text;
                 }
@@ -230,7 +236,7 @@ namespace MiscTools
             if (iCl.ChatType == (int)ChatMode.Echo && iCl.Text.Length > 0)
             {
                 string[] cmd = iCl.Text.Split(' ');
-                if (cmd.Length >= 1 && cmd[0].ToLower() == "enjoyfishing" && cmd.Length > 1)
+                if (cmd.Length > 1 && cmd[0].ToLower() == "enjoyfishing")
                 {
                     EventReceivedCommand(cmd.ToList().GetRange(1, cmd.Length - 1));
                 }

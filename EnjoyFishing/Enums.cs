@@ -5,20 +5,6 @@ using System.Text;
 
 namespace EnjoyFishing
 {
-    public enum InventoryType : int
-    {
-        Inventory = 0,
-        Safe = 1,
-        Storage = 2,
-        Temp = 3,
-        Locker = 4,
-        Satchel = 5,
-        Sack = 6,
-        Case = 7,
-        Wardrobe = 8,
-        Safe2 = 9,
-    }
-
     #region Status
 
     /// <summary>

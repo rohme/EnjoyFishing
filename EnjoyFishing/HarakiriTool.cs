@@ -294,19 +294,19 @@ namespace EnjoyFishing
                 firsttime = false;
                 setMessage(string.Format("ハラキリ中：{0} 残り{1}匹", this.HarakiriFishName, remain));
                 //鞄に対象の魚を移動させる
-                if (control.GetInventoryItemCount(itemId, InventoryType.Inventory) <= 0)
+                if (control.GetInventoryItemCount(itemId, StorageContainer.Inventory) <= 0)
                 {
-                    if (control.GetInventoryItemCount(itemId, InventoryType.Satchel) > 0)
+                    if (control.GetInventoryItemCount(itemId, StorageContainer.Satchel) > 0)
                     {
-                        control.GetItemizer(this.HarakiriFishName, InventoryType.Satchel);
+                        control.GetItemizer(this.HarakiriFishName, StorageContainer.Satchel);
                     }
-                    else if (control.GetInventoryItemCount(itemId, InventoryType.Sack) > 0)
+                    else if (control.GetInventoryItemCount(itemId, StorageContainer.Sack) > 0)
                     {
-                        control.GetItemizer(this.HarakiriFishName, InventoryType.Sack);
+                        control.GetItemizer(this.HarakiriFishName, StorageContainer.Sack);
                     }
-                    else if (control.GetInventoryItemCount(itemId, InventoryType.Case) > 0)
+                    else if (control.GetInventoryItemCount(itemId, StorageContainer.Case) > 0)
                     {
-                        control.GetItemizer(this.HarakiriFishName, InventoryType.Case);
+                        control.GetItemizer(this.HarakiriFishName, StorageContainer.Case);
                     }
                 }
                 //Zaldonの近くかチェック
@@ -462,12 +462,12 @@ namespace EnjoyFishing
         public int GetHarakiriRemain(string iFishName)
         {
             uint itemId = resource.GetItem(iFishName).ItemID;
-            int remain = control.GetInventoryItemCount(itemId, InventoryType.Inventory);
+            int remain = control.GetInventoryItemCount(itemId, StorageContainer.Inventory);
             if (settings.UseItemizer)
             {
-                remain += control.GetInventoryItemCount(itemId, InventoryType.Satchel);
-                remain += control.GetInventoryItemCount(itemId, InventoryType.Sack);
-                remain += control.GetInventoryItemCount(itemId, InventoryType.Case);
+                remain += control.GetInventoryItemCount(itemId, StorageContainer.Satchel);
+                remain += control.GetInventoryItemCount(itemId, StorageContainer.Sack);
+                remain += control.GetInventoryItemCount(itemId, StorageContainer.Case);
             }
             return remain;
         }
