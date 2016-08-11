@@ -2139,7 +2139,7 @@ namespace EnjoyFishing
         private bool repairRod(string iRodName)
         {
             //折れた竿名と修理に使用するクリスタルを取得
-            List<RodDBRodModel> rods = FishDB.SelectRod(iRodName);
+            List<RodDBRodModel> rods = FishDB.SelectRod(string.Format("^{0}$", iRodName));
             if (rods.Count != 1) return false;
             string breakRodName = rods[0].BreakRodName;
             uint breakRodID = resource.GetItem(breakRodName).ItemID;
