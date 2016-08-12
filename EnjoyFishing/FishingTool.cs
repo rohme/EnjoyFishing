@@ -1718,7 +1718,7 @@ namespace EnjoyFishing
             }
             //釣れた魚を登録
             if (iFish.Result == FishResultStatusKind.Catch &&
-               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish))
+               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish || iFish.FishName == "コバルトジェリー"))
             {
                 settings.CaughtFishesUpdate(iFish.FishName, true);
                 EventCaughtFishesUpdate(iFish.FishName);
