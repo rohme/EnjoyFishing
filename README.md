@@ -316,7 +316,9 @@ EnjoyFishingでは魚を扱うモードをIDモードと名前モードの二つ
 * 釣りの開始 `//EnjoyFishing Start`
 * 釣りの停止 `//EnjoyFishing Stop`
 
-　大文字小文字は区別していません。
+　大文字小文字は区別していません。  
+　FF11のマクロから実行する場合には`/console EnjoyFishing Start`と指定してください。
+
 
 ## インストール・アンインストール
 1. [こちら](https://github.com/rohme/EnjoyFishing/releases)から、最新版のバイナリを取得する。
@@ -360,7 +362,7 @@ https://github.com/rohme/
 ## 修正履歴
 ### 2016-09-10 Ver1.2.3
 * 不具合修正
-	- 太公望の釣り竿が修復できない。
+	- 太公望の釣竿が修復できない。
 	- コバルトジェリーを釣っても釣った魚リストに登録されない。
 
 ### 2016-08-07 Ver1.2.2
