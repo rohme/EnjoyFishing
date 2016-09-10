@@ -1718,7 +1718,7 @@ namespace EnjoyFishing
             }
             //釣れた魚を登録
             if (iFish.Result == FishResultStatusKind.Catch &&
-               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish))
+               (iFish.FishType == FishDBFishTypeKind.SmallFish || iFish.FishType == FishDBFishTypeKind.LargeFish || iFish.FishName == "コバルトジェリー"))
             {
                 settings.CaughtFishesUpdate(iFish.FishName, true);
                 EventCaughtFishesUpdate(iFish.FishName);
@@ -2139,7 +2139,7 @@ namespace EnjoyFishing
         private bool repairRod(string iRodName)
         {
             //折れた竿名と修理に使用するクリスタルを取得
-            List<RodDBRodModel> rods = FishDB.SelectRod(iRodName);
+            List<RodDBRodModel> rods = FishDB.SelectRod(string.Format("^{0}$", iRodName));
             if (rods.Count != 1) return false;
             string breakRodName = rods[0].BreakRodName;
             uint breakRodID = resource.GetItem(breakRodName).ItemID;
