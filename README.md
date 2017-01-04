@@ -3,6 +3,8 @@
 [![Master status](https://ci.appveyor.com/api/projects/status/x4bkwg1snstpwxp8?svg=true&passingText=master%20-%20OK&failingText=master%20-%20NG)](https://ci.appveyor.com/project/rohme/enjoyfishing)
 [![Develop status](https://ci.appveyor.com/api/projects/status/ton6b0akaxlau57k?svg=true&passingText=develop%20-%20OK&failingText=master%20-%20NG)](https://ci.appveyor.com/project/rohme/enjoyfishing-itsg1)
 
+[![Join the chat at https://gitter.im/rohme/EnjoyFishing](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rohme/EnjoyFishing?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 EnjoyFishingはFF11の釣りを支援するツールです。
 
 ![全体イメージ](https://raw.githubusercontent.com/rohme/EnjoyFishing/master/images/main.jpg)
