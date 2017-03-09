@@ -6,6 +6,7 @@ using MiscTools;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using EliteMMO.API;
 
 namespace EnjoyFishing
 {
@@ -49,7 +50,7 @@ namespace EnjoyFishing
                 System.Environment.Exit(1); // プログラム終了
             }
             // シフトキーでテストフォーム表示
-            if (Control.ModifierKeys == Keys.Shift)
+            if (Control.ModifierKeys == System.Windows.Forms.Keys.Shift)
             {
                 logger.Info("EliteAPIテストモードで起動");
                 //テストモード

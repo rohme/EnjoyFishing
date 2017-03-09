@@ -159,7 +159,7 @@ namespace MiscTools
                         {
                             switch (status)
                             {
-                                case LoginStatus.CharacterLoginScreen:
+                                case LoginStatus.LoginScreen:
                                     changeStatus(PolStatusKind.CharacterLoginScreen);
                                     break;
                                 case LoginStatus.LoggedIn:

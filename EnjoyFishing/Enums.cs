@@ -35,6 +35,8 @@ namespace EnjoyFishing
     /// <summary>
     /// Login Status
     /// </summary>
+    /// 
+/*
     public enum LoginStatus : byte
     {
         CharacterLoginScreen = 0,
@@ -42,7 +44,7 @@ namespace EnjoyFishing
         LoggedIn = 2
 
     }
-
+*/
     #endregion
 
     #region Job
@@ -4950,30 +4952,30 @@ namespace EnjoyFishing
     }
 
     #endregion
-
+    
     #region Timer Related
-
-    /// <summary>
-    /// The different moon phases
-    /// </summary>
-    public enum MoonPhase : byte
-    {
-        New,
-        WaxingCrescent,
-        WaxingCrescent2,
-        FirstQuarter,
-        WaxingGibbous,
-        WaxingGibbous2,
-        Full,
-        WaningGibbous,
-        WaningGibbous2,
-        LastQuarter,
-        WaningCrescent,
-        WaningCrescent2,
-        Unknown
-
-    } // @ public enum MoonPhase
-
+    /*
+        /// <summary>
+        /// The different moon phases
+        /// </summary>
+        public enum MoonPhase : byte
+        {
+            New,
+            WaxingCrescent,
+            WaxingCrescent2,
+            FirstQuarter,
+            WaxingGibbous,
+            WaxingGibbous2,
+            Full,
+            WaningGibbous,
+            WaningGibbous2,
+            LastQuarter,
+            WaningCrescent,
+            WaningCrescent2,
+            Unknown
+        } // @ public enum MoonPhase
+    */
+    /*
     /// <summary>
     /// Names of the days of the week
     /// </summary>
@@ -4988,9 +4990,8 @@ namespace EnjoyFishing
         Lightsday,
         Darksday,
         Unknown
-
     } // @ public enum Weekday
-
+    */
     #endregion
 
     #region KeyCodes

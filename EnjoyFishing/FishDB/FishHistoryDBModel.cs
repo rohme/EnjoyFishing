@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.Collections;
 using MiscTools;
+using EliteMMO.API;
 
 namespace EnjoyFishing
 {
