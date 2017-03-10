@@ -384,6 +384,9 @@ namespace MiscTools
             if (GetInventoryItemCount(iItemName, StorageContainer.Satchel) > 0) return StorageContainer.Satchel;
             if (GetInventoryItemCount(iItemName, StorageContainer.Case) > 0) return StorageContainer.Case;
             if (GetInventoryItemCount(iItemName, StorageContainer.Wardrobe) > 0) return StorageContainer.Wardrobe;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Wardrobe2) > 0) return StorageContainer.Wardrobe2;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Wardrobe3) > 0) return StorageContainer.Wardrobe3;
+            if (GetInventoryItemCount(iItemName, StorageContainer.Wardrobe4) > 0) return StorageContainer.Wardrobe4;
             return null;
         }
         /// <summary>

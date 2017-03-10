@@ -447,18 +447,60 @@ namespace EnjoyFishing
             get { return control.GetInventoryMaxByType(StorageContainer.Case); }
         }
         /// <summary>
-        /// ワードローブ所持数
+        /// ワードローブ1所持数
         /// </summary>
         public int WardrobeCount
         {
             get { return control.GetInventoryCountByType(StorageContainer.Wardrobe); }
         }
         /// <summary>
-        /// ワードローブ最大所持数
+        /// ワードローブ1最大所持数
         /// </summary>
         public int WardrobeMax
         {
             get { return control.GetInventoryMaxByType(StorageContainer.Wardrobe); }
+        }
+        /// <summary>
+        /// ワードローブ2所持数
+        /// </summary>
+        public int Wardrobe2Count
+        {
+            get { return control.GetInventoryCountByType(StorageContainer.Wardrobe2); }
+        }
+        /// <summary>
+        /// ワードローブ2最大所持数
+        /// </summary>
+        public int Wardrobe2Max
+        {
+            get { return control.GetInventoryMaxByType(StorageContainer.Wardrobe2); }
+        }
+        /// <summary>
+        /// ワードローブ3所持数
+        /// </summary>
+        public int Wardrobe3Count
+        {
+            get { return control.GetInventoryCountByType(StorageContainer.Wardrobe3); }
+        }
+        /// <summary>
+        /// ワードローブ3最大所持数
+        /// </summary>
+        public int Wardrobe3Max
+        {
+            get { return control.GetInventoryMaxByType(StorageContainer.Wardrobe3); }
+        }
+        /// <summary>
+        /// ワードローブ4所持数
+        /// </summary>
+        public int Wardrobe4Count
+        {
+            get { return control.GetInventoryCountByType(StorageContainer.Wardrobe4); }
+        }
+        /// <summary>
+        /// ワードローブ4最大所持数
+        /// </summary>
+        public int Wardrobe4Max
+        {
+            get { return control.GetInventoryMaxByType(StorageContainer.Wardrobe4); }
         }
         /// <summary>
         /// 釣りスキル
@@ -507,7 +549,10 @@ namespace EnjoyFishing
                 //鞄にアイテムが存在するかチェック
                 uint rodId = resource.GetItem(this.RodName).ItemID;
                 int remain = control.GetInventoryItemCount(rodId, StorageContainer.Inventory) +
-                             control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe);
+                             control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe) +
+                             control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe2) +
+                             control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe3) +
+                             control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe4);
                 if (settings.UseItemizer)
                 {
                     if (settings.Fishing.NoBaitNoRodSatchel) remain += control.GetInventoryItemCount(rodId, StorageContainer.Satchel);
@@ -554,7 +599,10 @@ namespace EnjoyFishing
                 //鞄にアイテムが存在するかチェック
                 var baitId = resource.GetItem(this.BaitName).ItemID;
                 int remain = control.GetInventoryItemCount(baitId, StorageContainer.Inventory) +
-                              control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe);
+                             control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe) +
+                             control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe2) +
+                             control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe3) +
+                             control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe4);
                 if (settings.UseItemizer)
                 {
                     if (settings.Fishing.NoBaitNoRodSatchel) remain += control.GetInventoryItemCount(baitId, StorageContainer.Satchel);
@@ -1072,7 +1120,10 @@ namespace EnjoyFishing
                 {
                     if (!string.IsNullOrEmpty(lastRodName) &&
                         !control.IsExistItem(lastRodName, StorageContainer.Inventory) &&
-                        !control.IsExistItem(lastRodName, StorageContainer.Wardrobe))
+                        !control.IsExistItem(lastRodName, StorageContainer.Wardrobe) &&
+                        !control.IsExistItem(lastRodName, StorageContainer.Wardrobe2) &&
+                        !control.IsExistItem(lastRodName, StorageContainer.Wardrobe3) &&
+                        !control.IsExistItem(lastRodName, StorageContainer.Wardrobe4))
                     {
                         //予備の竿を鞄へ移動
                         if (!getRodBaitItem(lastRodName))
@@ -1109,7 +1160,10 @@ namespace EnjoyFishing
                 {
                     if (!string.IsNullOrEmpty(lastBaitName) &&
                         !control.IsExistItem(lastBaitName, StorageContainer.Inventory) &&
-                        !control.IsExistItem(lastBaitName, StorageContainer.Wardrobe))
+                        !control.IsExistItem(lastBaitName, StorageContainer.Wardrobe) &&
+                        !control.IsExistItem(lastBaitName, StorageContainer.Wardrobe2) &&
+                        !control.IsExistItem(lastBaitName, StorageContainer.Wardrobe3) &&
+                        !control.IsExistItem(lastBaitName, StorageContainer.Wardrobe4))
                     {
                         getRodBaitItem(lastBaitName);
                     }
@@ -2148,12 +2202,19 @@ namespace EnjoyFishing
             for (int i = 0; i < Constants.MAX_LOOP_COUNT; i++)
             {
                 //鞄に竿が入っていない場合、鞄に移動する
-                bool wardrobe = false;
+                StorageContainer container = StorageContainer.Inventory;
                 if (!control.IsExistItem(breakRodName, StorageContainer.Inventory))
                 {
-                    wardrobe = true;
                     //ワードローブに竿があるか確認
-                    if (control.GetInventoryItemCount(breakRodID, StorageContainer.Wardrobe) == 0)
+                    if (control.GetInventoryItemCount(breakRodID, StorageContainer.Wardrobe) > 0)
+                        container = StorageContainer.Wardrobe;
+                    else if (control.GetInventoryItemCount(breakRodID, StorageContainer.Wardrobe2) > 0)
+                        container = StorageContainer.Wardrobe2;
+                    else if (control.GetInventoryItemCount(breakRodID, StorageContainer.Wardrobe3) > 0)
+                        container = StorageContainer.Wardrobe3;
+                    else if (control.GetInventoryItemCount(breakRodID, StorageContainer.Wardrobe4) > 0)
+                        container = StorageContainer.Wardrobe4;
+                    else
                     {
                         setMessage(string.Format("竿の修理：{0}が見つからなかったので停止", breakRodName));
                         return false;
@@ -2168,12 +2229,12 @@ namespace EnjoyFishing
                         }
                     }
                     //竿を鞄に移動
-                    if (!control.GetItemizer(breakRodName, StorageContainer.Wardrobe))
+                    if (!control.GetItemizer(breakRodName, container))
                     {
                         setMessage(string.Format("竿の修理：{0}が鞄に移動できなかったので停止", breakRodName));
                         return false;
                     }
-                    setMessage(string.Format("{0}を{1}から取り出しました", breakRodName, StorageContainer.Wardrobe.ToString()));
+                    setMessage(string.Format("{0}を{1}から取り出しました", breakRodName, container.ToString()));
                     Thread.Sleep(1000);
                 }
                 //鞄にクリスタルが入っていない場合、鞄に移動する
@@ -2212,15 +2273,15 @@ namespace EnjoyFishing
                 bool synthSuccess = RepairRodSynthesis(repairCrystal, breakRodName);
                 Thread.Sleep(1000);
                 //ワードローブに竿を戻す
-                if (synthSuccess && wardrobe)
+                if (synthSuccess && container != StorageContainer.Inventory)
                 {
-                    if (!putItem(iRodName, StorageContainer.Wardrobe))
+                    if (!putItem(iRodName, container))
                     {
-                        setMessage(string.Format("竿の修理：{0}が{1}に移動できなかったので停止", breakRodName, StorageContainer.Wardrobe.ToString()));
+                        setMessage(string.Format("竿の修理：{0}が{1}に移動できなかったので停止", breakRodName, container.ToString()));
                         return false;
                     }
                     Thread.Sleep(500);
-                    setMessage(string.Format("竿の修理：{0}をワードローブに移動しました", iRodName));
+                    //setMessage(string.Format("竿の修理：{0}を{1}に移動しました", iRodName, container.ToString()));
                 }
                 if (synthSuccess) return true;
             }
@@ -2574,7 +2635,10 @@ namespace EnjoyFishing
             //鞄にアイテムが存在するかチェック
             uint rodId = resource.GetItem(iRodName).ItemID;
             int rodCnt = control.GetInventoryItemCount(rodId, StorageContainer.Inventory) +
-                         control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe);
+                         control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe) +
+                         control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe2) +
+                         control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe3) +
+                         control.GetInventoryItemCount(rodId, StorageContainer.Wardrobe4);
             //アイテムの装備
             if (rodCnt > 0)
             {
@@ -2606,7 +2670,10 @@ namespace EnjoyFishing
             //鞄にアイテムが存在するかチェック
             uint baitId = resource.GetItem(iBaitName).ItemID;
             int baitCnt = control.GetInventoryItemCount(baitId, StorageContainer.Inventory) +
-                          control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe);
+                          control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe) +
+                          control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe2) +
+                          control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe3) +
+                          control.GetInventoryItemCount(baitId, StorageContainer.Wardrobe4);
             //アイテムの装備
             if (baitCnt > 0)
             {
@@ -2677,6 +2744,24 @@ namespace EnjoyFishing
                 {
                     moveOkFlg = true;
                     setMessage(string.Format("{0}を{1}から取り出しました", iItemName, StorageContainer.Wardrobe.ToString()));
+                    Thread.Sleep(1000);
+                }
+                if (!moveOkFlg && control.GetItemizer(iItemName, StorageContainer.Wardrobe2))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, StorageContainer.Wardrobe2.ToString()));
+                    Thread.Sleep(1000);
+                }
+                if (!moveOkFlg && control.GetItemizer(iItemName, StorageContainer.Wardrobe3))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, StorageContainer.Wardrobe3.ToString()));
+                    Thread.Sleep(1000);
+                }
+                if (!moveOkFlg && control.GetItemizer(iItemName, StorageContainer.Wardrobe4))
+                {
+                    moveOkFlg = true;
+                    setMessage(string.Format("{0}を{1}から取り出しました", iItemName, StorageContainer.Wardrobe4.ToString()));
                     Thread.Sleep(1000);
                 }
             }

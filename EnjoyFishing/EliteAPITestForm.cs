@@ -107,6 +107,9 @@ namespace EnjoyFishing
             dicStatus.Add("ワードローブ4", string.Format("{0}/{1}", control.GetInventoryCountByType(StorageContainer.Wardrobe4), control.GetInventoryMaxByType(StorageContainer.Wardrobe4)));
             dicStatus.Add("装備-竿", string.Format("{0}({1})", api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, resource.GetItem(api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id).Name[1]));
             dicStatus.Add("装備-竿-鞄残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Inventory).ToString());
+            dicStatus.Add("装備-竿-サッチェル残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Satchel).ToString());
+            dicStatus.Add("装備-竿-サック残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Sack).ToString());
+            dicStatus.Add("装備-竿-ケース残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Case).ToString());
             dicStatus.Add("装備-竿-ワードローブ残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Wardrobe).ToString());
             dicStatus.Add("装備-竿-ワードローブ2残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Wardrobe2).ToString());
             dicStatus.Add("装備-竿-ワードローブ3残数", control.GetInventoryItemCount((uint)api.Inventory.GetEquippedItem((int)EquipSlot.Range).Id, StorageContainer.Wardrobe3).ToString());
